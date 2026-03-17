@@ -53,28 +53,21 @@
 let map, geocoder, markers = [];
 
 function initMap() {
-  // Default map location
   const defaultLocation = { lat: 43.7, lng: -79.4 };
-  map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 12,
-    center: defaultLocation
-  });
+  map = new google.maps.Map(document.getElementById("map"), { zoom: 12, center: defaultLocation });
   geocoder = new google.maps.Geocoder();
 }
 
-// Set filter button value
 function setFilter(type) {
   document.getElementById("placeKeyword").value = type;
 }
 
-// Clear markers and selected place display
 function clearMarkers() {
   markers.forEach(m => m.setMap(null));
   markers = [];
   document.getElementById("selectedPlace").innerHTML = "";
 }
 
-// Search nearby places using Google Places API
 function searchNearby(midpoint, keyword) {
   const service = new google.maps.places.PlacesService(map);
   service.nearbySearch({
@@ -84,10 +77,7 @@ function searchNearby(midpoint, keyword) {
   }, function(results, status) {
     if (status !== "OK") return;
     results.forEach(place => {
-      const marker = new google.maps.Marker({
-        map: map,
-        position: place.geometry.location
-      });
+      const marker = new google.maps.Marker({ map: map, position: place.geometry.location });
       markers.push(marker);
       marker.addListener("click", function() {
         const link = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.vicinity)}`;
@@ -98,17 +88,13 @@ function searchNearby(midpoint, keyword) {
   });
 }
 
-// Calculate midpoint and search
 function findMidpoint() {
   const addr1 = document.getElementById("address1").value;
   const addr2 = document.getElementById("address2").value;
   const keyword = document.getElementById("placeKeyword").value;
   const slider = document.getElementById("weightSlider").value / 100;
 
-  if (!addr1 || !addr2) {
-    alert("Enter both addresses");
-    return;
-  }
+  if (!addr1 || !addr2) { alert("Enter both addresses"); return; }
 
   clearMarkers();
 
@@ -120,11 +106,9 @@ function findMidpoint() {
       const c1 = r1[0].geometry.location;
       const c2 = r2[0].geometry.location;
 
-      // Basic midpoint
       const midLat0 = (c1.lat() + c2.lat()) / 2;
       const midLng0 = (c1.lng() + c2.lng()) / 2;
 
-      // Apply slider adjustment (max 30% shift)
       const maxShift = 0.3;
       const shift = (slider - 0.5) * 2 * maxShift;
       const midLat = midLat0 + (c1.lat() - midLat0) * shift;
@@ -132,26 +116,19 @@ function findMidpoint() {
 
       const midpoint = { lat: midLat, lng: midLng };
 
-      // Show midpoint marker
       map.setCenter(midpoint);
-      new google.maps.Marker({
-        position: midpoint,
-        map: map,
-        icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-      });
+      new google.maps.Marker({ position: midpoint, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" });
 
-      // Search nearby places
       searchNearby(midpoint, keyword);
     });
   });
 }
 </script>
 
-<!-- Google Maps API -->
+<!-- Only one Google Maps script -->
 <script async
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAw&libraries=places&callback=initMap">
 </script>
 
 </body>
 </html>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAw&callback=initMap" async defer><AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAw>
