@@ -1,126 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Midpoint</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <style>
-        body {margin:0; font-family: Arial,sans-serif; background: #f4f7fb;}
-        header {background:#1976d2; color:white; padding:15px; text-align:center; font-size:0;}
-        header img {width:120px; height:auto;}
-        .container {padding:15px; max-width:500px; margin:auto;}
-        .card {background:white; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:15px;}
-        input {width:100%; padding:10px; margin:6px 0; border-radius:8px; border:1px solid #ccc;}
-        button {background:#1976d2; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer;}
-        button:hover {background:#125ea9;}
-        .filters button {margin:3px; background:#e3f2fd; color:#1976d2;}
-        .filters button:hover {background:#bbdefb;}
-        #selectedPlace {margin-top:10px; padding:10px; background:#e8f5e9; border-radius:8px; font-weight:bold;}
-        #map {height:400px; width:100%; border-radius:10px;}
-        .instructions {font-size:14px; color:#555;}
-    </style>
+  <meta charset="UTF-8">
+  <title>Midpoint</title>
+  <link rel="icon" href="midpoint_icon.png" type="image/png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f0ff; /* soft blue background */
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background-color: #007BFF; /* main blue header */
+      color: white;
+      font-size: 2em;
+      font-weight: bold;
+    }
+    .container {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    input, select, button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      font-size: 1em;
+    }
+    label {
+      font-weight: bold;
+    }
+    #map {
+      height: 400px;
+      width: 100%;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-    <img src="midpoint_icon.png" alt="Midpoint Logo">
-</header>
+  <header>Midpoint Logo</header>
 
-<div class="container">
+  <div class="container">
+    <label for="location1">Enter first location:</label>
+    <input type="text" id="location1" placeholder="e.g., 42 Fergus Ave Richmond Hill">
 
-    <div class="card instructions">
-        Enter two locations → adjust midpoint → pick a place → share it
-    </div>
+    <label for="location2">Enter second location:</label>
+    <input type="text" id="location2" placeholder="e.g., Wonderland">
 
-    <div class="card">
-        <input id="address1" placeholder="First location">
-        <input id="address2" placeholder="Second location">
+    <label for="placeType">Pick a place:</label>
+    <select id="placeType">
+      <option value="cafe">☕ Cafe</option>
+      <option value="restaurant">🍽️ Restaurant</option>
+      <option value="park">🌳 Park</option>
+      <option value="hotel">🏨 Hotel</option>
+      <option value="movie_theater">🎬 Movie Theater</option>
+    </select>
 
-        <input id="placeKeyword" placeholder="Search (optional)">
+    <label for="midpointSlider">Adjust midpoint:</label>
+    <input type="range" id="midpointSlider" min="0" max="100" value="50">
 
-        <div class="filters">
-            <button onclick="setFilter('cafe')">☕</button>
-            <button onclick="setFilter('restaurant')">🍽️</button>
-            <button onclick="setFilter('park')">🌳</button>
-            <button onclick="setFilter('lodging')">🏨</button>
-            <button onclick="setFilter('movie_theater')">🎬</button>
-        </div>
+    <button id="findSpot">Find Meetup Spot</button>
+  </div>
 
-        <br>
+  <!-- Map container -->
+  <div id="map"></div>
 
-        <label>Adjust midpoint:</label><br>
-        <input type="range" id="weightSlider" min="0" max="100" value="50">
+  <!-- Google Maps JavaScript -->
+  <script>
+    function initMap() {
+      // Example midpoint coordinates (replace with dynamic later)
+      var midpoint = { lat: 43.836, lng: -79.439 };
 
-        <br><br>
+      // Create the map
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: midpoint
+      });
 
-        <button onclick="findMidpoint()" style="width:100%;">Find Meetup Spot</button>
+      // Add a marker at the midpoint
+      var marker = new google.maps.Marker({
+        position: midpoint,
+        map: map
+      });
+    }
 
-        <div id="selectedPlace"></div>
-    </div>
-
-    <div id="map"></div>
-
-</div>
-
-<script>
-let map, geocoder, markers = [];
-function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {zoom:12, center:{ lat:43.7, lng:-79.4 }});
-    geocoder = new google.maps.Geocoder();
-}
-function setFilter(type){document.getElementById("placeKeyword").value=type;}
-function clearMarkers(){markers.forEach(m=>m.setMap(null)); markers=[]; document.getElementById("selectedPlace").innerHTML="";}
-function searchNearby(midpoint,keyword){
-    const service = new google.maps.places.PlacesService(map);
-    service.nearbySearch({location:midpoint, radius:3000, keyword:keyword||undefined}, function(results,status){
-        if(status!=="OK") return;
-        results.forEach(place=>{
-            const marker = new google.maps.Marker({map:map, position:place.geometry.location});
-            markers.push(marker);
-            marker.addListener("click", function(){
-                const link = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.vicinity)}`;
-                document.getElementById("selectedPlace").innerHTML=`✅ ${place.name}<br><a href="${link}" target="_blank">Navigate</a> | <a href="${link}" target="_blank">Share</a>`;
-            });
-        });
+    // Placeholder for your button logic
+    document.getElementById('findSpot').addEventListener('click', function() {
+      alert('This will calculate the midpoint and find your selected place type.');
     });
-}
-function findMidpoint(){
-    const addr1 = document.getElementById("address1").value;
-    const addr2 = document.getElementById("address2").value;
-    const keyword = document.getElementById("placeKeyword").value;
-    const slider = document.getElementById("weightSlider").value/100;
-    if(!addr1 || !addr2){alert("Enter both addresses"); return;}
-    clearMarkers();
-    geocoder.geocode({address:addr1}, function(r1,s1){
-        if(s1!=="OK") return;
-        geocoder.geocode({address:addr2}, function(r2,s2){
-            if(s2!=="OK") return;
-            const c1=r1[0].geometry.location;
-            const c2=r2[0].geometry.location;
-            const midLat0=(c1.lat()+c2.lat())/2;
-            const midLng0=(c1.lng()+c2.lng())/2;
-            const maxShift=0.3;
-            const shift=(slider-0.5)*2*maxShift;
-            const midLat=midLat0+(c1.lat()-midLat0)*shift;
-            const midLng=midLng0+(c1.lng()-midLng0)*shift;
-            const midpoint={lat:midLat, lng:midLng};
-            map.setCenter(midpoint);
-            new google.maps.Marker({position:midpoint, map:map, icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png"});
-            searchNearby(midpoint, keyword);
-        });
-    });
-}
-</script>
-function initMap() {
-  var midpoint = { lat: 43.836, lng: -79.439 }; // Example coordinates
-  var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: midpoint
-  });
-  var marker = new google.maps.Marker({ position: midpoint, map: map });
-}
-<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAw&libraries=places&callback=initMap"></script>
+  </script>
+
+  <!-- Load Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAw&callback=initMap" async defer></script>
 
 </body>
 </html>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAwY&callback=initMap" async defer></script>
