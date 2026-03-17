@@ -4,99 +4,153 @@
   <meta charset="UTF-8">
   <title>Midpoint</title>
   <link rel="icon" href="midpoint_icon.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #e6f0ff; /* soft blue background */
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      text-align: center;
-      padding: 20px;
-      background-color: #007BFF; /* main blue header */
-      color: white;
-      font-size: 2em;
-      font-weight: bold;
-    }
-    .container {
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-    input, select, button {
-      display: block;
-      margin: 10px 0;
-      padding: 10px;
-      width: 100%;
-      font-size: 1em;
-    }
-    label {
-      font-weight: bold;
-    }
-    #map {
-      height: 400px;
-      width: 100%;
-      margin-top: 20px;
-    }
+    body {margin:0; font-family: Arial,sans-serif; background: #e6f0ff;}
+    header {background:#007BFF; color:white; text-align:center; padding:20px;}
+    header img {width:120px;}
+    .container {padding:20px; max-width:600px; margin:auto;}
+    input, select, button {width:100%; padding:10px; margin:10px 0; font-size:1em;}
+    .filters button {margin:3px; background:#e3f2fd; color:#1976d2; border:none; padding:8px; border-radius:5px;}
+    .filters button:hover {background:#bbdefb; cursor:pointer;}
+    #map {height:400px; width:100%; margin-top:20px; border-radius:10px;}
+    #selectedPlace {margin-top:10px; padding:10px; background:#e8f5e9; border-radius:8px; font-weight:bold;}
   </style>
 </head>
 <body>
 
-  <header>Midpoint Logo</header>
+<header>
+  <img src="midpoint_icon.png" alt="Midpoint Logo">
+</header>
 
-  <div class="container">
-    <label for="location1">Enter first location:</label>
-    <input type="text" id="location1" placeholder="e.g., 42 Fergus Ave Richmond Hill">
-
-    <label for="location2">Enter second location:</label>
-    <input type="text" id="location2" placeholder="e.g., Wonderland">
-
-    <label for="placeType">Pick a place:</label>
-    <select id="placeType">
-      <option value="cafe">☕ Cafe</option>
-      <option value="restaurant">🍽️ Restaurant</option>
-      <option value="park">🌳 Park</option>
-      <option value="hotel">🏨 Hotel</option>
-      <option value="movie_theater">🎬 Movie Theater</option>
-    </select>
-
-    <label for="midpointSlider">Adjust midpoint:</label>
-    <input type="range" id="midpointSlider" min="0" max="100" value="50">
-
-    <button id="findSpot">Find Meetup Spot</button>
+<div class="container">
+  <div class="instructions">
+    Enter two locations → adjust midpoint → pick a place → share it
   </div>
+  <input id="address1" placeholder="First location">
+  <input id="address2" placeholder="Second location">
+  <input id="placeKeyword" placeholder="Search (optional)">
+  
+  <div class="filters">
+    <button onclick="setFilter('cafe')">☕ Cafe</button>
+    <button onclick="setFilter('restaurant')">🍽️ Restaurant</button>
+    <button onclick="setFilter('park')">🌳 Park</button>
+    <button onclick="setFilter('lodging')">🏨 Hotel</button>
+    <button onclick="setFilter('movie_theater')">🎬 Movie Theater</button>
+  </div>
+  
+  <label>Adjust midpoint:</label>
+  <input type="range" id="weightSlider" min="0" max="100" value="50">
+  
+  <button onclick="findMidpoint()">Find Meetup Spot</button>
+  
+  <div id="selectedPlace"></div>
+</div>
 
-  <!-- Map container -->
-  <div id="map"></div>
+<div id="map"></div>
 
-  <!-- Google Maps JavaScript -->
-  <script>
-    function initMap() {
-      // Example midpoint coordinates (replace with dynamic later)
-      var midpoint = { lat: 43.836, lng: -79.439 };
+<script>
+let map, geocoder, markers = [];
 
-      // Create the map
-      var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
-        center: midpoint
+function initMap() {
+  // Default map location
+  const defaultLocation = { lat: 43.7, lng: -79.4 };
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 12,
+    center: defaultLocation
+  });
+  geocoder = new google.maps.Geocoder();
+}
+
+// Set filter button value
+function setFilter(type) {
+  document.getElementById("placeKeyword").value = type;
+}
+
+// Clear markers and selected place display
+function clearMarkers() {
+  markers.forEach(m => m.setMap(null));
+  markers = [];
+  document.getElementById("selectedPlace").innerHTML = "";
+}
+
+// Search nearby places using Google Places API
+function searchNearby(midpoint, keyword) {
+  const service = new google.maps.places.PlacesService(map);
+  service.nearbySearch({
+    location: midpoint,
+    radius: 3000,
+    keyword: keyword || undefined
+  }, function(results, status) {
+    if (status !== "OK") return;
+    results.forEach(place => {
+      const marker = new google.maps.Marker({
+        map: map,
+        position: place.geometry.location
       });
-
-      // Add a marker at the midpoint
-      var marker = new google.maps.Marker({
-        position: midpoint,
-        map: map
+      markers.push(marker);
+      marker.addListener("click", function() {
+        const link = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.vicinity)}`;
+        document.getElementById("selectedPlace").innerHTML =
+          `✅ ${place.name}<br><a href="${link}" target="_blank">Navigate</a> | <a href="${link}" target="_blank">Share</a>`;
       });
-    }
-
-    // Placeholder for your button logic
-    document.getElementById('findSpot').addEventListener('click', function() {
-      alert('This will calculate the midpoint and find your selected place type.');
     });
-  </script>
+  });
+}
 
-  <!-- Load Google Maps API -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAw&callback=initMap" async defer></script>
+// Calculate midpoint and search
+function findMidpoint() {
+  const addr1 = document.getElementById("address1").value;
+  const addr2 = document.getElementById("address2").value;
+  const keyword = document.getElementById("placeKeyword").value;
+  const slider = document.getElementById("weightSlider").value / 100;
+
+  if (!addr1 || !addr2) {
+    alert("Enter both addresses");
+    return;
+  }
+
+  clearMarkers();
+
+  geocoder.geocode({ address: addr1 }, function(r1, s1) {
+    if (s1 !== "OK") return;
+    geocoder.geocode({ address: addr2 }, function(r2, s2) {
+      if (s2 !== "OK") return;
+
+      const c1 = r1[0].geometry.location;
+      const c2 = r2[0].geometry.location;
+
+      // Basic midpoint
+      const midLat0 = (c1.lat() + c2.lat()) / 2;
+      const midLng0 = (c1.lng() + c2.lng()) / 2;
+
+      // Apply slider adjustment (max 30% shift)
+      const maxShift = 0.3;
+      const shift = (slider - 0.5) * 2 * maxShift;
+      const midLat = midLat0 + (c1.lat() - midLat0) * shift;
+      const midLng = midLng0 + (c1.lng() - midLng0) * shift;
+
+      const midpoint = { lat: midLat, lng: midLng };
+
+      // Show midpoint marker
+      map.setCenter(midpoint);
+      new google.maps.Marker({
+        position: midpoint,
+        map: map,
+        icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+      });
+
+      // Search nearby places
+      searchNearby(midpoint, keyword);
+    });
+  });
+}
+</script>
+
+<!-- Google Maps API -->
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAw&libraries=places&callback=initMap">
+</script>
 
 </body>
 </html>
