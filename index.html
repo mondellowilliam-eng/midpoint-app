@@ -111,8 +111,16 @@ function findMidpoint(){
     });
 }
 </script>
-
-<script async src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"></script>
+function initMap() {
+  var midpoint = { lat: 43.836, lng: -79.439 }; // Example coordinates
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 12,
+    center: midpoint
+  });
+  var marker = new google.maps.Marker({ position: midpoint, map: map });
+}
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAw&libraries=places&callback=initMap"></script>
 
 </body>
 </html>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1N6CfvlBVP4xbY8j5h-YzOA6YIQi-SAwY&callback=initMap" async defer></script>
