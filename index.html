@@ -277,7 +277,21 @@
       });
     });
   }
+function sharePlace(name, destination) {
+  const link =
+    "https://www.google.com/maps/dir/?api=1&destination=" +
+    encodeURIComponent(destination);
 
+  if (navigator.share) {
+    navigator.share({
+      title: "Midpoint Meetup",
+      text: "Meet me here: " + name,
+      url: link
+    });
+  } else {
+    prompt("Copy this link:", link);
+  }
+}
   function findMidpoint() {
     const addr1 = document.getElementById("address1").value.trim();
     const addr2 = document.getElementById("address2").value.trim();
