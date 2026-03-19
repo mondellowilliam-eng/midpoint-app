@@ -263,17 +263,17 @@
         markers.push(marker);
 
         marker.addListener("click", function() {
-          const destination = place.vicinity || place.name;
-          const link =
-            "https://www.google.com/maps/dir/?api=1&destination=" +
-            encodeURIComponent(destination);
+  const destination = place.vicinity || place.name;
+  const link =
+    "https://www.google.com/maps/dir/?api=1&destination=" +
+    encodeURIComponent(destination);
 
-          document.getElementById("selectedPlace").innerHTML =
-            "✅ " + place.name + "<br>" +
-            (place.vicinity ? place.vicinity + "<br>" : "") +
-            '<a href="' + link + '" target="_blank">Navigate</a> | ' +
-            '<a href="' + link + '" target="_blank">Share</a>';
-        });
+  document.getElementById("selectedPlace").innerHTML =
+    "✅ " + place.name + "<br>" +
+    (place.vicinity ? place.vicinity + "<br>" : "") +
+    '<a href="' + link + '" target="_blank">Navigate</a> | ' +
+    '<button onclick="sharePlace(\'' + place.name + '\', \'' + destination + '\')">Share</button>';
+  });
       });
     });
   }
