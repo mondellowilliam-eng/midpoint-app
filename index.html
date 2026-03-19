@@ -166,7 +166,7 @@ function sharePlace(name, destination) {
       title: "Midpoint",
       text: "Meet me here: " + name,
       url: link
-    }).catch(function() {
+    }).catch(() => {
       fallbackCopy(link);
     });
   } else {
@@ -176,9 +176,9 @@ function sharePlace(name, destination) {
 
 function fallbackCopy(link) {
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(link).then(function() {
-      alert("Link copied. You can now paste it and send it.");
-    }).catch(function() {
+    navigator.clipboard.writeText(link).then(() => {
+      alert("Link copied. You can now paste and send it.");
+    }).catch(() => {
       prompt("Copy this link:", link);
     });
   } else {
