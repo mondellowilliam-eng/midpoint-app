@@ -26,7 +26,7 @@
 
     .container {
       padding: 20px;
-      max-width: 680px;
+      max-width: 700px;
       margin: auto;
     }
 
@@ -114,7 +114,7 @@
     }
 
     #map {
-      height: 420px;
+      height: 440px;
       width: 100%;
       margin-top: 20px;
       border-radius: 10px;
@@ -164,8 +164,13 @@
 <script>
   let map;
   let geocoder;
+  let placesService;
   let markers = [];
   let midpointMarker = null;
+  let address1Marker = null;
+  let address2Marker = null;
+  let autocomplete1 = null;
+  let autocomplete2 = null;
 
   function initMap() {
     const defaultLocation = { lat: 43.7, lng: -79.4 };
@@ -176,11 +181,23 @@
     });
 
     geocoder = new google.maps.Geocoder();
+    placesService = new google.maps.places.PlacesService(map);
 
     const slider = document.getElementById("weightSlider");
     slider.addEventListener("input", function () {
       document.getElementById("weightValue").textContent = this.value + "%";
     });
+
+    // Address autocomplete
+    autocomplete1 = new google.maps.places.Autocomplete(
+      document.getElementById("address1"),
+      { types: ["geocode"] }
+    );
+
+    autocomplete2 = new google.maps.places.Autocomplete(
+      document.getElementById("address2"),
+      { types: ["geocode"] }
+    );
   }
 
   function setFilter(type) {
@@ -194,6 +211,14 @@
     if (midpointMarker) {
       midpointMarker.setMap(null);
       midpointMarker = null;
+    }
+    if (address1Marker) {
+      address1Marker.setMap(null);
+      address1Marker = null;
+    }
+    if (address2Marker) {
+      address2Marker.setMap(null);
+      address2Marker = null;
     }
 
     document.getElementById("selectedPlace").innerHTML = "";
@@ -217,9 +242,7 @@
   }
 
   function searchNearby(midpoint, keyword) {
-    const service = new google.maps.places.PlacesService(map);
-
-    service.nearbySearch({
+    placesService.nearbySearch({
       location: midpoint,
       radius: 3000,
       keyword: keyword || undefined
@@ -283,6 +306,21 @@
         const c1 = r1[0].geometry.location;
         const c2 = r2[0].geometry.location;
 
+        // Show both entered addresses on the map
+        address1Marker = new google.maps.Marker({
+          position: { lat: c1.lat(), lng: c1.lng() },
+          map: map,
+          title: "Address 1",
+          label: "1"
+        });
+
+        address2Marker = new google.maps.Marker({
+          position: { lat: c2.lat(), lng: c2.lng() },
+          map: map,
+          title: "Address 2",
+          label: "2"
+        });
+
         const midLat0 = (c1.lat() + c2.lat()) / 2;
         const midLng0 = (c1.lng() + c2.lng()) / 2;
 
@@ -301,8 +339,12 @@
           title: "Midpoint"
         });
 
-        map.setCenter(midpoint);
-        map.setZoom(12);
+        // Fit map to show all 3 markers
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(c1);
+        bounds.extend(c2);
+        bounds.extend(midpoint);
+        map.fitBounds(bounds);
 
         const dist1 = getDistanceKm(
           { lat: c1.lat(), lng: c1.lng() },
