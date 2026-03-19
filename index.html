@@ -7,81 +7,140 @@
 <link rel="icon" href="midpoint_icon.png">
 
 <style>
-  body { margin:0; font-family:Arial, sans-serif; background:#e6f0ff; }
-  header { background:#007BFF; padding:20px; text-align:center; }
-  header img { width:120px; }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #e6f0ff;
+  }
 
-  .container { padding:20px; max-width:700px; margin:auto; }
+  header {
+    background: #007BFF;
+    padding: 20px;
+    text-align: center;
+  }
+
+  header img {
+    width: 120px;
+  }
+
+  .container {
+    padding: 20px;
+    max-width: 700px;
+    margin: auto;
+  }
+
   .card {
-    background:white;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:15px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .instructions {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 12px;
+    line-height: 1.5;
   }
 
   input, button {
-    width:100%;
-    padding:10px;
-    margin:10px 0;
-    box-sizing:border-box;
-    font-size:16px;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+
+  button {
+    border: none;
+    background: #007BFF;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #0062cc;
   }
 
   .filters {
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin:10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
   }
 
   .filters button {
-    width:auto;
-    flex:1 1 auto;
-    min-width:90px;
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 90px;
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+
+  .filters button:hover {
+    background: #bbdefb;
   }
 
   #map {
-    height:420px;
-    margin-top:20px;
-    border-radius:10px;
+    height: 420px;
+    margin-top: 20px;
+    border-radius: 10px;
   }
 
   #selectedPlace {
-    margin-top:12px;
-    padding:12px;
-    background:#e8f5e9;
-    border-radius:8px;
-    line-height:1.6;
-    min-height:24px;
+    margin-top: 12px;
+    padding: 12px;
+    background: #e8f5e9;
+    border-radius: 8px;
+    line-height: 1.6;
+    min-height: 24px;
   }
 
   .action-row {
-    display:flex;
-    gap:10px;
-    margin-top:10px;
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
   }
 
   .action-link,
   .share-btn {
-    display:inline-block;
-    padding:10px 14px;
-    border-radius:8px;
-    text-decoration:none;
-    text-align:center;
-    cursor:pointer;
-    border:none;
-    font-size:15px;
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    font-size: 15px;
   }
 
   .action-link {
-    background:#007BFF;
-    color:white;
+    background: #007BFF;
+    color: white;
   }
 
   .share-btn {
-    background:#28a745;
-    color:white;
+    background: #28a745;
+    color: white;
+  }
+
+  #distanceInfo {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.4;
+  }
+
+  #weightWrap {
+    margin-top: 10px;
+  }
+
+  #weightValue {
+    font-weight: bold;
+    margin-left: 8px;
   }
 </style>
 </head>
@@ -93,10 +152,14 @@
 
 <div class="container">
   <div class="card">
+    <div class="instructions">
+      Enter two locations → adjust midpoint → choose a place type or search a brand → click a result letter → navigate or share it
+    </div>
+
     <input id="address1" placeholder="First location">
     <input id="address2" placeholder="Second location">
 
-    <input id="placeKeyword" placeholder="Search optional">
+    <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc.">
 
     <div class="filters">
       <button type="button" onclick="setFilter('cafe')">☕ Cafe</button>
@@ -106,11 +169,14 @@
       <button type="button" onclick="setFilter('movie_theater')">🎬 Movies</button>
     </div>
 
-    <label for="weightSlider">Adjust midpoint</label>
-    <input type="range" id="weightSlider" min="0" max="100" value="50">
+    <div id="weightWrap">
+      <label for="weightSlider">Adjust midpoint <span id="weightValue">50%</span></label>
+      <input type="range" id="weightSlider" min="0" max="100" value="50">
+    </div>
 
     <button type="button" onclick="findMidpoint()">Find Meetup Spot</button>
 
+    <div id="distanceInfo"></div>
     <div id="selectedPlace"></div>
   </div>
 
@@ -123,6 +189,8 @@ let markers = [];
 let midpointMarker = null;
 let m1 = null;
 let m2 = null;
+let selectedShareName = "";
+let selectedShareDestination = "";
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -135,6 +203,10 @@ function initMap() {
 
   new google.maps.places.Autocomplete(document.getElementById("address1"));
   new google.maps.places.Autocomplete(document.getElementById("address2"));
+
+  document.getElementById("weightSlider").addEventListener("input", function () {
+    document.getElementById("weightValue").textContent = this.value + "%";
+  });
 }
 
 function setFilter(type) {
@@ -154,6 +226,26 @@ function clearMarkers() {
   m2 = null;
 
   document.getElementById("selectedPlace").innerHTML = "";
+  document.getElementById("distanceInfo").innerHTML = "";
+}
+
+function getDistanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function shareSelectedPlace() {
+  sharePlace(selectedShareName, selectedShareDestination);
 }
 
 function sharePlace(name, destination) {
@@ -177,15 +269,7 @@ function sharePlace(name, destination) {
     "User 1 route:\n" + link1 + "\n\n" +
     "User 2 route:\n" + link2;
 
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(message).then(function() {
-      alert("Meeting links copied. Paste them into a text or email.");
-    }).catch(function() {
-      prompt("Copy these links:", message);
-    });
-  } else {
-    prompt("Copy these links:", message);
-  }
+  prompt("Copy these links:", message);
 }
 
 function showSelectedPlace(place) {
@@ -206,17 +290,19 @@ function showSelectedPlace(place) {
     "&destination=" +
     encodeURIComponent(destination);
 
+  selectedShareName = place.name;
+  selectedShareDestination = destination;
+
   document.getElementById("selectedPlace").innerHTML =
     "<strong>✅ " + place.name + "</strong><br>" +
     destination +
     '<div class="action-row">' +
       '<a class="action-link" href="' + navLink1 + '" target="_blank">Navigate User 1</a>' +
       '<a class="action-link" href="' + navLink2 + '" target="_blank">Navigate User 2</a>' +
-      '<button class="share-btn" type="button" onclick="sharePlace(' +
-      JSON.stringify(place.name) + ',' + JSON.stringify(destination) +
-      ')">Share</button>' +
+      '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share</button>' +
     '</div>';
 }
+
 function searchNearby(mid, keyword) {
   placesService.nearbySearch({
     location: mid,
@@ -224,8 +310,7 @@ function searchNearby(mid, keyword) {
     keyword: keyword || undefined
   }, function(results, status) {
     if (status !== "OK" || !results.length) {
-      document.getElementById("selectedPlace").innerHTML =
-        "No places found nearby.";
+      document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
       return;
     }
 
@@ -301,6 +386,13 @@ function findMidpoint() {
         map: map,
         icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
       });
+
+      const d1 = getDistanceKm(c1.lat(), c1.lng(), mid.lat, mid.lng).toFixed(1);
+      const d2 = getDistanceKm(c2.lat(), c2.lng(), mid.lat, mid.lng).toFixed(1);
+
+      document.getElementById("distanceInfo").innerHTML =
+        "User 1 to midpoint: " + d1 + " km<br>" +
+        "User 2 to midpoint: " + d2 + " km";
 
       const bounds = new google.maps.LatLngBounds();
       bounds.extend(c1);
