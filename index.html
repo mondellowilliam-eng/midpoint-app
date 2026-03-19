@@ -7,181 +7,282 @@
 <link rel="icon" href="midpoint_icon.png">
 
 <style>
-body {margin:0;font-family:Arial;background:#e6f0ff;}
-header {background:#007BFF;padding:20px;text-align:center;}
-header img {width:120px;}
-.container {padding:20px;max-width:700px;margin:auto;}
-.card {background:white;padding:15px;border-radius:10px;margin-bottom:15px;}
-input,button {width:100%;padding:10px;margin:10px 0;}
-.filters button {width:auto;margin:5px;}
-#map {height:420px;margin-top:20px;}
+  body { margin:0; font-family:Arial, sans-serif; background:#e6f0ff; }
+  header { background:#007BFF; padding:20px; text-align:center; }
+  header img { width:120px; }
+
+  .container { padding:20px; max-width:700px; margin:auto; }
+  .card {
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  input, button {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    box-sizing:border-box;
+    font-size:16px;
+  }
+
+  .filters {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:10px 0;
+  }
+
+  .filters button {
+    width:auto;
+    flex:1 1 auto;
+    min-width:90px;
+  }
+
+  #map {
+    height:420px;
+    margin-top:20px;
+    border-radius:10px;
+  }
+
+  #selectedPlace {
+    margin-top:12px;
+    padding:12px;
+    background:#e8f5e9;
+    border-radius:8px;
+    line-height:1.6;
+    min-height:24px;
+  }
+
+  .action-row {
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+  }
+
+  .action-link,
+  .share-btn {
+    display:inline-block;
+    padding:10px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    text-align:center;
+    cursor:pointer;
+    border:none;
+    font-size:15px;
+  }
+
+  .action-link {
+    background:#007BFF;
+    color:white;
+  }
+
+  .share-btn {
+    background:#28a745;
+    color:white;
+  }
 </style>
 </head>
-
 <body>
 
 <header>
-<img src="midpoint_icon.png">
+  <img src="midpoint_icon.png" alt="Midpoint Logo">
 </header>
 
 <div class="container">
-<div class="card">
+  <div class="card">
+    <input id="address1" placeholder="First location">
+    <input id="address2" placeholder="Second location">
 
-<input id="address1" placeholder="First location">
-<input id="address2" placeholder="Second location">
+    <input id="placeKeyword" placeholder="Search optional">
 
-<input id="placeKeyword" placeholder="Search (optional)">
+    <div class="filters">
+      <button type="button" onclick="setFilter('cafe')">☕ Cafe</button>
+      <button type="button" onclick="setFilter('restaurant')">🍽️ Food</button>
+      <button type="button" onclick="setFilter('park')">🌳 Park</button>
+      <button type="button" onclick="setFilter('lodging')">🏨 Hotel</button>
+      <button type="button" onclick="setFilter('movie_theater')">🎬 Movies</button>
+    </div>
 
-<div class="filters">
-<button onclick="setFilter('cafe')">☕</button>
-<button onclick="setFilter('restaurant')">🍽️</button>
-<button onclick="setFilter('park')">🌳</button>
-<button onclick="setFilter('lodging')">🏨</button>
-<button onclick="setFilter('movie_theater')">🎬</button>
-</div>
+    <label for="weightSlider">Adjust midpoint</label>
+    <input type="range" id="weightSlider" min="0" max="100" value="50">
 
-<label>Adjust midpoint</label>
-<input type="range" id="weightSlider" min="0" max="100" value="50">
+    <button type="button" onclick="findMidpoint()">Find Meetup Spot</button>
 
-<button onclick="findMidpoint()">Find Meetup Spot</button>
+    <div id="selectedPlace"></div>
+  </div>
 
-<div id="selectedPlace"></div>
-
-</div>
-
-<div id="map"></div>
+  <div id="map"></div>
 </div>
 
 <script>
 let map, geocoder, placesService;
-let markers=[], midpointMarker, m1, m2;
+let markers = [];
+let midpointMarker = null;
+let m1 = null;
+let m2 = null;
 
-function initMap(){
-map=new google.maps.Map(document.getElementById("map"),{
-zoom:11,center:{lat:43.7,lng:-79.4}
-});
-geocoder=new google.maps.Geocoder();
-placesService=new google.maps.places.PlacesService(map);
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 11,
+    center: { lat: 43.7, lng: -79.4 }
+  });
 
-// autocomplete
-new google.maps.places.Autocomplete(document.getElementById("address1"));
-new google.maps.places.Autocomplete(document.getElementById("address2"));
+  geocoder = new google.maps.Geocoder();
+  placesService = new google.maps.places.PlacesService(map);
+
+  new google.maps.places.Autocomplete(document.getElementById("address1"));
+  new google.maps.places.Autocomplete(document.getElementById("address2"));
 }
 
-function setFilter(type){
-document.getElementById("placeKeyword").value=type;
+function setFilter(type) {
+  document.getElementById("placeKeyword").value = type;
 }
 
-function clearMarkers(){
-markers.forEach(m=>m.setMap(null));
-markers=[];
-if(midpointMarker) midpointMarker.setMap(null);
-if(m1) m1.setMap(null);
-if(m2) m2.setMap(null);
-document.getElementById("selectedPlace").innerHTML="";
+function clearMarkers() {
+  markers.forEach(m => m.setMap(null));
+  markers = [];
+
+  if (midpointMarker) midpointMarker.setMap(null);
+  if (m1) m1.setMap(null);
+  if (m2) m2.setMap(null);
+
+  midpointMarker = null;
+  m1 = null;
+  m2 = null;
+
+  document.getElementById("selectedPlace").innerHTML = "";
 }
 
-function searchNearby(mid,keyword){
+function sharePlace(name, destination) {
+  const link =
+    "https://www.google.com/maps/dir/?api=1&destination=" +
+    encodeURIComponent(destination);
 
-placesService.nearbySearch({
-location:mid,
-radius:1000,
-keyword:keyword||undefined
-},function(results,status){
-
-if(status!=="OK"||!results.length)return;
-
-results.slice(0,5).forEach(place=>{
-
-const marker=new google.maps.Marker({
-map:map,
-position:place.geometry.location,
-label:String.fromCharCode(65+markers.length) // A B C D E
-});
-
-markers.push(marker);
-
-marker.addListener("click",function(){
-
-const dest=place.vicinity||place.name;
-const link="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest);
-
-document.getElementById("selectedPlace").innerHTML=
-"✅ "+place.name+"<br>"+
-(dest)+"<br>"+
-'<a href="'+link+'" target="_blank">Navigate</a> | '+
-'<button onclick="sharePlace(\''+place.name+'\',\''+dest+'\')">Share</button>';
-
-});
-
-});
-
-});
+  if (navigator.share) {
+    navigator.share({
+      title: "Midpoint",
+      text: "Meet me here: " + name,
+      url: link
+    }).catch(() => {});
+  } else {
+    window.prompt("Copy this link:", link);
+  }
 }
 
-function findMidpoint(){
+function showSelectedPlace(place) {
+  const destination = place.vicinity || place.name;
+  const link =
+    "https://www.google.com/maps/dir/?api=1&destination=" +
+    encodeURIComponent(destination);
 
-const a1=document.getElementById("address1").value;
-const a2=document.getElementById("address2").value;
-const keyword=document.getElementById("placeKeyword").value;
-const slider=document.getElementById("weightSlider").value/100;
-
-if(!a1||!a2){alert("Enter both");return;}
-
-clearMarkers();
-
-geocoder.geocode({address:a1},function(r1,s1){
-if(s1!=="OK")return;
-
-geocoder.geocode({address:a2},function(r2,s2){
-if(s2!=="OK")return;
-
-const c1=r1[0].geometry.location;
-const c2=r2[0].geometry.location;
-
-m1=new google.maps.Marker({position:c1,map:map,label:"1"});
-m2=new google.maps.Marker({position:c2,map:map,label:"2"});
-
-const midLat=(c1.lat()+c2.lat())/2;
-const midLng=(c1.lng()+c2.lng())/2;
-
-const shift=(slider-0.5)*0.6;
-
-const mid={
-lat:midLat+(c1.lat()-midLat)*shift,
-lng:midLng+(c1.lng()-midLng)*shift
-};
-
-midpointMarker=new google.maps.Marker({
-position:mid,
-map:map,
-icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-});
-
-const bounds=new google.maps.LatLngBounds();
-bounds.extend(c1);
-bounds.extend(c2);
-bounds.extend(mid);
-map.fitBounds(bounds);
-
-searchNearby(mid,keyword);
-
-});
-});
+  document.getElementById("selectedPlace").innerHTML =
+    "<strong>✅ " + place.name + "</strong><br>" +
+    destination +
+    '<div class="action-row">' +
+      '<a class="action-link" href="' + link + '" target="_blank">Navigate</a>' +
+      '<button class="share-btn" type="button" onclick="sharePlace(' +
+      JSON.stringify(place.name) + ',' + JSON.stringify(destination) +
+      ')">Share</button>' +
+    '</div>';
 }
 
-function sharePlace(name,dest){
-const link="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest);
+function searchNearby(mid, keyword) {
+  placesService.nearbySearch({
+    location: mid,
+    radius: 1000,
+    keyword: keyword || undefined
+  }, function(results, status) {
+    if (status !== "OK" || !results.length) {
+      document.getElementById("selectedPlace").innerHTML =
+        "No places found nearby.";
+      return;
+    }
 
-if(navigator.share){
-navigator.share({
-title:"Midpoint",
-text:"Meet me here: "+name,
-url:link
-});
-}else{
-prompt("Copy this link:",link);
+    results.slice(0, 5).forEach((place, index) => {
+      const marker = new google.maps.Marker({
+        map: map,
+        position: place.geometry.location,
+        title: place.name,
+        label: String.fromCharCode(65 + index) // A B C D E
+      });
+
+      markers.push(marker);
+
+      marker.addListener("click", function() {
+        showSelectedPlace(place);
+      });
+    });
+  });
 }
+
+function findMidpoint() {
+  const a1 = document.getElementById("address1").value.trim();
+  const a2 = document.getElementById("address2").value.trim();
+  const keyword = document.getElementById("placeKeyword").value.trim();
+  const slider = document.getElementById("weightSlider").value / 100;
+
+  if (!a1 || !a2) {
+    alert("Enter both addresses");
+    return;
+  }
+
+  clearMarkers();
+
+  geocoder.geocode({ address: a1 }, function(r1, s1) {
+    if (s1 !== "OK" || !r1.length) {
+      alert("Could not find first address.");
+      return;
+    }
+
+    geocoder.geocode({ address: a2 }, function(r2, s2) {
+      if (s2 !== "OK" || !r2.length) {
+        alert("Could not find second address.");
+        return;
+      }
+
+      const c1 = r1[0].geometry.location;
+      const c2 = r2[0].geometry.location;
+
+      m1 = new google.maps.Marker({
+        position: c1,
+        map: map,
+        label: "1"
+      });
+
+      m2 = new google.maps.Marker({
+        position: c2,
+        map: map,
+        label: "2"
+      });
+
+      const midLat0 = (c1.lat() + c2.lat()) / 2;
+      const midLng0 = (c1.lng() + c2.lng()) / 2;
+
+      const shift = (slider - 0.5) * 0.6;
+
+      const mid = {
+        lat: midLat0 + (c1.lat() - midLat0) * shift,
+        lng: midLng0 + (c1.lng() - midLng0) * shift
+      };
+
+      midpointMarker = new google.maps.Marker({
+        position: mid,
+        map: map,
+        icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+      });
+
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend(c1);
+      bounds.extend(c2);
+      bounds.extend(mid);
+      map.fitBounds(bounds);
+
+      searchNearby(mid, keyword);
+    });
+  });
 }
 </script>
 
