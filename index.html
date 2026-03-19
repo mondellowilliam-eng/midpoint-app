@@ -188,21 +188,33 @@ function fallbackCopy(link) {
 
 function showSelectedPlace(place) {
   const destination = place.vicinity || place.name;
-  const link =
-    "https://www.google.com/maps/dir/?api=1&destination=" +
+
+  const origin1 = document.getElementById("address1").value.trim();
+  const origin2 = document.getElementById("address2").value.trim();
+
+  const navLink1 =
+    "https://www.google.com/maps/dir/?api=1&origin=" +
+    encodeURIComponent(origin1) +
+    "&destination=" +
+    encodeURIComponent(destination);
+
+  const navLink2 =
+    "https://www.google.com/maps/dir/?api=1&origin=" +
+    encodeURIComponent(origin2) +
+    "&destination=" +
     encodeURIComponent(destination);
 
   document.getElementById("selectedPlace").innerHTML =
     "<strong>✅ " + place.name + "</strong><br>" +
     destination +
     '<div class="action-row">' +
-      '<a class="action-link" href="' + link + '" target="_blank">Navigate</a>' +
+      '<a class="action-link" href="' + navLink1 + '" target="_blank">Navigate User 1</a>' +
+      '<a class="action-link" href="' + navLink2 + '" target="_blank">Navigate User 2</a>' +
       '<button class="share-btn" type="button" onclick="sharePlace(' +
       JSON.stringify(place.name) + ',' + JSON.stringify(destination) +
       ')">Share</button>' +
     '</div>';
 }
-
 function searchNearby(mid, keyword) {
   placesService.nearbySearch({
     location: mid,
