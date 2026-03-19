@@ -157,32 +157,34 @@ function clearMarkers() {
 }
 
 function sharePlace(name, destination) {
-  const link =
-    "https://www.google.com/maps/dir/?api=1&destination=" +
+  const origin1 = document.getElementById("address1").value.trim();
+  const origin2 = document.getElementById("address2").value.trim();
+
+  const link1 =
+    "https://www.google.com/maps/dir/?api=1&origin=" +
+    encodeURIComponent(origin1) +
+    "&destination=" +
     encodeURIComponent(destination);
 
-  if (navigator.share) {
-    navigator.share({
-      title: "Midpoint",
-      text: "Meet me here: " + name,
-      url: link
-    }).catch(() => {
-      fallbackCopy(link);
-    });
-  } else {
-    fallbackCopy(link);
-  }
-}
+  const link2 =
+    "https://www.google.com/maps/dir/?api=1&origin=" +
+    encodeURIComponent(origin2) +
+    "&destination=" +
+    encodeURIComponent(destination);
 
-function fallbackCopy(link) {
+  const message =
+    "Midpoint meetup: " + name + "\n\n" +
+    "User 1 route:\n" + link1 + "\n\n" +
+    "User 2 route:\n" + link2;
+
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(link).then(() => {
-      alert("Link copied. You can now paste and send it.");
-    }).catch(() => {
-      prompt("Copy this link:", link);
+    navigator.clipboard.writeText(message).then(function() {
+      alert("Meeting links copied. Paste them into a text or email.");
+    }).catch(function() {
+      prompt("Copy these links:", message);
     });
   } else {
-    prompt("Copy this link:", link);
+    prompt("Copy these links:", message);
   }
 }
 
