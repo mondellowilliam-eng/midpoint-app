@@ -1,133 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Midpoint</title>
-  <link rel="icon" href="midpoint_icon.png" type="image/png">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {margin:0; font-family: Arial,sans-serif; background: #e6f0ff;}
-    header {background:#007BFF; color:white; text-align:center; padding:20px;}
-    header img {width:120px;}
-    .container {padding:20px; max-width:600px; margin:auto;}
-    input, select, button {width:100%; padding:10px; margin:10px 0; font-size:1em;}
-    .filters button {margin:3px; background:#e3f2fd; color:#1976d2; border:none; padding:8px; border-radius:5px;}
-    .filters button:hover {background:#bbdefb; cursor:pointer;}
-    #map {height:400px; width:100%; margin-top:20px; border-radius:10px;}
-    #selectedPlace {margin-top:10px; padding:10px; background:#e8f5e9; border-radius:8px; font-weight:bold;}
-  </style>
+<meta charset="UTF-8">
+<title>Midpoint</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {margin:0; font-family: Arial; background:#e6f0ff;}
+header {background:#007BFF; padding:20px; text-align:center;}
+header img {width:120px;}
+.container {padding:20px; max-width:600px; margin:auto;}
+input, button {width:100%; padding:10px; margin:10px 0;}
+#map {height:400px; margin-top:20px;}
+</style>
 </head>
+
 <body>
 
 <header>
-  <img src="midpoint_icon.png" alt="Midpoint Logo">
+<img src="midpoint_icon.png">
 </header>
 
 <div class="container">
-  <div class="instructions">
-    Enter two locations → adjust midpoint → pick a place → share it
-  </div>
-  <input id="address1" placeholder="First location">
-  <input id="address2" placeholder="Second location">
-  <input id="placeKeyword" placeholder="Search (optional)">
-  
-  <div class="filters">
-    <button onclick="setFilter('cafe')">☕ Cafe</button>
-    <button onclick="setFilter('restaurant')">🍽️ Restaurant</button>
-    <button onclick="setFilter('park')">🌳 Park</button>
-    <button onclick="setFilter('lodging')">🏨 Hotel</button>
-    <button onclick="setFilter('movie_theater')">🎬 Movie Theater</button>
-  </div>
-  
-  <label>Adjust midpoint:</label>
-  <input type="range" id="weightSlider" min="0" max="100" value="50">
-  
-  <button onclick="findMidpoint()">Find Meetup Spot</button>
-  
-  <div id="selectedPlace"></div>
+<input id="address1" placeholder="First location">
+<input id="address2" placeholder="Second location">
+<button onclick="findMidpoint()">Find Meetup Spot</button>
 </div>
 
 <div id="map"></div>
 
 <script>
-let map, geocoder, markers = [];
+let map, geocoder;
 
 function initMap() {
-  const defaultLocation = { lat: 43.7, lng: -79.4 };
-  map = new google.maps.Map(document.getElementById("map"), { zoom: 12, center: defaultLocation });
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 12,
+    center: {lat:43.7, lng:-79.4}
+  });
   geocoder = new google.maps.Geocoder();
 }
 
-function setFilter(type) {
-  document.getElementById("placeKeyword").value = type;
-}
+function findMidpoint(){
+  const a1 = document.getElementById("address1").value;
+  const a2 = document.getElementById("address2").value;
 
-function clearMarkers() {
-  markers.forEach(m => m.setMap(null));
-  markers = [];
-  document.getElementById("selectedPlace").innerHTML = "";
-}
+  if(!a1 || !a2){
+    alert("Enter both locations");
+    return;
+  }
 
-function searchNearby(midpoint, keyword) {
-  const service = new google.maps.places.PlacesService(map);
-  service.nearbySearch({
-    location: midpoint,
-    radius: 3000,
-    keyword: keyword || undefined
-  }, function(results, status) {
-    if (status !== "OK") return;
-    results.forEach(place => {
-      const marker = new google.maps.Marker({ map: map, position: place.geometry.location });
-      markers.push(marker);
-      marker.addListener("click", function() {
-        const link = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.vicinity)}`;
-        document.getElementById("selectedPlace").innerHTML =
-          `✅ ${place.name}<br><a href="${link}" target="_blank">Navigate</a> | <a href="${link}" target="_blank">Share</a>`;
-      });
-    });
-  });
-}
+  geocoder.geocode({address:a1}, function(r1,s1){
+    if(s1!=="OK") return;
 
-function findMidpoint() {
-  const addr1 = document.getElementById("address1").value;
-  const addr2 = document.getElementById("address2").value;
-  const keyword = document.getElementById("placeKeyword").value;
-  const slider = document.getElementById("weightSlider").value / 100;
-
-  if (!addr1 || !addr2) { alert("Enter both addresses"); return; }
-
-  clearMarkers();
-
-  geocoder.geocode({ address: addr1 }, function(r1, s1) {
-    if (s1 !== "OK") return;
-    geocoder.geocode({ address: addr2 }, function(r2, s2) {
-      if (s2 !== "OK") return;
+    geocoder.geocode({address:a2}, function(r2,s2){
+      if(s2!=="OK") return;
 
       const c1 = r1[0].geometry.location;
       const c2 = r2[0].geometry.location;
 
-      const midLat0 = (c1.lat() + c2.lat()) / 2;
-      const midLng0 = (c1.lng() + c2.lng()) / 2;
+      const mid = {
+        lat:(c1.lat()+c2.lat())/2,
+        lng:(c1.lng()+c2.lng())/2
+      };
 
-      const maxShift = 0.3;
-      const shift = (slider - 0.5) * 2 * maxShift;
-      const midLat = midLat0 + (c1.lat() - midLat0) * shift;
-      const midLng = midLng0 + (c1.lng() - midLng0) * shift;
+      map.setCenter(mid);
 
-      const midpoint = { lat: midLat, lng: midLng };
-
-      map.setCenter(midpoint);
-      new google.maps.Marker({ position: midpoint, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" });
-
-      searchNearby(midpoint, keyword);
+      new google.maps.Marker({position:mid, map:map});
     });
   });
 }
 </script>
 
-<!-- Only one Google Maps script -->
 <script async
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4-SAw&libraries=places&callback=initMap">
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&callback=initMap">
 </script>
 
 </body>
