@@ -1,386 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Midpoint</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="midpoint_icon.png" type="image/png" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #e6f0ff;
-    }
+<meta charset="UTF-8">
+<title>Midpoint</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="midpoint_icon.png">
 
-    header {
-      background: #007BFF;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-
-    header img {
-      width: 120px;
-      height: auto;
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 700px;
-      margin: auto;
-    }
-
-    .card {
-      background: white;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      margin-bottom: 16px;
-    }
-
-    .instructions {
-      font-size: 14px;
-      color: #444;
-      margin-bottom: 12px;
-      line-height: 1.5;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 1em;
-      box-sizing: border-box;
-    }
-
-    button {
-      border: none;
-      background: #007BFF;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0062cc;
-    }
-
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0;
-    }
-
-    .filters button {
-      width: auto;
-      min-width: 120px;
-      flex: 1 1 auto;
-      background: #e3f2fd;
-      color: #1976d2;
-      border-radius: 6px;
-    }
-
-    .filters button:hover {
-      background: #bbdefb;
-    }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 8px;
-    }
-
-    #weightValue {
-      font-weight: bold;
-      margin-left: 8px;
-    }
-
-    #distanceInfo {
-      margin-top: 8px;
-      font-size: 14px;
-      color: #333;
-      line-height: 1.4;
-    }
-
-    #selectedPlace {
-      margin-top: 12px;
-      padding: 12px;
-      background: #e8f5e9;
-      border-radius: 8px;
-      font-weight: bold;
-      line-height: 1.6;
-      min-height: 24px;
-    }
-
-    #map {
-      height: 440px;
-      width: 100%;
-      margin-top: 20px;
-      border-radius: 10px;
-    }
-  </style>
+<style>
+body {margin:0;font-family:Arial;background:#e6f0ff;}
+header {background:#007BFF;padding:20px;text-align:center;}
+header img {width:120px;}
+.container {padding:20px;max-width:700px;margin:auto;}
+.card {background:white;padding:15px;border-radius:10px;margin-bottom:15px;}
+input,button {width:100%;padding:10px;margin:10px 0;}
+.filters button {width:auto;margin:5px;}
+#map {height:420px;margin-top:20px;}
+</style>
 </head>
+
 <body>
 
 <header>
-  <img src="midpoint_icon.png" alt="Midpoint Logo" />
+<img src="midpoint_icon.png">
 </header>
 
 <div class="container">
-  <div class="card">
-    <div class="instructions">
-      Enter two locations → adjust midpoint → choose a place type or search a brand → click a result → navigate or share it
-    </div>
+<div class="card">
 
-    <input id="address1" placeholder="First location" />
-    <input id="address2" placeholder="Second location" />
+<input id="address1" placeholder="First location">
+<input id="address2" placeholder="Second location">
 
-    <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc." />
+<input id="placeKeyword" placeholder="Search (optional)">
 
-    <div class="filters">
-      <button type="button" onclick="setFilter('cafe')">☕ Cafe</button>
-      <button type="button" onclick="setFilter('restaurant')">🍽️ Restaurant</button>
-      <button type="button" onclick="setFilter('park')">🌳 Park</button>
-      <button type="button" onclick="setFilter('lodging')">🏨 Hotel</button>
-      <button type="button" onclick="setFilter('movie_theater')">🎬 Movie Theater</button>
-    </div>
+<div class="filters">
+<button onclick="setFilter('cafe')">☕</button>
+<button onclick="setFilter('restaurant')">🍽️</button>
+<button onclick="setFilter('park')">🌳</button>
+<button onclick="setFilter('lodging')">🏨</button>
+<button onclick="setFilter('movie_theater')">🎬</button>
+</div>
 
-    <label for="weightSlider">
-      Adjust midpoint:
-      <span id="weightValue">50%</span>
-    </label>
-    <input type="range" id="weightSlider" min="0" max="100" value="50" />
+<label>Adjust midpoint</label>
+<input type="range" id="weightSlider" min="0" max="100" value="50">
 
-    <button type="button" onclick="findMidpoint()">Find Meetup Spot</button>
+<button onclick="findMidpoint()">Find Meetup Spot</button>
 
-    <div id="distanceInfo"></div>
-    <div id="selectedPlace"></div>
-  </div>
+<div id="selectedPlace"></div>
 
-  <div id="map"></div>
+</div>
+
+<div id="map"></div>
 </div>
 
 <script>
-  let map;
-  let geocoder;
-  let placesService;
-  let markers = [];
-  let midpointMarker = null;
-  let address1Marker = null;
-  let address2Marker = null;
-  let autocomplete1 = null;
-  let autocomplete2 = null;
+let map, geocoder, placesService;
+let markers=[], midpointMarker, m1, m2;
 
-  function initMap() {
-    const defaultLocation = { lat: 43.7, lng: -79.4 };
+function initMap(){
+map=new google.maps.Map(document.getElementById("map"),{
+zoom:11,center:{lat:43.7,lng:-79.4}
+});
+geocoder=new google.maps.Geocoder();
+placesService=new google.maps.places.PlacesService(map);
 
-    map = new google.maps.Map(document.getElementById("map"), {
-      zoom: 11,
-      center: defaultLocation
-    });
-
-    geocoder = new google.maps.Geocoder();
-    placesService = new google.maps.places.PlacesService(map);
-
-    const slider = document.getElementById("weightSlider");
-    slider.addEventListener("input", function () {
-      document.getElementById("weightValue").textContent = this.value + "%";
-    });
-
-    // Address autocomplete
-    autocomplete1 = new google.maps.places.Autocomplete(
-      document.getElementById("address1"),
-      { types: ["geocode"] }
-    );
-
-    autocomplete2 = new google.maps.places.Autocomplete(
-      document.getElementById("address2"),
-      { types: ["geocode"] }
-    );
-  }
-
-  function setFilter(type) {
-    document.getElementById("placeKeyword").value = type;
-  }
-
-  function clearMarkers() {
-    markers.forEach(marker => marker.setMap(null));
-    markers = [];
-
-    if (midpointMarker) {
-      midpointMarker.setMap(null);
-      midpointMarker = null;
-    }
-    if (address1Marker) {
-      address1Marker.setMap(null);
-      address1Marker = null;
-    }
-    if (address2Marker) {
-      address2Marker.setMap(null);
-      address2Marker = null;
-    }
-
-    document.getElementById("selectedPlace").innerHTML = "";
-    document.getElementById("distanceInfo").textContent = "";
-  }
-
-  function getDistanceKm(a, b) {
-    const R = 6371;
-    const dLat = (b.lat - a.lat) * Math.PI / 180;
-    const dLng = (b.lng - a.lng) * Math.PI / 180;
-    const lat1 = a.lat * Math.PI / 180;
-    const lat2 = b.lat * Math.PI / 180;
-
-    const x =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1) * Math.cos(lat2) *
-      Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-    const y = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
-    return R * y;
-  }
-
-  function searchNearby(midpoint, keyword) {
-    placesService.nearbySearch({
-      location: midpoint,
-      radius: 1000,
-      keyword: keyword || undefined
-    }, function(results, status) {
-      if (status !== google.maps.places.PlacesServiceStatus.OK || !results.length) {
-        document.getElementById("selectedPlace").innerHTML =
-          "No places found near this midpoint. Try another search or another pair of locations.";
-        return;
-      }
-
-      results.slice(0, 5).forEach(place => {
-        const marker = new google.maps.Marker({
-          map: map,
-          position: place.geometry.location,
-          title: place.name
-        });
-
-        markers.push(marker);
-
-        marker.addListener("click", function() {
-  const destination = place.vicinity || place.name;
-  const link =
-    "https://www.google.com/maps/dir/?api=1&destination=" +
-    encodeURIComponent(destination);
-
-  document.getElementById("selectedPlace").innerHTML =
-    "✅ " + place.name + "<br>" +
-    (place.vicinity ? place.vicinity + "<br>" : "") +
-    '<a href="' + link + '" target="_blank">Navigate</a> | ' +
-    '<button onclick="sharePlace(\'' + place.name + '\', \'' + destination + '\')">Share</button>';
-  });
-      });
-    });
-  }
-function sharePlace(name, destination) {
-  const link =
-    "https://www.google.com/maps/dir/?api=1&destination=" +
-    encodeURIComponent(destination);
-
-  if (navigator.share) {
-    navigator.share({
-      title: "Midpoint Meetup",
-      text: "Meet me here: " + name,
-      url: link
-    });
-  } else {
-    prompt("Copy this link:", link);
-  }
+// autocomplete
+new google.maps.places.Autocomplete(document.getElementById("address1"));
+new google.maps.places.Autocomplete(document.getElementById("address2"));
 }
-  function findMidpoint() {
-    const addr1 = document.getElementById("address1").value.trim();
-    const addr2 = document.getElementById("address2").value.trim();
-    const keyword = document.getElementById("placeKeyword").value.trim();
-    const slider = document.getElementById("weightSlider").value / 100;
 
-    if (!addr1 || !addr2) {
-      alert("Enter both addresses");
-      return;
-    }
+function setFilter(type){
+document.getElementById("placeKeyword").value=type;
+}
 
-    clearMarkers();
+function clearMarkers(){
+markers.forEach(m=>m.setMap(null));
+markers=[];
+if(midpointMarker) midpointMarker.setMap(null);
+if(m1) m1.setMap(null);
+if(m2) m2.setMap(null);
+document.getElementById("selectedPlace").innerHTML="";
+}
 
-    geocoder.geocode({ address: addr1 }, function(r1, s1) {
-      if (s1 !== "OK" || !r1.length) {
-        alert("Could not find the first address.");
-        return;
-      }
+function searchNearby(mid,keyword){
 
-      geocoder.geocode({ address: addr2 }, function(r2, s2) {
-        if (s2 !== "OK" || !r2.length) {
-          alert("Could not find the second address.");
-          return;
-        }
+placesService.nearbySearch({
+location:mid,
+radius:1000,
+keyword:keyword||undefined
+},function(results,status){
 
-        const c1 = r1[0].geometry.location;
-        const c2 = r2[0].geometry.location;
+if(status!=="OK"||!results.length)return;
 
-        // Show both entered addresses on the map
-        address1Marker = new google.maps.Marker({
-          position: { lat: c1.lat(), lng: c1.lng() },
-          map: map,
-          title: "Address 1",
-          label: "1"
-        });
+results.slice(0,5).forEach(place=>{
 
-        address2Marker = new google.maps.Marker({
-          position: { lat: c2.lat(), lng: c2.lng() },
-          map: map,
-          title: "Address 2",
-          label: "2"
-        });
+const marker=new google.maps.Marker({
+map:map,
+position:place.geometry.location,
+label:String.fromCharCode(65+markers.length) // A B C D E
+});
 
-        const midLat0 = (c1.lat() + c2.lat()) / 2;
-        const midLng0 = (c1.lng() + c2.lng()) / 2;
+markers.push(marker);
 
-        const maxShift = 0.3;
-        const shift = (slider - 0.5) * 2 * maxShift;
+marker.addListener("click",function(){
 
-        const midLat = midLat0 + (c1.lat() - midLat0) * shift;
-        const midLng = midLng0 + (c1.lng() - midLng0) * shift;
+const dest=place.vicinity||place.name;
+const link="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest);
 
-        const midpoint = { lat: midLat, lng: midLng };
+document.getElementById("selectedPlace").innerHTML=
+"✅ "+place.name+"<br>"+
+(dest)+"<br>"+
+'<a href="'+link+'" target="_blank">Navigate</a> | '+
+'<button onclick="sharePlace(\''+place.name+'\',\''+dest+'\')">Share</button>';
 
-        midpointMarker = new google.maps.Marker({
-          position: midpoint,
-          map: map,
-          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-          title: "Midpoint"
-        });
+});
 
-        // Fit map to show all 3 markers
-        const bounds = new google.maps.LatLngBounds();
-        bounds.extend(c1);
-        bounds.extend(c2);
-        bounds.extend(midpoint);
-        map.fitBounds(bounds);
+});
 
-        const dist1 = getDistanceKm(
-          { lat: c1.lat(), lng: c1.lng() },
-          midpoint
-        ).toFixed(1);
+});
+}
 
-        const dist2 = getDistanceKm(
-          { lat: c2.lat(), lng: c2.lng() },
-          midpoint
-        ).toFixed(1);
+function findMidpoint(){
 
-        document.getElementById("distanceInfo").textContent =
-          "Midpoint is " + dist1 + " km from User 1 and " + dist2 + " km from User 2";
+const a1=document.getElementById("address1").value;
+const a2=document.getElementById("address2").value;
+const keyword=document.getElementById("placeKeyword").value;
+const slider=document.getElementById("weightSlider").value/100;
 
-        searchNearby(midpoint, keyword);
-      });
-    });
-  }
+if(!a1||!a2){alert("Enter both");return;}
+
+clearMarkers();
+
+geocoder.geocode({address:a1},function(r1,s1){
+if(s1!=="OK")return;
+
+geocoder.geocode({address:a2},function(r2,s2){
+if(s2!=="OK")return;
+
+const c1=r1[0].geometry.location;
+const c2=r2[0].geometry.location;
+
+m1=new google.maps.Marker({position:c1,map:map,label:"1"});
+m2=new google.maps.Marker({position:c2,map:map,label:"2"});
+
+const midLat=(c1.lat()+c2.lat())/2;
+const midLng=(c1.lng()+c2.lng())/2;
+
+const shift=(slider-0.5)*0.6;
+
+const mid={
+lat:midLat+(c1.lat()-midLat)*shift,
+lng:midLng+(c1.lng()-midLng)*shift
+};
+
+midpointMarker=new google.maps.Marker({
+position:mid,
+map:map,
+icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+});
+
+const bounds=new google.maps.LatLngBounds();
+bounds.extend(c1);
+bounds.extend(c2);
+bounds.extend(mid);
+map.fitBounds(bounds);
+
+searchNearby(mid,keyword);
+
+});
+});
+}
+
+function sharePlace(name,dest){
+const link="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest);
+
+if(navigator.share){
+navigator.share({
+title:"Midpoint",
+text:"Meet me here: "+name,
+url:link
+});
+}else{
+prompt("Copy this link:",link);
+}
+}
 </script>
 
 <script async
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&libraries=places&callback=initMap">
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&libraries=places&callback=initMap">
 </script>
 
 </body>
