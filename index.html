@@ -166,9 +166,23 @@ function sharePlace(name, destination) {
       title: "Midpoint",
       text: "Meet me here: " + name,
       url: link
-    }).catch(() => {});
+    }).catch(function() {
+      fallbackCopy(link);
+    });
   } else {
-    window.prompt("Copy this link:", link);
+    fallbackCopy(link);
+  }
+}
+
+function fallbackCopy(link) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(link).then(function() {
+      alert("Link copied. You can now paste it and send it.");
+    }).catch(function() {
+      prompt("Copy this link:", link);
+    });
+  } else {
+    prompt("Copy this link:", link);
   }
 }
 
