@@ -324,10 +324,11 @@
 
     function searchNearby(mid, keyword) {
       placesService.nearbySearch({
-        location: mid,
-        radius: 1000,
-        keyword: keyword || undefined
-      }, function(results, status) {
+  location: mid,
+  radius: 1000,
+  keyword: keyword || undefined,
+  type: "establishment"
+}, function(results, status) {
         if (status !== "OK" || !results.length) {
           document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
           return;
