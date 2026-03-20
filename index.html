@@ -1,436 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Midpoint</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" href="midpoint_icon.png">
+  <meta charset="UTF-8">
+  <title>Midpoint</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="midpoint_icon.png">
 
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #e6f0ff;
-  }
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e6f0ff;
+    }
 
-  header {
-    background: #007BFF;
-    padding: 20px;
-    text-align: center;
-  }
+    header {
+      background: #007BFF;
+      padding: 20px;
+      text-align: center;
+    }
 
-  header img {
-    width: 120px;
-  }
+    header img {
+      width: 120px;
+    }
 
-  .container {
-    padding: 20px;
-    max-width: 700px;
-    margin: auto;
-  }
+    .container {
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
 
-  .card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
 
-  .instructions {
-    font-size: 14px;
-    color: #444;
-    margin-bottom: 12px;
-    line-height: 1.5;
-  }
+    .instructions {
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
 
-  input, button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    box-sizing: border-box;
-    font-size: 16px;
-  }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
 
-  button {
-    border: none;
-    background: #007BFF;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+    button {
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-  button:hover {
-    background: #0062cc;
-  }
+    button:hover {
+      background: #0062cc;
+    }
 
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 10px 0;
-  }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
 
-  .filters button {
-    width: auto;
-    flex: 1 1 auto;
-    min-width: 90px;
-    background: #e3f2fd;
-    color: #1976d2;
-  }
+    .filters button {
+      width: auto;
+      flex: 1 1 auto;
+      min-width: 90px;
+      background: #e3f2fd;
+      color: #1976d2;
+    }
 
-  .filters button:hover {
-    background: #bbdefb;
-  }
+    .filters button:hover {
+      background: #bbdefb;
+    }
 
-  #map {
-    height: 420px;
-    margin-top: 20px;
-    border-radius: 10px;
-  }
+    #map {
+      height: 420px;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
 
-  #selectedPlace {
-    margin-top: 12px;
-    padding: 12px;
-    background: #e8f5e9;
-    border-radius: 8px;
-    line-height: 1.6;
-    min-height: 24px;
-  }
+    #selectedPlace {
+      margin-top: 12px;
+      padding: 12px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      line-height: 1.6;
+      min-height: 24px;
+    }
 
-  .best-badge {
-    display: inline-block;
-    background: #ffd54f;
-    color: #333;
-    font-weight: bold;
-    padding: 4px 8px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-  }
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
 
-  .action-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  }
+    .action-link,
+    .share-btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      font-size: 15px;
+    }
 
-  .action-link,
-  .share-btn {
-    display: inline-block;
-    padding: 10px 14px;
-    border-radius: 8px;
-    text-decoration: none;
-    text-align: center;
-    cursor: pointer;
-    border: none;
-    font-size: 15px;
-  }
+    .action-link {
+      background: #007BFF;
+      color: white;
+    }
 
-  .action-link {
-    background: #007BFF;
-    color: white;
-  }
+    .share-btn {
+      background: #28a745;
+      color: white;
+    }
 
-  .share-btn {
-    background: #28a745;
-    color: white;
-  }
+    #distanceInfo {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.4;
+    }
 
-  #distanceInfo {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #333;
-    line-height: 1.4;
-  }
+    #weightWrap {
+      margin-top: 10px;
+    }
 
-  #weightWrap {
-    margin-top: 10px;
-  }
+    #weightValue {
+      font-weight: bold;
+      margin-left: 8px;
+    }
 
-  #weightValue {
-    font-weight: bold;
-    margin-left: 8px;
-  }
-</style>
+    .top-pick {
+      background: #fff8e1;
+      border: 1px solid #f2d675;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <img src="midpoint_icon.png" alt="Midpoint Logo">
-</header>
+  <header>
+    <img src="midpoint_icon.png" alt="Midpoint Logo">
+  </header>
 
-<div class="container">
-  <div class="card">
-    <div class="instructions">
-      Enter two locations → adjust midpoint → choose a place type or search a brand → the app picks the best option automatically
+  <div class="container">
+    <div class="card">
+      <div class="instructions">
+        Enter two locations → adjust midpoint → choose a place type or search a brand → click a result letter → navigate or share it
+      </div>
+
+      <input id="address1" placeholder="First location">
+      <input id="address2" placeholder="Second location">
+
+      <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc.">
+
+      <div class="filters">
+        <button type="button" onclick="setFilter('cafe')">☕ Cafe</button>
+        <button type="button" onclick="setFilter('restaurant')">🍽️ Food</button>
+        <button type="button" onclick="setFilter('park')">🌳 Park</button>
+        <button type="button" onclick="setFilter('lodging')">🏨 Hotel</button>
+        <button type="button" onclick="setFilter('movie_theater')">🎬 Movies</button>
+      </div>
+
+      <div id="weightWrap">
+        <label for="weightSlider">Adjust midpoint <span id="weightValue">50%</span></label>
+        <input type="range" id="weightSlider" min="0" max="100" value="50">
+      </div>
+
+      <button type="button" onclick="findMidpoint()">Find Meetup Spot</button>
+
+      <div id="distanceInfo"></div>
+      <div id="selectedPlace"></div>
     </div>
 
-    <input id="address1" placeholder="First location">
-    <input id="address2" placeholder="Second location">
-
-    <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc.">
-
-    <div class="filters">
-      <button type="button" onclick="setFilter('cafe')">☕ Cafe</button>
-      <button type="button" onclick="setFilter('restaurant')">🍽️ Food</button>
-      <button type="button" onclick="setFilter('park')">🌳 Park</button>
-      <button type="button" onclick="setFilter('lodging')">🏨 Hotel</button>
-      <button type="button" onclick="setFilter('movie_theater')">🎬 Movies</button>
-    </div>
-
-    <div id="weightWrap">
-      <label for="weightSlider">Adjust midpoint <span id="weightValue">50%</span></label>
-      <input type="range" id="weightSlider" min="0" max="100" value="50">
-    </div>
-
-    <button type="button" onclick="findMidpoint()">Find Meetup Spot</button>
-
-    <div id="distanceInfo"></div>
-    <div id="selectedPlace"></div>
+    <div id="map"></div>
   </div>
 
-  <div id="map"></div>
-</div>
+  <script>
+    let map, geocoder, placesService;
+    let markers = [];
+    let midpointMarker = null;
+    let m1 = null;
+    let m2 = null;
+    let selectedShareName = "";
+    let selectedShareDestination = "";
 
-<script>
-let map, geocoder, placesService;
-let markers = [];
-let midpointMarker = null;
-let m1 = null;
-let m2 = null;
-let selectedShareName = "";
-let selectedShareDestination = "";
-let autoSelectedMarker = null;
-
-function initMap() {
-  map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 11,
-    center: { lat: 43.7, lng: -79.4 }
-  });
-
-  geocoder = new google.maps.Geocoder();
-  placesService = new google.maps.places.PlacesService(map);
-
-  new google.maps.places.Autocomplete(document.getElementById("address1"));
-  new google.maps.places.Autocomplete(document.getElementById("address2"));
-
-  document.getElementById("weightSlider").addEventListener("input", function () {
-    document.getElementById("weightValue").textContent = this.value + "%";
-  });
-}
-
-function setFilter(type) {
-  document.getElementById("placeKeyword").value = type;
-}
-
-function clearMarkers() {
-  markers.forEach(m => m.setMap(null));
-  markers = [];
-
-  if (midpointMarker) midpointMarker.setMap(null);
-  if (m1) m1.setMap(null);
-  if (m2) m2.setMap(null);
-
-  midpointMarker = null;
-  m1 = null;
-  m2 = null;
-  autoSelectedMarker = null;
-
-  document.getElementById("selectedPlace").innerHTML = "";
-  document.getElementById("distanceInfo").innerHTML = "";
-}
-
-function getDistanceKm(lat1, lng1, lat2, lng2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-function shareSelectedPlace() {
-  sharePlace(selectedShareName, selectedShareDestination);
-}
-
-function sharePlace(name, destination) {
-  const origin1 = document.getElementById("address1").value.trim();
-  const origin2 = document.getElementById("address2").value.trim();
-
-  const link1 =
-    "https://www.google.com/maps/dir/?api=1&origin=" +
-    encodeURIComponent(origin1) +
-    "&destination=" +
-    encodeURIComponent(destination);
-
-  const link2 =
-    "https://www.google.com/maps/dir/?api=1&origin=" +
-    encodeURIComponent(origin2) +
-    "&destination=" +
-    encodeURIComponent(destination);
-
-  const message =
-    "Midpoint meetup: " + name + "\n\n" +
-    "User 1 route:\n" + link1 + "\n\n" +
-    "User 2 route:\n" + link2;
-
-  prompt("Copy these links:", message);
-}
-
-function showSelectedPlace(place, isBest = false) {
-  const destination = place.vicinity || place.name;
-
-  const origin1 = document.getElementById("address1").value.trim();
-  const origin2 = document.getElementById("address2").value.trim();
-
-  const navLink1 =
-    "https://www.google.com/maps/dir/?api=1&origin=" +
-    encodeURIComponent(origin1) +
-    "&destination=" +
-    encodeURIComponent(destination);
-
-  const navLink2 =
-    "https://www.google.com/maps/dir/?api=1&origin=" +
-    encodeURIComponent(origin2) +
-    "&destination=" +
-    encodeURIComponent(destination);
-
-  selectedShareName = place.name;
-  selectedShareDestination = destination;
-
-  document.getElementById("selectedPlace").innerHTML =
-    (isBest ? '<div class="best-badge">Best option</div>' : '') +
-    "<strong>✅ " + place.name + "</strong><br>" +
-    destination +
-    '<div class="action-row">' +
-      '<a class="action-link" href="' + navLink1 + '" target="_blank">Navigate User 1</a>' +
-      '<a class="action-link" href="' + navLink2 + '" target="_blank">Navigate User 2</a>' +
-      '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share</button>' +
-    '</div>';
-}
-
-function searchNearby(mid, keyword) {
-  placesService.nearbySearch({
-    location: mid,
-    radius: 1000,
-    keyword: keyword || undefined
-  }, function(results, status) {
-    if (status !== "OK" || !results.length) {
-      document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
-      return;
-    }
-
-    const topResults = results.slice(0, 5);
-
-    topResults.forEach((place, index) => {
-      const marker = new google.maps.Marker({
-        map: map,
-        position: place.geometry.location,
-        title: place.name,
-        label: String.fromCharCode(65 + index)
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 11,
+        center: { lat: 43.7, lng: -79.4 }
       });
 
-      markers.push(marker);
+      geocoder = new google.maps.Geocoder();
+      placesService = new google.maps.places.PlacesService(map);
 
-      marker.addListener("click", function() {
-        showSelectedPlace(place, false);
+      new google.maps.places.Autocomplete(document.getElementById("address1"));
+      new google.maps.places.Autocomplete(document.getElementById("address2"));
+
+      document.getElementById("weightSlider").addEventListener("input", function () {
+        document.getElementById("weightValue").textContent = this.value + "%";
       });
-
-      if (index === 0) {
-        autoSelectedMarker = marker;
-      }
-    });
-
-    // Auto-select the first / best result
-    showSelectedPlace(topResults[0], true);
-  });
-}
-
-function findMidpoint() {
-  const a1 = document.getElementById("address1").value.trim();
-  const a2 = document.getElementById("address2").value.trim();
-  const keyword = document.getElementById("placeKeyword").value.trim();
-  const slider = document.getElementById("weightSlider").value / 100;
-
-  if (!a1 || !a2) {
-    alert("Enter both addresses");
-    return;
-  }
-
-  clearMarkers();
-
-  geocoder.geocode({ address: a1 }, function(r1, s1) {
-    if (s1 !== "OK" || !r1.length) {
-      alert("Could not find first address.");
-      return;
     }
 
-    geocoder.geocode({ address: a2 }, function(r2, s2) {
-      if (s2 !== "OK" || !r2.length) {
-        alert("Could not find second address.");
+    function setFilter(type) {
+      document.getElementById("placeKeyword").value = type;
+    }
+
+    function clearMarkers() {
+      markers.forEach(m => m.setMap(null));
+      markers = [];
+
+      if (midpointMarker) midpointMarker.setMap(null);
+      if (m1) m1.setMap(null);
+      if (m2) m2.setMap(null);
+
+      midpointMarker = null;
+      m1 = null;
+      m2 = null;
+
+      document.getElementById("selectedPlace").innerHTML = "";
+      document.getElementById("distanceInfo").innerHTML = "";
+    }
+
+    function getDistanceKm(lat1, lng1, lat2, lng2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function shareSelectedPlace() {
+      sharePlace(selectedShareName, selectedShareDestination);
+    }
+
+    function sharePlace(name, destination) {
+      const origin1 = document.getElementById("address1").value.trim();
+      const origin2 = document.getElementById("address2").value.trim();
+
+      const link1 =
+        "https://www.google.com/maps/dir/?api=1&origin=" +
+        encodeURIComponent(origin1) +
+        "&destination=" +
+        encodeURIComponent(destination);
+
+      const link2 =
+        "https://www.google.com/maps/dir/?api=1&origin=" +
+        encodeURIComponent(origin2) +
+        "&destination=" +
+        encodeURIComponent(destination);
+
+      const message =
+        "Midpoint meetup: " + name + "\n\n" +
+        "User 1 route:\n" + link1 + "\n\n" +
+        "User 2 route:\n" + link2;
+
+      prompt("Copy these links:", message);
+    }
+
+    function showSelectedPlace(place) {
+      const destination = place.vicinity || place.name;
+
+      const origin1 = document.getElementById("address1").value.trim();
+      const origin2 = document.getElementById("address2").value.trim();
+
+      const navLink1 =
+        "https://www.google.com/maps/dir/?api=1&origin=" +
+        encodeURIComponent(origin1) +
+        "&destination=" +
+        encodeURIComponent(destination);
+
+      const navLink2 =
+        "https://www.google.com/maps/dir/?api=1&origin=" +
+        encodeURIComponent(origin2) +
+        "&destination=" +
+        encodeURIComponent(destination);
+
+      selectedShareName = place.name;
+      selectedShareDestination = destination;
+
+      document.getElementById("selectedPlace").innerHTML =
+        "<strong>✅ " + place.name + "</strong><br>" +
+        destination +
+        '<div class="action-row">' +
+          '<a class="action-link" href="' + navLink1 + '" target="_blank">Navigate User 1</a>' +
+          '<a class="action-link" href="' + navLink2 + '" target="_blank">Navigate User 2</a>' +
+          '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share</button>' +
+        '</div>';
+    }
+
+    function showTopPick(place) {
+      const destination = place.vicinity || place.name;
+
+      document.getElementById("selectedPlace").innerHTML =
+        '<div class="top-pick">' +
+        '⭐ <strong>Top Pick: ' + place.name + '</strong><br>' +
+        destination + '<br>' +
+        '<em>Tap a letter on the map to navigate or share.</em>' +
+        '</div>';
+    }
+
+    function searchNearby(mid, keyword) {
+      placesService.nearbySearch({
+        location: mid,
+        radius: 1000,
+        keyword: keyword || undefined
+      }, function(results, status) {
+        if (status !== "OK" || !results.length) {
+          document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
+          return;
+        }
+
+        const topPlace = results[0];
+        showTopPick(topPlace);
+
+        results.slice(0, 5).forEach((place, index) => {
+          const marker = new google.maps.Marker({
+            map: map,
+            position: place.geometry.location,
+            title: place.name,
+            label: String.fromCharCode(65 + index) // A B C D E
+          });
+
+          markers.push(marker);
+
+          marker.addListener("click", function() {
+            showSelectedPlace(place);
+          });
+        });
+      });
+    }
+
+    function findMidpoint() {
+      const a1 = document.getElementById("address1").value.trim();
+      const a2 = document.getElementById("address2").value.trim();
+      const keyword = document.getElementById("placeKeyword").value.trim();
+      const slider = document.getElementById("weightSlider").value / 100;
+
+      if (!a1 || !a2) {
+        alert("Enter both addresses");
         return;
       }
 
-      const c1 = r1[0].geometry.location;
-      const c2 = r2[0].geometry.location;
+      clearMarkers();
 
-      m1 = new google.maps.Marker({
-        position: c1,
-        map: map,
-        label: "1"
+      geocoder.geocode({ address: a1 }, function(r1, s1) {
+        if (s1 !== "OK" || !r1.length) {
+          alert("Could not find first address.");
+          return;
+        }
+
+        geocoder.geocode({ address: a2 }, function(r2, s2) {
+          if (s2 !== "OK" || !r2.length) {
+            alert("Could not find second address.");
+            return;
+          }
+
+          const c1 = r1[0].geometry.location;
+          const c2 = r2[0].geometry.location;
+
+          m1 = new google.maps.Marker({
+            position: c1,
+            map: map,
+            label: "1"
+          });
+
+          m2 = new google.maps.Marker({
+            position: c2,
+            map: map,
+            label: "2"
+          });
+
+          const midLat0 = (c1.lat() + c2.lat()) / 2;
+          const midLng0 = (c1.lng() + c2.lng()) / 2;
+
+          const shift = (slider - 0.5) * 0.6;
+
+          const mid = {
+            lat: midLat0 + (c1.lat() - midLat0) * shift,
+            lng: midLng0 + (c1.lng() - midLng0) * shift
+          };
+
+          midpointMarker = new google.maps.Marker({
+            position: mid,
+            map: map,
+            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+          });
+
+          const d1 = getDistanceKm(c1.lat(), c1.lng(), mid.lat, mid.lng).toFixed(1);
+          const d2 = getDistanceKm(c2.lat(), c2.lng(), mid.lat, mid.lng).toFixed(1);
+
+          document.getElementById("distanceInfo").innerHTML =
+            "User 1 to midpoint: " + d1 + " km<br>" +
+            "User 2 to midpoint: " + d2 + " km";
+
+          const bounds = new google.maps.LatLngBounds();
+          bounds.extend(c1);
+          bounds.extend(c2);
+          bounds.extend(mid);
+          map.fitBounds(bounds);
+
+          searchNearby(mid, keyword);
+        });
       });
+    }
+  </script>
 
-      m2 = new google.maps.Marker({
-        position: c2,
-        map: map,
-        label: "2"
-      });
-
-      const midLat0 = (c1.lat() + c2.lat()) / 2;
-      const midLng0 = (c1.lng() + c2.lng()) / 2;
-
-      const shift = (slider - 0.5) * 0.6;
-
-      const mid = {
-        lat: midLat0 + (c1.lat() - midLat0) * shift,
-        lng: midLng0 + (c1.lng() - midLng0) * shift
-      };
-
-      midpointMarker = new google.maps.Marker({
-        position: mid,
-        map: map,
-        icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-      });
-
-      const d1 = getDistanceKm(c1.lat(), c1.lng(), mid.lat, mid.lng).toFixed(1);
-      const d2 = getDistanceKm(c2.lat(), c2.lng(), mid.lat, mid.lng).toFixed(1);
-
-      document.getElementById("distanceInfo").innerHTML =
-        "User 1 to midpoint: " + d1 + " km<br>" +
-        "User 2 to midpoint: " + d2 + " km";
-
-      const bounds = new google.maps.LatLngBounds();
-      bounds.extend(c1);
-      bounds.extend(c2);
-      bounds.extend(mid);
-      map.fitBounds(bounds);
-
-      searchNearby(mid, keyword);
-    });
-  });
-}
-</script>
-
-<script async
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&libraries=places&callback=initMap">
-</script>
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&libraries=places&callback=initMap">
+  </script>
 
 </body>
 </html>
