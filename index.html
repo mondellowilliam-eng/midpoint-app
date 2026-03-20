@@ -427,7 +427,23 @@
       });
     }
   </script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCJD0P-O892D1qzB0_zNfhylKMTqHHIfYM",
+  authDomain: "midpoint-web.firebaseapp.com",
+  databaseURL: "https://midpoint-web-default-rtdb.firebaseio.com/",
+  projectId: "midpoint-web",
+  storageBucket: "midpoint-web.firebasestorage.app",
+  messagingSenderId: "73084785329",
+  appId: "1:73084785329:web:2586e545c1fa599f648890"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
   <script async
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&libraries=places&callback=initMap">
   </script>
