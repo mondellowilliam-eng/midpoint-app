@@ -98,6 +98,16 @@
     min-height: 24px;
   }
 
+  .best-badge {
+    display: inline-block;
+    background: #ffd54f;
+    color: #333;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+
   .action-row {
     display: flex;
     gap: 10px;
@@ -153,7 +163,7 @@
 <div class="container">
   <div class="card">
     <div class="instructions">
-      Enter two locations → adjust midpoint → choose a place type or search a brand → click a result letter → navigate or share it
+      Enter two locations → adjust midpoint → choose a place type or search a brand → the app picks the best option automatically
     </div>
 
     <input id="address1" placeholder="First location">
@@ -191,6 +201,7 @@ let m1 = null;
 let m2 = null;
 let selectedShareName = "";
 let selectedShareDestination = "";
+let autoSelectedMarker = null;
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -224,6 +235,7 @@ function clearMarkers() {
   midpointMarker = null;
   m1 = null;
   m2 = null;
+  autoSelectedMarker = null;
 
   document.getElementById("selectedPlace").innerHTML = "";
   document.getElementById("distanceInfo").innerHTML = "";
@@ -272,7 +284,7 @@ function sharePlace(name, destination) {
   prompt("Copy these links:", message);
 }
 
-function showSelectedPlace(place) {
+function showSelectedPlace(place, isBest = false) {
   const destination = place.vicinity || place.name;
 
   const origin1 = document.getElementById("address1").value.trim();
@@ -294,6 +306,7 @@ function showSelectedPlace(place) {
   selectedShareDestination = destination;
 
   document.getElementById("selectedPlace").innerHTML =
+    (isBest ? '<div class="best-badge">Best option</div>' : '') +
     "<strong>✅ " + place.name + "</strong><br>" +
     destination +
     '<div class="action-row">' +
@@ -314,20 +327,29 @@ function searchNearby(mid, keyword) {
       return;
     }
 
-    results.slice(0, 5).forEach((place, index) => {
+    const topResults = results.slice(0, 5);
+
+    topResults.forEach((place, index) => {
       const marker = new google.maps.Marker({
         map: map,
         position: place.geometry.location,
         title: place.name,
-        label: String.fromCharCode(65 + index) // A B C D E
+        label: String.fromCharCode(65 + index)
       });
 
       markers.push(marker);
 
       marker.addListener("click", function() {
-        showSelectedPlace(place);
+        showSelectedPlace(place, false);
       });
+
+      if (index === 0) {
+        autoSelectedMarker = marker;
+      }
     });
+
+    // Auto-select the first / best result
+    showSelectedPlace(topResults[0], true);
   });
 }
 
