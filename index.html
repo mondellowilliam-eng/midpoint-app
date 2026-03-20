@@ -212,7 +212,7 @@
       new google.maps.places.Autocomplete(document.getElementById("address1"));
       new google.maps.places.Autocomplete(document.getElementById("address2"));
 
-      //document.getElementById("weightSlider").addEventListener("input", function () {
+      document.getElementById("weightSlider").addEventListener("input", function () {
         document.getElementById("weightValue").textContent = this.value + "%";
       });
     }
@@ -322,36 +322,36 @@
         '</div>';
     }
 
-  function searchNearby(mid, keyword) {
-  placesService.nearbySearch({
-    location: mid,
-    radius: 1000,
-    keyword: keyword || undefined
-  }, function(results, status) {
-    if (status !== "OK" || !results.length) {
-      document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
-      return;
+    function searchNearby(mid, keyword) {
+      placesService.nearbySearch({
+        location: mid,
+        radius: 1000,
+        keyword: keyword || undefined
+      }, function(results, status) {
+        if (status !== "OK" || !results.length) {
+          document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
+          return;
+        }
+
+        const topPlace = results[0];
+        showTopPick(topPlace);
+
+        results.slice(0, 5).forEach((place, index) => {
+          const marker = new google.maps.Marker({
+            map: map,
+            position: place.geometry.location,
+            title: place.name,
+            label: String.fromCharCode(65 + index)
+          });
+
+          markers.push(marker);
+
+          marker.addListener("click", function() {
+            showSelectedPlace(place);
+          });
+        });
+      });
     }
-
-    const topPlace = results[0];
-    showTopPick(topPlace);
-
-    results.slice(0, 5).forEach((place, index) => {
-      const marker = new google.maps.Marker({
-        map: map,
-        position: place.geometry.location,
-        title: place.name,
-        label: String.fromCharCode(65 + index)
-      });
-
-      markers.push(marker);
-
-      marker.addListener("click", function() {
-        showSelectedPlace(place);
-      });
-    });
-  });
-} 
 
     function findMidpoint() {
       const a1 = document.getElementById("address1").value.trim();
