@@ -361,17 +361,7 @@
       '</div>';
   }
 
-  function loadSession() {
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get("session");
-    if (!sessionId) return;
-
-    db.ref("sessions/" + sessionId).once("value", snapshot => {
-      const data = snapshot.val();
-      if (!data) return;
-      renderSharedSession(data);
-    });
-  }
+  
 
   function showSelectedPlace(place) {
     const destination = place.vicinity || place.name;
@@ -381,7 +371,22 @@
 
     const navLink1 =
       "https://www.google.com/maps/dir/?api=1&origin=" +
-      encodeURIComponent(origin1) +
+      encodeURIComponefunction loadSession() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get("session");
+
+  if (!sessionId) return;
+
+  db.ref("sessions/" + sessionId).once("value").then(snapshot => {
+    const data = snapshot.val();
+    if (!data) {
+      alert("Session not found.");
+      return;
+    }
+
+    renderSharedSession(data);
+  });
+}nt(origin1) +
       "&destination=" +
       encodeURIComponent(destination);
 
