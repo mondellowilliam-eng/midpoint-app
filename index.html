@@ -282,28 +282,40 @@
   }
 
   function createSession() {
-    if (!selectedShareDestination || selectedShareLat === null || selectedShareLng === null) {
-      alert("Pick a place first by clicking A–E.");
-      return;
-    }
-
-    const sessionId = Math.random().toString(36).substring(2, 8);
-
-    db.ref("sessions/" + sessionId).set({
-      destination: selectedShareDestination,
-      name: selectedShareName,
-      lat: selectedShareLat,
-      lng: selectedShareLng,
-      address1: document.getElementById("address1").value.trim(),
-      address2: document.getElementById("address2").value.trim(),
-      created: Date.now()
-    });
-
-    const link =
-      "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
-
-    prompt("Share this session link:", link);
+  if (!selectedShareDestination || selectedShareLat === null || selectedShareLng === null) {
+    alert("Pick a place first by clicking A–E.");
+    return;
   }
+
+  const sessionId = Math.random().toString(36).substring(2, 8);
+
+  db.ref("sessions/" + sessionId).set({
+    destination: selectedShareDestination,
+    name: selectedShareName,
+    lat: selectedShareLat,
+    lng: selectedShareLng,
+    address1: document.getElementById("address1").value.trim(),
+    address2: document.getElementById("address2").value.trim(),
+    created: Date.now()
+  }).then(() => {
+    const sessionLink =
+      window.location.origin +
+      window.location.pathname +
+      "?session=" + sessionId;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "Midpoint Session",
+        text: "Join my meetup session",
+        url: sessionLink
+      }).catch(() => {
+        prompt("Copy this session link:", sessionLink);
+      });
+    } else {
+      prompt("Copy this session link:", sessionLink);
+    }
+  });
+}
 
   function renderSharedSession(data) {
     if (!data || typeof data.lat !== "number" || typeof data.lng !== "number") return;
