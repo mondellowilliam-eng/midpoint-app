@@ -107,7 +107,8 @@
 
     .action-link,
     .share-btn,
-    .session-btn {
+    .session-btn,
+    .tracking-btn {
       display: inline-block;
       padding: 10px 14px;
       border-radius: 8px;
@@ -129,6 +130,10 @@
 
     .session-btn {
       background: #6f42c1;
+    }
+
+    .tracking-btn {
+      background: #ff9800;
     }
 
     #distanceInfo {
@@ -174,7 +179,7 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → adjust midpoint → choose a place type or search a brand → click a result letter → navigate, share destination, or share the full session
+        Enter two locations → adjust midpoint → choose a place type or search a brand → click a result letter → navigate, share destination, share session, and track both users live
       </div>
 
       <div id="sharedSessionInfo"></div>
@@ -233,6 +238,9 @@
     let selectedShareDestination = "";
     let selectedShareLat = null;
     let selectedShareLng = null;
+    let currentSessionId = "";
+    let liveUserMarkers = {};
+    let watchId = null;
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -270,6 +278,9 @@
       m1 = null;
       m2 = null;
       sessionPlaceMarker = null;
+
+      Object.values(liveUserMarkers).forEach(marker => marker.setMap(null));
+      liveUserMarkers = {};
 
       document.getElementById("selectedPlace").innerHTML = "";
       document.getElementById("distanceInfo").innerHTML = "";
@@ -312,6 +323,84 @@
       }
     }
 
+    function getOrCreateUserId() {
+      let userId = localStorage.getItem("midpointUserId");
+      if (!userId) {
+        userId = Math.random().toString(36).substring(2, 8);
+        localStorage.setItem("midpointUserId", userId);
+      }
+      return userId;
+    }
+
+    function startLiveTracking() {
+      if (!navigator.geolocation || !currentSessionId) return;
+
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+
+      const userId = getOrCreateUserId();
+
+      watchId = navigator.geolocation.watchPosition(
+        position => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          db.ref("sessions/" + currentSessionId + "/users/" + userId).set({
+            lat: lat,
+            lng: lng,
+            updated: Date.now()
+          });
+        },
+        error => {
+          console.log("Live tracking error:", error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 10000
+        }
+      );
+    }
+
+    function listenForUsers(sessionId) {
+      db.ref("sessions/" + sessionId + "/users").on("value", snapshot => {
+        const users = snapshot.val();
+        if (!users) return;
+
+        const existingIds = new Set(Object.keys(users));
+
+        for (const id in liveUserMarkers) {
+          if (!existingIds.has(id)) {
+            liveUserMarkers[id].setMap(null);
+            delete liveUserMarkers[id];
+          }
+        }
+
+        for (const id in users) {
+          const user = users[id];
+          const pos = { lat: user.lat, lng: user.lng };
+
+          if (!liveUserMarkers[id]) {
+            liveUserMarkers[id] = new google.maps.Marker({
+              map: map,
+              position: pos,
+              label: "👤",
+              title: "Live User"
+            });
+          } else {
+            liveUserMarkers[id].setPosition(pos);
+          }
+        }
+      });
+    }
+
+    function beginSessionTracking(sessionId) {
+      currentSessionId = sessionId;
+      startLiveTracking();
+      listenForUsers(sessionId);
+    }
+
     function createSession() {
       if (!selectedShareDestination || selectedShareLat === null || selectedShareLng === null) {
         alert("Pick a place first by clicking A–E.");
@@ -333,6 +422,8 @@
           window.location.origin +
           window.location.pathname +
           "?session=" + sessionId;
+
+        beginSessionTracking(sessionId);
 
         if (navigator.share) {
           navigator.share({
@@ -389,6 +480,7 @@
         '<div class="action-row">' +
           '<a class="action-link" href="' + navLink + '" target="_blank">Navigate</a>' +
           '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
+          '<button class="tracking-btn" type="button" onclick="startLiveTracking()">Start Live Tracking</button>' +
         '</div>';
     }
 
@@ -398,6 +490,8 @@
 
       if (!sessionId) return;
 
+      currentSessionId = sessionId;
+
       db.ref("sessions/" + sessionId).once("value").then(snapshot => {
         const data = snapshot.val();
         if (!data) {
@@ -406,6 +500,7 @@
         }
 
         renderSharedSession(data);
+        beginSessionTracking(sessionId);
       });
     }
 
