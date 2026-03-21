@@ -505,25 +505,26 @@
     }
 
     function showSelectedPlace(place) {
-      const destination = place.vicinity || place.name;
+  const destination = place.vicinity || place.name;
 
-      const navLink =
-  "https://www.google.com/maps/dir/?api=1&destination=" +
-  encodeURIComponent(destination);
-      selectedShareName = place.name;
-      selectedShareDestination = destination;
-      selectedShareLat = place.geometry.location.lat();
-      selectedShareLng = place.geometry.location.lng();
+  const navLink =
+    "https://www.google.com/maps/dir/?api=1&destination=" +
+    encodeURIComponent(destination);
 
-     document.getElementById("selectedPlace").innerHTML =
-  "<strong>✅ " + place.name + "</strong><br>" +
-  destination +
-  '<div class="action-row">' +
-    '<a class="action-link" href="' + navLink + '" target="_blank">Navigate</a>' +
-    '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
-    '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-  '</div>'; 
-    }
+  selectedShareName = place.name;
+  selectedShareDestination = destination;
+  selectedShareLat = place.geometry.location.lat();
+  selectedShareLng = place.geometry.location.lng();
+
+  document.getElementById("selectedPlace").innerHTML =
+    "<strong>✅ " + place.name + "</strong><br>" +
+    destination +
+    '<div class="action-row">' +
+      '<a class="action-link" href="' + navLink + '" target="_blank">Navigate</a>' +
+      '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
+      '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+    '</div>';
+}
 
     function showTopPick(place) {
       const destination = place.vicinity || place.name;
