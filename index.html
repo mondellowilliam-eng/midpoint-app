@@ -25,7 +25,7 @@
 
     .container {
       padding: 20px;
-      max-width: 700px;
+      max-width: 720px;
       margin: auto;
     }
 
@@ -84,7 +84,7 @@
     }
 
     #map {
-      height: 420px;
+      height: 430px;
       margin-top: 20px;
       border-radius: 10px;
     }
@@ -108,7 +108,7 @@
     .action-link,
     .share-btn,
     .session-btn,
-    .tracking-btn {
+    .live-btn {
       display: inline-block;
       padding: 10px 14px;
       border-radius: 8px;
@@ -132,11 +132,12 @@
       background: #6f42c1;
     }
 
-    .tracking-btn {
-      background: #ff9800;
+    .live-btn {
+      background: #ff7a00;
     }
 
-    #distanceInfo {
+    #distanceInfo,
+    #liveInfo {
       margin-top: 10px;
       font-size: 14px;
       color: #333;
@@ -179,7 +180,7 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → adjust midpoint → choose a place type or search a brand → click a result letter → navigate, share destination, share session, and track both users live
+        Enter two locations → find a spot → click a result letter → share destination or share full session → both users can open the same session and start live sharing
       </div>
 
       <div id="sharedSessionInfo"></div>
@@ -206,6 +207,7 @@
 
       <div id="distanceInfo"></div>
       <div id="selectedPlace"></div>
+      <div id="liveInfo"></div>
     </div>
 
     <div id="map"></div>
@@ -233,14 +235,16 @@
     let midpointMarker = null;
     let m1 = null;
     let m2 = null;
-    let sessionPlaceMarker = null;
+    let destinationMarker = null;
+
     let selectedShareName = "";
     let selectedShareDestination = "";
-    let selectedShareLat = null;
-    let selectedShareLng = null;
     let currentSessionId = "";
-    let liveUserMarkers = {};
-    let watchId = null;
+    let selectedRole = "";
+    let liveWatchId = null;
+
+    let liveUser1Marker = null;
+    let liveUser2Marker = null;
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -272,15 +276,12 @@
       if (midpointMarker) midpointMarker.setMap(null);
       if (m1) m1.setMap(null);
       if (m2) m2.setMap(null);
-      if (sessionPlaceMarker) sessionPlaceMarker.setMap(null);
+      if (destinationMarker) destinationMarker.setMap(null);
 
       midpointMarker = null;
       m1 = null;
       m2 = null;
-      sessionPlaceMarker = null;
-
-      Object.values(liveUserMarkers).forEach(marker => marker.setMap(null));
-      liveUserMarkers = {};
+      destinationMarker = null;
 
       document.getElementById("selectedPlace").innerHTML = "";
       document.getElementById("distanceInfo").innerHTML = "";
@@ -323,86 +324,8 @@
       }
     }
 
-    function getOrCreateUserId() {
-      let userId = localStorage.getItem("midpointUserId");
-      if (!userId) {
-        userId = Math.random().toString(36).substring(2, 8);
-        localStorage.setItem("midpointUserId", userId);
-      }
-      return userId;
-    }
-
-    function startLiveTracking() {
-      if (!navigator.geolocation || !currentSessionId) return;
-
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-
-      const userId = getOrCreateUserId();
-
-      watchId = navigator.geolocation.watchPosition(
-        position => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-
-          db.ref("sessions/" + currentSessionId + "/users/" + userId).set({
-            lat: lat,
-            lng: lng,
-            updated: Date.now()
-          });
-        },
-        error => {
-          console.log("Live tracking error:", error);
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 5000,
-          timeout: 10000
-        }
-      );
-    }
-
-    function listenForUsers(sessionId) {
-      db.ref("sessions/" + sessionId + "/users").on("value", snapshot => {
-        const users = snapshot.val();
-        if (!users) return;
-
-        const existingIds = new Set(Object.keys(users));
-
-        for (const id in liveUserMarkers) {
-          if (!existingIds.has(id)) {
-            liveUserMarkers[id].setMap(null);
-            delete liveUserMarkers[id];
-          }
-        }
-
-        for (const id in users) {
-          const user = users[id];
-          const pos = { lat: user.lat, lng: user.lng };
-
-          if (!liveUserMarkers[id]) {
-            liveUserMarkers[id] = new google.maps.Marker({
-              map: map,
-              position: pos,
-              label: "👤",
-              title: "Live User"
-            });
-          } else {
-            liveUserMarkers[id].setPosition(pos);
-          }
-        }
-      });
-    }
-
-    function beginSessionTracking(sessionId) {
-      currentSessionId = sessionId;
-      startLiveTracking();
-      listenForUsers(sessionId);
-    }
-
     function createSession() {
-      if (!selectedShareDestination || selectedShareLat === null || selectedShareLng === null) {
+      if (!selectedShareDestination) {
         alert("Pick a place first by clicking A–E.");
         return;
       }
@@ -412,119 +335,143 @@
       db.ref("sessions/" + sessionId).set({
         destination: selectedShareDestination,
         name: selectedShareName,
-        lat: selectedShareLat,
-        lng: selectedShareLng,
         address1: document.getElementById("address1").value.trim(),
         address2: document.getElementById("address2").value.trim(),
         created: Date.now()
-      }).then(() => {
-        const sessionLink =
-          window.location.origin +
-          window.location.pathname +
-          "?session=" + sessionId;
+      })
+      .then(() => {
+        const link =
+          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
 
-        beginSessionTracking(sessionId);
+        prompt("Copy and send this session link:", link);
+      })
+      .catch((error) => {
+        alert("Firebase error: " + error.message);
+      });
+    }
 
-        if (navigator.share) {
-          navigator.share({
-            title: "Midpoint Session",
-            text: "Join my meetup session",
-            url: sessionLink
-          }).catch(() => {
-            prompt("Copy this session link:", sessionLink);
+    function chooseRole(role) {
+      selectedRole = role;
+      document.getElementById("liveInfo").innerHTML =
+        "Live sharing role selected: <strong>" + role.toUpperCase() + "</strong>";
+    }
+
+    function startLiveSharing() {
+      if (!currentSessionId) {
+        alert("Open a shared session first.");
+        return;
+      }
+
+      if (!selectedRole) {
+        alert("Choose User 1 or User 2 first.");
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        alert("Location sharing is not supported on this device.");
+        return;
+      }
+
+      if (liveWatchId !== null) {
+        navigator.geolocation.clearWatch(liveWatchId);
+      }
+
+      liveWatchId = navigator.geolocation.watchPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const speed = position.coords.speed || 0;
+
+          db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
+            lat: lat,
+            lng: lng,
+            speed: speed,
+            updated: Date.now()
+          });
+
+          document.getElementById("liveInfo").innerHTML =
+            "Live sharing active as <strong>" + selectedRole.toUpperCase() + "</strong>";
+        },
+        function(error) {
+          alert("Location error: " + error.message);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 10000
+        }
+      );
+    }
+
+    function listenToLiveUsers(sessionId) {
+      db.ref("sessions/" + sessionId + "/live/user1").on("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const pos = { lat: data.lat, lng: data.lng };
+
+        if (!liveUser1Marker) {
+          liveUser1Marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            label: "1",
+            title: "User 1 Live"
           });
         } else {
-          prompt("Copy this session link:", sessionLink);
+          liveUser1Marker.setPosition(pos);
         }
       });
-    }
 
-    function renderSharedSession(data) {
-      if (!data || typeof data.lat !== "number" || typeof data.lng !== "number") return;
-
-      clearMarkers();
-
-      const pos = { lat: data.lat, lng: data.lng };
-
-      sessionPlaceMarker = new google.maps.Marker({
-        position: pos,
-        map: map,
-        title: data.name || "Shared Meetup"
-      });
-
-      map.setCenter(pos);
-      map.setZoom(14);
-
-      selectedShareName = data.name || "";
-      selectedShareDestination = data.destination || "";
-      selectedShareLat = data.lat;
-      selectedShareLng = data.lng;
-
-      if (data.address1) document.getElementById("address1").value = data.address1;
-      if (data.address2) document.getElementById("address2").value = data.address2;
-
-      document.getElementById("sharedSessionInfo").innerHTML =
-        '<div class="shared-box">' +
-        '🔗 <strong>Shared Session Loaded</strong><br>' +
-        (data.name || "") + '<br>' +
-        (data.destination || "") +
-        '</div>';
-
-      const navLink =
-        "https://www.google.com/maps/dir/?api=1&destination=" +
-        encodeURIComponent(data.destination || data.name || "");
-
-      document.getElementById("selectedPlace").innerHTML =
-        "<strong>✅ Shared Meetup: " + (data.name || "") + "</strong><br>" +
-        (data.destination || "") +
-        '<div class="action-row">' +
-          '<a class="action-link" href="' + navLink + '" target="_blank">Navigate</a>' +
-          '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
-          '<button class="tracking-btn" type="button" onclick="startLiveTracking()">Start Live Tracking</button>' +
-        '</div>';
-    }
-
-    function loadSession() {
-      const params = new URLSearchParams(window.location.search);
-      const sessionId = params.get("session");
-
-      if (!sessionId) return;
-
-      currentSessionId = sessionId;
-
-      db.ref("sessions/" + sessionId).once("value").then(snapshot => {
+      db.ref("sessions/" + sessionId + "/live/user2").on("value", snapshot => {
         const data = snapshot.val();
-        if (!data) {
-          alert("Session not found.");
-          return;
-        }
+        if (!data) return;
 
-        renderSharedSession(data);
-        beginSessionTracking(sessionId);
+        const pos = { lat: data.lat, lng: data.lng };
+
+        if (!liveUser2Marker) {
+          liveUser2Marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            label: "2",
+            title: "User 2 Live"
+          });
+        } else {
+          liveUser2Marker.setPosition(pos);
+        }
       });
     }
 
     function showSelectedPlace(place) {
-  const destination = place.vicinity || place.name;
+      const destination = place.vicinity || place.name;
 
-  const navLink =
-    "https://www.google.com/maps/dir/?api=1&destination=" +
-    encodeURIComponent(destination);
+      const origin1 = document.getElementById("address1").value.trim();
+      const origin2 = document.getElementById("address2").value.trim();
 
-  selectedShareName = place.name;
-  selectedShareDestination = destination;
-  selectedShareLat = place.geometry.location.lat();
-  selectedShareLng = place.geometry.location.lng();
+      const navLink1 =
+        "https://www.google.com/maps/dir/?api=1&origin=" +
+        encodeURIComponent(origin1) +
+        "&destination=" +
+        encodeURIComponent(destination);
 
-  document.getElementById("selectedPlace").innerHTML =
-    "<strong>✅ " + place.name + "</strong><br>" +
-    destination +
-    '<div class="action-row">' +
-      '<a class="action-link" href="' + navLink + '" target="_blank">Navigate</a>' +
-      '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
-      '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-    '</div>';
-}
+      const navLink2 =
+        "https://www.google.com/maps/dir/?api=1&origin=" +
+        encodeURIComponent(origin2) +
+        "&destination=" +
+        encodeURIComponent(destination);
+
+      selectedShareName = place.name;
+      selectedShareDestination = destination;
+
+      document.getElementById("selectedPlace").innerHTML =
+        "<strong>✅ " + place.name + "</strong><br>" +
+        destination +
+        '<div class="action-row">' +
+          '<a class="action-link" href="' + navLink1 + '" target="_blank">Navigate User 1</a>' +
+          '<a class="action-link" href="' + navLink2 + '" target="_blank">Navigate User 2</a>' +
+          '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
+          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+        '</div>';
+    }
 
     function showTopPick(place) {
       const destination = place.vicinity || place.name;
@@ -565,6 +512,73 @@
             showSelectedPlace(place);
           });
         });
+      });
+    }
+
+    function showDestinationFromSession(destinationText) {
+      geocoder.geocode({ address: destinationText }, function(results, status) {
+        if (status !== "OK" || !results.length) return;
+
+        const location = results[0].geometry.location;
+
+        if (destinationMarker) destinationMarker.setMap(null);
+
+        destinationMarker = new google.maps.Marker({
+          position: location,
+          map: map,
+          title: destinationText,
+          icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+        });
+
+        map.setCenter(location);
+        map.setZoom(13);
+      });
+    }
+
+    function loadSession() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session");
+
+      if (!sessionId) return;
+
+      currentSessionId = sessionId;
+
+      db.ref("sessions/" + sessionId).once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        selectedShareDestination = data.destination || "";
+        selectedShareName = data.name || "";
+
+        document.getElementById("sharedSessionInfo").innerHTML =
+          '<div class="shared-box">' +
+          '🔗 <strong>Shared Session Loaded</strong><br>' +
+          (data.name || "") + '<br>' +
+          (data.destination || "") +
+          '<div class="action-row">' +
+            '<button class="session-btn" type="button" onclick="chooseRole(\'user1\')">Join as User 1</button>' +
+            '<button class="session-btn" type="button" onclick="chooseRole(\'user2\')">Join as User 2</button>' +
+            '<button class="live-btn" type="button" onclick="startLiveSharing()">Start Live Sharing</button>' +
+          '</div>' +
+          '</div>';
+
+        if (data.address1) document.getElementById("address1").value = data.address1;
+        if (data.address2) document.getElementById("address2").value = data.address2;
+
+        if (data.destination) {
+          showDestinationFromSession(data.destination);
+        }
+
+        if (data.name && data.destination) {
+          document.getElementById("selectedPlace").innerHTML =
+            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+            data.destination +
+            '<div class="action-row">' +
+              '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
+            '</div>';
+        }
+
+        listenToLiveUsers(sessionId);
       });
     }
 
