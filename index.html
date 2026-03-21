@@ -515,15 +515,14 @@
       selectedShareLat = place.geometry.location.lat();
       selectedShareLng = place.geometry.location.lng();
 
-      document.getElementById("selectedPlace").innerHTML =
-        "<strong>✅ " + place.name + "</strong><br>" +
-        destination +
-        '<div class="action-row">' +
-          '<a class="action-link" href="' + navLink1 + '" target="_blank">Navigate User 1</a>' +
-          '<a class="action-link" href="' + navLink2 + '" target="_blank">Navigate User 2</a>' +
-          '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
-          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-        '</div>';
+     document.getElementById("selectedPlace").innerHTML =
+  "<strong>✅ " + place.name + "</strong><br>" +
+  destination +
+  '<div class="action-row">' +
+    '<a class="action-link" href="' + navLink + '" target="_blank">Navigate</a>' +
+    '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
+    '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+  '</div>'; 
     }
 
     function showTopPick(place) {
