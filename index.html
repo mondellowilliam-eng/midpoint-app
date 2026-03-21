@@ -317,49 +317,49 @@
   });
 }
 
-  function renderSharedSession(data) {
-    if (!data || typeof data.lat !== "number" || typeof data.lng !== "number") return;
+ function renderSharedSession(data) {
+  if (!data || typeof data.lat !== "number" || typeof data.lng !== "number") return;
 
-    clearMarkers();
+  clearMarkers();
 
-    const pos = { lat: data.lat, lng: data.lng };
+  const pos = { lat: data.lat, lng: data.lng };
 
-    sessionPlaceMarker = new google.maps.Marker({
-      position: pos,
-      map: map,
-      title: data.name || "Shared Meetup"
-    });
+  sessionPlaceMarker = new google.maps.Marker({
+    position: pos,
+    map: map,
+    title: data.name || "Shared Meetup"
+  });
 
-    map.setCenter(pos);
-    map.setZoom(14);
+  map.setCenter(pos);
+  map.setZoom(14);
 
-    selectedShareName = data.name || "";
-    selectedShareDestination = data.destination || "";
-    selectedShareLat = data.lat;
-    selectedShareLng = data.lng;
+  selectedShareName = data.name || "";
+  selectedShareDestination = data.destination || "";
+  selectedShareLat = data.lat;
+  selectedShareLng = data.lng;
 
-    document.getElementById("sharedSessionInfo").innerHTML =
-      '<div class="shared-box">' +
-      '🔗 <strong>Shared Session Loaded</strong><br>' +
-      (data.name || "") + '<br>' +
-      (data.destination || "") +
-      '</div>';
+  if (data.address1) document.getElementById("address1").value = data.address1;
+  if (data.address2) document.getElementById("address2").value = data.address2;
 
-    if (data.address1) document.getElementById("address1").value = data.address1;
-    if (data.address2) document.getElementById("address2").value = data.address2;
+  document.getElementById("sharedSessionInfo").innerHTML =
+    '<div class="shared-box">' +
+    '🔗 <strong>Shared Session Loaded</strong><br>' +
+    (data.name || "") + '<br>' +
+    (data.destination || "") +
+    '</div>';
 
-    const navLink =
-      "https://www.google.com/maps/dir/?api=1&destination=" +
-      encodeURIComponent(data.destination || data.name || "");
+  const navLink =
+    "https://www.google.com/maps/dir/?api=1&destination=" +
+    encodeURIComponent(data.destination || data.name || "");
 
-    document.getElementById("selectedPlace").innerHTML =
-      "<strong>✅ Shared Meetup: " + (data.name || "") + "</strong><br>" +
-      (data.destination || "") +
-      '<div class="action-row">' +
-        '<a class="action-link" href="' + navLink + '" target="_blank">Navigate</a>' +
-        '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
-      '</div>';
-  }
+  document.getElementById("selectedPlace").innerHTML =
+    "<strong>✅ Shared Meetup: " + (data.name || "") + "</strong><br>" +
+    (data.destination || "") +
+    '<div class="action-row">' +
+      '<a class="action-link" href="' + navLink + '" target="_blank">Navigate</a>' +
+      '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
+    '</div>';
+} 
 
   
 
