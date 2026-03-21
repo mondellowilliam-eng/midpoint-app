@@ -507,21 +507,9 @@
     function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
 
-      const origin1 = document.getElementById("address1").value.trim();
-      const origin2 = document.getElementById("address2").value.trim();
-
-      const navLink1 =
-        "https://www.google.com/maps/dir/?api=1&origin=" +
-        encodeURIComponent(origin1) +
-        "&destination=" +
-        encodeURIComponent(destination);
-
-      const navLink2 =
-        "https://www.google.com/maps/dir/?api=1&origin=" +
-        encodeURIComponent(origin2) +
-        "&destination=" +
-        encodeURIComponent(destination);
-
+      const navLink =
+  "https://www.google.com/maps/dir/?api=1&destination=" +
+  encodeURIComponent(destination);
       selectedShareName = place.name;
       selectedShareDestination = destination;
       selectedShareLat = place.geometry.location.lat();
