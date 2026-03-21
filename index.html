@@ -106,7 +106,8 @@
     }
 
     .action-link,
-    .share-btn {
+    .share-btn,
+    .session-btn {
       display: inline-block;
       padding: 10px 14px;
       border-radius: 8px;
@@ -115,16 +116,19 @@
       cursor: pointer;
       border: none;
       font-size: 15px;
+      color: white;
     }
 
     .action-link {
       background: #007BFF;
-      color: white;
     }
 
     .share-btn {
       background: #28a745;
-      color: white;
+    }
+
+    .session-btn {
+      background: #6f42c1;
     }
 
     #distanceInfo {
@@ -150,6 +154,15 @@
       padding: 10px;
       margin-bottom: 10px;
     }
+
+    .shared-box {
+      background: #eef6ff;
+      border: 1px solid #9cc3ff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -161,8 +174,10 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → adjust midpoint → choose a place type or search a brand → click a result letter → navigate or share it
+        Enter two locations → adjust midpoint → choose a place type or search a brand → click a result letter → navigate, share, or share the whole session
       </div>
+
+      <div id="sharedSessionInfo"></div>
 
       <input id="address1" placeholder="First location">
       <input id="address2" placeholder="Second location">
@@ -183,7 +198,7 @@
       </div>
 
       <button type="button" onclick="findMidpoint()">Find Meetup Spot</button>
-<button type="button" onclick="createSession()">Share Session</button>
+
       <div id="distanceInfo"></div>
       <div id="selectedPlace"></div>
     </div>
@@ -191,7 +206,23 @@
     <div id="map"></div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJD0P-O892D1qzB0_zNfhylKMTqHHIfYM",
+      authDomain: "midpoint-web.firebaseapp.com",
+      databaseURL: "https://midpoint-web-default-rtdb.firebaseio.com/",
+      projectId: "midpoint-web",
+      storageBucket: "midpoint-web.firebasestorage.app",
+      messagingSenderId: "73084785329",
+      appId: "1:73084785329:web:2586e545c1fa599f648890"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     let map, geocoder, placesService;
     let markers = [];
     let midpointMarker = null;
@@ -199,6 +230,7 @@
     let m2 = null;
     let selectedShareName = "";
     let selectedShareDestination = "";
+    let currentSessionId = "";
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -215,6 +247,8 @@
       document.getElementById("weightSlider").addEventListener("input", function () {
         document.getElementById("weightValue").textContent = this.value + "%";
       });
+
+      loadSession();
     }
 
     function setFilter(type) {
@@ -257,27 +291,79 @@
     }
 
     function sharePlace(name, destination) {
-      const origin1 = document.getElementById("address1").value.trim();
-      const origin2 = document.getElementById("address2").value.trim();
-
-      const link1 =
-        "https://www.google.com/maps/dir/?api=1&origin=" +
-        encodeURIComponent(origin1) +
-        "&destination=" +
+      const link =
+        "https://www.google.com/maps/dir/?api=1&destination=" +
         encodeURIComponent(destination);
 
-      const link2 =
-        "https://www.google.com/maps/dir/?api=1&origin=" +
-        encodeURIComponent(origin2) +
-        "&destination=" +
-        encodeURIComponent(destination);
+      if (navigator.share) {
+        navigator.share({
+          title: "Midpoint meetup",
+          text: "Meet me here: " + name,
+          url: link
+        }).catch(() => {
+          prompt("Copy this link:", link);
+        });
+      } else {
+        prompt("Copy this link:", link);
+      }
+    }
 
-      const message =
-        "Midpoint meetup: " + name + "\n\n" +
-        "User 1 route:\n" + link1 + "\n\n" +
-        "User 2 route:\n" + link2;
+    function createSession() {
+      if (!selectedShareDestination) {
+        alert("Pick a place first by clicking A–E.");
+        return;
+      }
 
-      prompt("Copy these links:", message);
+      const sessionId = Math.random().toString(36).substring(2, 8);
+
+      db.ref("sessions/" + sessionId).set({
+        destination: selectedShareDestination,
+        name: selectedShareName,
+        address1: document.getElementById("address1").value.trim(),
+        address2: document.getElementById("address2").value.trim(),
+        created: Date.now()
+      });
+
+      const link =
+        "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+
+      prompt("Share this session link:", link);
+    }
+
+    function loadSession() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session");
+
+      if (!sessionId) return;
+
+      currentSessionId = sessionId;
+
+      db.ref("sessions/" + sessionId).once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        selectedShareDestination = data.destination || "";
+        selectedShareName = data.name || "";
+
+        document.getElementById("sharedSessionInfo").innerHTML =
+          '<div class="shared-box">' +
+          '🔗 <strong>Shared Session Loaded</strong><br>' +
+          (data.name || "") + '<br>' +
+          (data.destination || "") +
+          '</div>';
+
+        if (data.address1) document.getElementById("address1").value = data.address1;
+        if (data.address2) document.getElementById("address2").value = data.address2;
+
+        if (data.name && data.destination) {
+          document.getElementById("selectedPlace").innerHTML =
+            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+            data.destination +
+            '<div class="action-row">' +
+              '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
+            '</div>';
+        }
+      });
     }
 
     function showSelectedPlace(place) {
@@ -307,7 +393,8 @@
         '<div class="action-row">' +
           '<a class="action-link" href="' + navLink1 + '" target="_blank">Navigate User 1</a>' +
           '<a class="action-link" href="' + navLink2 + '" target="_blank">Navigate User 2</a>' +
-          '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share</button>' +
+          '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
+          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
         '</div>';
     }
 
@@ -318,7 +405,7 @@
         '<div class="top-pick">' +
         '⭐ <strong>Top Pick: ' + place.name + '</strong><br>' +
         destination + '<br>' +
-        '<em>Tap a letter on the map to navigate or share.</em>' +
+        '<em>Tap a letter on the map to navigate, share destination, or share the full session.</em>' +
         '</div>';
     }
 
@@ -426,24 +513,8 @@
         });
       });
     }
-  </script><button type="button" onclick="createSession()">Share Session</button>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  </script>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCJD0P-O892D1qzB0_zNfhylKMTqHHIfYM",
-  authDomain: "midpoint-web.firebaseapp.com",
-  databaseURL: "https://midpoint-web-default-rtdb.firebaseio.com/",
-  projectId: "midpoint-web",
-  storageBucket: "midpoint-web.firebasestorage.app",
-  messagingSenderId: "73084785329",
-  appId: "1:73084785329:web:2586e545c1fa599f648890"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-</script>
   <script async
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&libraries=places&callback=initMap">
   </script>
