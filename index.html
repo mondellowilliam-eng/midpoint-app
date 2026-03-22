@@ -120,21 +120,10 @@
       color: white;
     }
 
-    .action-link {
-      background: #007BFF;
-    }
-
-    .share-btn {
-      background: #28a745;
-    }
-
-    .session-btn {
-      background: #6f42c1;
-    }
-
-    .live-btn {
-      background: #ff7a00;
-    }
+    .action-link { background: #007BFF; }
+    .share-btn { background: #28a745; }
+    .session-btn { background: #6f42c1; }
+    .live-btn { background: #ff7a00; }
 
     #distanceInfo,
     #liveInfo {
@@ -180,7 +169,7 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → find a spot → click a result letter → share destination or share full session → both users can open the same session and start live sharing
+        Enter two locations → find a spot → click a result letter → navigate, share destination, or share the full session
       </div>
 
       <div id="sharedSessionInfo"></div>
@@ -324,42 +313,36 @@
       }
     }
 
-   function createSession() {
-  if (!selectedShareDestination) {
-    alert("Pick a place first by clicking A–E.");
-    return;
-  }
+    function createSession() {
+      if (!selectedShareDestination) {
+        alert("Pick a place first by clicking A–E.");
+        return;
+      }
 
-  const sessionId = Math.random().toString(36).substring(2, 8);
+      const sessionId = Math.random().toString(36).substring(2, 8);
 
-  db.ref("sessions/" + sessionId).set({
-    destination: selectedShareDestination,
-    name: selectedShareName,
-    address1: document.getElementById("address1").value.trim(),
-    address2: document.getElementById("address2").value.trim(),
-    created: Date.now()
-  })
-  .then(() => {
-    const link =
-      "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+      db.ref("sessions/" + sessionId).set({
+        destination: selectedShareDestination,
+        name: selectedShareName,
+        address1: document.getElementById("address1").value.trim(),
+        address2: document.getElementById("address2").value.trim(),
+        created: Date.now()
+      })
+      .then(() => {
+        const link =
+          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
 
-    if (navigator.share) {
-      navigator.share({
-        title: "Midpoint Session",
-        text: "Join my Midpoint session",
-        url: link
-      }).catch(() => {
-        prompt("Copy and send this session link:", link);
-      });
-    } else {
-      prompt("Copy and send this session link:", link);
-    }
-  })
-  .catch((error) => {
-    alert("Firebase error: " + error.message);
-  });
-}
-        prompt("Copy and send this session link:", link);
+        if (navigator.share) {
+          navigator.share({
+            title: "Midpoint Session",
+            text: "Join my Midpoint session",
+            url: link
+          }).catch(() => {
+            prompt("Copy and send this session link:", link);
+          });
+        } else {
+          prompt("Copy and send this session link:", link);
+        }
       })
       .catch((error) => {
         alert("Firebase error: " + error.message);
@@ -673,9 +656,9 @@
     }
   </script>
 
- <script async
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&loading=async&libraries=places&callback=initMap">
-</script>
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&loading=async&libraries=places&callback=initMap">
+  </script>
 
 </body>
 </html>
