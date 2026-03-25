@@ -108,7 +108,8 @@
     .action-link,
     .share-btn,
     .session-btn,
-    .live-btn {
+    .live-btn,
+    .modal-btn {
       display: inline-block;
       padding: 10px 14px;
       border-radius: 8px;
@@ -124,6 +125,11 @@
     .share-btn { background: #28a745; }
     .session-btn { background: #6f42c1; }
     .live-btn { background: #ff7a00; }
+    .modal-btn { background: #007BFF; width: auto; }
+
+    .modal-cancel {
+      background: #777;
+    }
 
     #distanceInfo,
     #liveInfo {
@@ -157,6 +163,44 @@
       padding: 10px;
       margin-bottom: 12px;
       line-height: 1.5;
+    }
+
+    /* modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 12px;
+      max-width: 420px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+
+    .modal-box h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .modal-box p {
+      margin-bottom: 16px;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
   </style>
 </head>
@@ -200,6 +244,23 @@
     </div>
 
     <div id="map"></div>
+  </div>
+
+  <!-- location permission modal -->
+  <div id="locationModal" class="modal-overlay">
+    <div class="modal-box">
+      <h3>Allow Location Sharing</h3>
+      <p>
+        Midpoint needs your live location so both users can see each other moving toward the meetup spot in real time.
+      </p>
+      <p>
+        Please tap <strong>Allow Location</strong>, then allow location access in your phone’s browser prompt.
+      </p>
+      <div class="modal-actions">
+        <button class="modal-btn" type="button" onclick="confirmStartLiveSharing()">Allow Location</button>
+        <button class="modal-btn modal-cancel" type="button" onclick="closeLocationModal()">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -256,6 +317,14 @@
 
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
+    }
+
+    function openLocationModal() {
+      document.getElementById("locationModal").style.display = "flex";
+    }
+
+    function closeLocationModal() {
+      document.getElementById("locationModal").style.display = "none";
     }
 
     function clearMarkers() {
@@ -365,6 +434,12 @@
         alert("Choose User 1 or User 2 first.");
         return;
       }
+
+      openLocationModal();
+    }
+
+    function confirmStartLiveSharing() {
+      closeLocationModal();
 
       if (!navigator.geolocation) {
         alert("Location sharing is not supported on this device.");
