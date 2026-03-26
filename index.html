@@ -319,7 +319,12 @@
     }
 
     function openLocationModal() {
-      document.getElementById("locationModal").style.display = "flex";
+      const modal = document.getElementById("locationModal");
+      if (!modal) {
+        alert("Location modal not found");
+        return;
+      }
+      modal.style.display = "flex";
     }
 
     function closeLocationModal() {
@@ -421,16 +426,19 @@
       selectedRole = role;
       document.getElementById("liveInfo").innerHTML =
         "Live sharing role selected: <strong>" + role.toUpperCase() + "</strong>";
+      alert("Joined as " + role.toUpperCase());
     }
 
     function startLiveSharing() {
+      alert("Start Live Sharing pressed");
+
       if (!currentSessionId) {
-        alert("Open a shared session first.");
+        alert("No shared session loaded");
         return;
       }
 
       if (!selectedRole) {
-        alert("Choose User 1 or User 2 first.");
+        alert("Choose User 1 or User 2 first");
         return;
       }
 
@@ -439,6 +447,7 @@
 
     function confirmStartLiveSharing() {
       closeLocationModal();
+      alert("Allow Location pressed");
 
       if (!navigator.geolocation) {
         alert("Location sharing is not supported on this device.");
@@ -464,6 +473,8 @@
 
           document.getElementById("liveInfo").innerHTML =
             "Live sharing active as <strong>" + selectedRole.toUpperCase() + "</strong>";
+
+          alert("Live location started for " + selectedRole.toUpperCase());
         },
         function(error) {
           alert("Location error: " + error.message);
