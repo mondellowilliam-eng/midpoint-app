@@ -515,49 +515,15 @@
       });
     }
 
-    function showSelectedPlace(place) {
-      const destination = place.vicinity || place.name;
+    function openNavigation(origin, destination) {
+  const link =
+    "https://www.google.com/maps/dir/?api=1&origin=" +
+    encodeURIComponent(origin) +
+    "&destination=" +
+    encodeURIComponent(destination);
 
-      const origin1 = document.getElementById("address1").value.trim();
-      const origin2 = document.getElementById("address2").value.trim();
-
-      const navLink1 =
-        "https://www.google.com/maps/dir/?api=1&origin=" +
-        encodeURIComponent(origin1) +
-        "&destination=" +
-        encodeURIComponent(destination);
-
-      const navLink2 =
-        "https://www.google.com/maps/dir/?api=1&origin=" +
-        encodeURIComponent(origin2) +
-        "&destination=" +
-        encodeURIComponent(destination);
-
-      selectedShareName = place.name;
-      selectedShareDestination = destination;
-
-      document.getElementById("selectedPlace").innerHTML =
-        "<strong>✅ " + place.name + "</strong><br>" +
-        destination +
-        '<div class="action-row">' +
-          '<a class="action-link" href="' + navLink1 + '" target="_blank">Navigate User 1</a>' +
-          '<a class="action-link" href="' + navLink2 + '" target="_blank">Navigate User 2</a>' +
-          '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
-          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-        '</div>';
-    }
-
-    function showTopPick(place) {
-      const destination = place.vicinity || place.name;
-
-      document.getElementById("selectedPlace").innerHTML =
-        '<div class="top-pick">' +
-        '⭐ <strong>Top Pick: ' + place.name + '</strong><br>' +
-        destination + '<br>' +
-        '<em>Tap a letter on the map to navigate, share destination, or share the full session.</em>' +
-        '</div>';
-    }
-
+  window.location.href = link;
+}
     function searchNearby(mid, keyword) {
       placesService.nearbySearch({
         location: mid,
