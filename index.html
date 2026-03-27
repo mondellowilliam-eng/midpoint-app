@@ -111,9 +111,7 @@
     }
 
     .action-link,
-    .share-btn,
-    .session-btn,
-    .live-btn {
+    .session-btn {
       display: inline-block;
       padding: 10px 14px;
       border-radius: 8px;
@@ -127,9 +125,7 @@
     }
 
     .action-link { background: #007BFF; }
-    .share-btn { background: #28a745; }
     .session-btn { background: #6f42c1; }
-    .live-btn { background: #ff7a00; }
 
     #distanceInfo,
     #liveInfo {
@@ -190,7 +186,7 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → find a spot → click a result letter → navigate, share destination, or share the full session
+        Enter two locations → find a spot → click a result letter → navigate or share the full session
       </div>
 
       <div id="sharedSessionInfo"></div>
@@ -316,32 +312,6 @@
       return R * c;
     }
 
-    function shareSelectedPlace() {
-      if (!selectedShareDestination) {
-        alert("Pick a place first.");
-        return;
-      }
-      sharePlace(selectedShareName, selectedShareDestination);
-    }
-
-    function sharePlace(name, destination) {
-      const link =
-        "https://www.google.com/maps/dir/?api=1&destination=" +
-        encodeURIComponent(destination);
-
-      if (navigator.share) {
-        navigator.share({
-          title: "Midpoint meetup",
-          text: "Meet me here: " + name,
-          url: link
-        }).catch(() => {
-          prompt("Copy this link:", link);
-        });
-      } else {
-        prompt("Copy this link:", link);
-      }
-    }
-
     function createSession() {
       if (!selectedShareDestination) {
         alert("Pick a place first by clicking A–E.");
@@ -359,7 +329,7 @@
       })
       .then(() => {
         const link =
-          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId + "&v=26";
+          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId + "&v=29";
 
         if (navigator.share) {
           navigator.share({
@@ -378,10 +348,13 @@
       });
     }
 
-    function chooseRole(role) {
+    function joinAsRole(role) {
       selectedRole = role;
+
       document.getElementById("liveInfo").innerHTML =
-        'Live sharing role selected: <span class="status-ok">' + role.toUpperCase() + '</span>';
+        'Joining as <span class="status-ok">' + role.toUpperCase() + '</span> and requesting location...';
+
+      startLiveSharing();
     }
 
     function startLiveSharing() {
@@ -526,7 +499,6 @@
         '<div class="action-row">' +
           '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(destination) + ')">Navigate User 1</button>' +
           '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(destination) + ')">Navigate User 2</button>' +
-          '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
           '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
         '</div>';
     }
@@ -538,7 +510,7 @@
         '<div class="top-pick">' +
         '⭐ <strong>Top Pick: ' + place.name + '</strong><br>' +
         destination + '<br>' +
-        '<em>Tap a letter on the map to navigate, share destination, or share the full session.</em>' +
+        '<em>Tap a letter on the map to navigate or share the full session.</em>' +
         '</div>';
     }
 
@@ -616,9 +588,8 @@
           (data.name || "") + '<br>' +
           (data.destination || "") +
           '<div class="action-row">' +
-            '<button class="session-btn" type="button" onclick="chooseRole(\'user1\')">Join as User 1</button>' +
-            '<button class="session-btn" type="button" onclick="chooseRole(\'user2\')">Join as User 2</button>' +
-            '<button class="live-btn" type="button" onclick="startLiveSharing()">Start Live Sharing</button>' +
+            '<button class="session-btn" type="button" onclick="joinAsRole(\'user1\')">Join as User 1 & Share Live Location</button>' +
+            '<button class="session-btn" type="button" onclick="joinAsRole(\'user2\')">Join as User 2 & Share Live Location</button>' +
           '</div>' +
           '</div>';
 
@@ -632,10 +603,7 @@
         if (data.name && data.destination) {
           document.getElementById("selectedPlace").innerHTML =
             "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-            data.destination +
-            '<div class="action-row">' +
-              '<button class="share-btn" type="button" onclick="shareSelectedPlace()">Share Destination</button>' +
-            '</div>';
+            data.destination;
         }
 
         listenToLiveUsers(sessionId);
