@@ -108,8 +108,7 @@
     .action-link,
     .share-btn,
     .session-btn,
-    .live-btn,
-    .modal-btn {
+    .live-btn {
       display: inline-block;
       padding: 10px 14px;
       border-radius: 8px;
@@ -126,11 +125,6 @@
     .share-btn { background: #28a745; }
     .session-btn { background: #6f42c1; }
     .live-btn { background: #ff7a00; }
-    .modal-btn { background: #007BFF; }
-
-    .modal-cancel {
-      background: #777;
-    }
 
     #distanceInfo,
     #liveInfo {
@@ -166,41 +160,19 @@
       line-height: 1.5;
     }
 
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+    .status-ok {
+      color: #1a7f37;
+      font-weight: bold;
     }
 
-    .modal-box {
-      background: white;
-      border-radius: 12px;
-      max-width: 420px;
-      width: 100%;
-      padding: 20px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    .status-warn {
+      color: #b45309;
+      font-weight: bold;
     }
 
-    .modal-box h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    .modal-box p {
-      margin-bottom: 16px;
-      line-height: 1.5;
-      color: #333;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    .status-error {
+      color: #b91c1c;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -244,22 +216,6 @@
     </div>
 
     <div id="map"></div>
-  </div>
-
-  <div id="locationModal" class="modal-overlay">
-    <div class="modal-box">
-      <h3>Allow Location Sharing</h3>
-      <p>
-        Midpoint needs your live location so both users can see each other moving toward the meetup spot in real time.
-      </p>
-      <p>
-        Tap <strong>Allow Location</strong>, then allow location access in your phone’s browser prompt.
-      </p>
-      <div class="modal-actions">
-        <button class="modal-btn" type="button" onclick="confirmStartLiveSharing()">Allow Location</button>
-        <button class="modal-btn modal-cancel" type="button" onclick="closeLocationModal()">Cancel</button>
-      </div>
-    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -316,19 +272,6 @@
 
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
-    }
-
-    function openLocationModal() {
-      const modal = document.getElementById("locationModal");
-      if (!modal) {
-        alert("Location modal not found");
-        return;
-      }
-      modal.style.display = "flex";
-    }
-
-    function closeLocationModal() {
-      document.getElementById("locationModal").style.display = "none";
     }
 
     function clearMarkers() {
@@ -425,34 +368,30 @@
     function chooseRole(role) {
       selectedRole = role;
       document.getElementById("liveInfo").innerHTML =
-        "Live sharing role selected: <strong>" + role.toUpperCase() + "</strong>";
-      alert("Joined as " + role.toUpperCase());
+        'Live sharing role selected: <span class="status-ok">' + role.toUpperCase() + '</span>';
     }
 
     function startLiveSharing() {
-      alert("Start Live Sharing pressed");
-
       if (!currentSessionId) {
-        alert("No shared session loaded");
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-error">No shared session loaded.</span>';
         return;
       }
 
       if (!selectedRole) {
-        alert("Choose User 1 or User 2 first");
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-warn">Choose User 1 or User 2 first.</span>';
         return;
       }
-
-      openLocationModal();
-    }
-
-    function confirmStartLiveSharing() {
-      closeLocationModal();
-      alert("Allow Location pressed");
 
       if (!navigator.geolocation) {
-        alert("Location sharing is not supported on this device.");
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-error">Geolocation is not supported on this device.</span>';
         return;
       }
+
+      document.getElementById("liveInfo").innerHTML =
+        'Requesting location for <span class="status-ok">' + selectedRole.toUpperCase() + '</span>...';
 
       if (liveWatchId !== null) {
         navigator.geolocation.clearWatch(liveWatchId);
@@ -472,20 +411,16 @@
           });
 
           document.getElementById("liveInfo").innerHTML =
-            "Live sharing active as <strong>" + selectedRole.toUpperCase() + "</strong>";
-
-          if (!window.liveStarted) {
-  alert("Live location started for " + selectedRole.toUpperCase());
-  window.liveStarted = true;
-}
+            'Live sharing active as <span class="status-ok">' + selectedRole.toUpperCase() + '</span>';
         },
         function(error) {
-          alert("Location error: " + error.message);
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Location error: ' + error.message + '</span>';
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 5000,
-          timeout: 10000
+          maximumAge: 0,
+          timeout: 15000
         }
       );
     }
