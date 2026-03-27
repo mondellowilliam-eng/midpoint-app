@@ -474,7 +474,10 @@
           document.getElementById("liveInfo").innerHTML =
             "Live sharing active as <strong>" + selectedRole.toUpperCase() + "</strong>";
 
-          alert("Live location started for " + selectedRole.toUpperCase());
+          if (!window.liveStarted) {
+  alert("Live location started for " + selectedRole.toUpperCase());
+  window.liveStarted = true;
+}
         },
         function(error) {
           alert("Location error: " + error.message);
