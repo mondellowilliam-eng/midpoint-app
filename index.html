@@ -310,7 +310,12 @@
         alert("Pick a place first by clicking A–E.");
         return;
       }
-
+function joinAsRole(role) {
+  selectedRole = role;
+  document.getElementById("liveInfo").innerHTML =
+    'Requesting location for <span class="status-ok">' + role.toUpperCase() + '</span>...';
+  startLiveSharing();
+}
       const sessionId = Math.random().toString(36).substring(2, 8);
 
       db.ref("sessions/" + sessionId).set({
