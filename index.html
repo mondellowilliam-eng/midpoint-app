@@ -172,6 +172,11 @@
       color: #b91c1c;
       font-weight: bold;
     }
+
+    .place-list-btn {
+      margin-bottom: 8px;
+      text-align: left;
+    }
   </style>
 </head>
 <body>
@@ -183,7 +188,7 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → find a spot → click a result letter → navigate or share the full session
+        Enter two locations → find a spot → click a result letter or list item → navigate or share the full session
       </div>
 
       <div id="sharedSessionInfo"></div>
@@ -249,6 +254,8 @@
     let liveUser1Marker = null;
     let liveUser2Marker = null;
 
+    let currentPlaces = [];
+
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 11,
@@ -285,6 +292,7 @@
       m1 = null;
       m2 = null;
       destinationMarker = null;
+      currentPlaces = [];
 
       document.getElementById("selectedPlace").innerHTML = "";
       document.getElementById("distanceInfo").innerHTML = "";
@@ -310,12 +318,7 @@
         alert("Pick a place first by clicking A–E.");
         return;
       }
-function joinAsRole(role) {
-  selectedRole = role;
-  document.getElementById("liveInfo").innerHTML =
-    'Requesting location for <span class="status-ok">' + role.toUpperCase() + '</span>...';
-  startLiveSharing();
-}
+
       const sessionId = Math.random().toString(36).substring(2, 8);
 
       db.ref("sessions/" + sessionId).set({
@@ -344,6 +347,13 @@ function joinAsRole(role) {
       .catch((error) => {
         alert("Firebase error: " + error.message);
       });
+    }
+
+    function joinAsRole(role) {
+      selectedRole = role;
+      document.getElementById("liveInfo").innerHTML =
+        'Requesting location for <span class="status-ok">' + role.toUpperCase() + '</span>...';
+      startLiveSharing();
     }
 
     function chooseRole(role) {
@@ -455,27 +465,27 @@ function joinAsRole(role) {
     }
 
     function showSelectedPlace(place) {
-  const destination = place.vicinity || place.name;
-  const origin1 = document.getElementById("address1").value.trim();
-  const origin2 = document.getElementById("address2").value.trim();
+      const destination = place.vicinity || place.name;
+      const origin1 = document.getElementById("address1").value.trim();
+      const origin2 = document.getElementById("address2").value.trim();
 
-  selectedShareName = place.name;
-  selectedShareDestination = destination;
+      selectedShareName = place.name;
+      selectedShareDestination = destination;
 
-  document.getElementById("selectedPlace").innerHTML =
-    "<strong>✅ " + place.name + "</strong><br>" +
-    destination +
-    '<div class="action-row">' +
-      '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(destination) + ')">Navigate User 1</button>' +
-      '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(destination) + ')">Navigate User 2</button>' +
-      '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-    '</div>';
+      document.getElementById("selectedPlace").innerHTML =
+        "<strong>✅ " + place.name + "</strong><br>" +
+        destination +
+        '<div class="action-row">' +
+          '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(destination) + ')">Navigate User 1</button>' +
+          '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(destination) + ')">Navigate User 2</button>' +
+          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+        '</div>';
 
-  document.getElementById("selectedPlace").scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-}
+      document.getElementById("selectedPlace").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
 
     function showTopPick(place) {
       const destination = place.vicinity || place.name;
@@ -484,117 +494,69 @@ function joinAsRole(role) {
         '<div class="top-pick">' +
         '⭐ <strong>Top Pick: ' + place.name + '</strong><br>' +
         destination + '<br>' +
-        '<em>Tap a letter on the map to navigate or share the full session.</em>' +
+        '<em>Tap a result below or click a letter on the map.</em>' +
         '</div>';
     }
 
-   function searchNearby(mid, keyword) {
-  placesService.nearbySearch({
-    location: mid,
-    radius: 1000,
-    keyword: keyword || undefined
-  }, function(results, status) {
-    if (status !== "OK" || !results.length) {
-      document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
-      return;
+    function selectPlaceByIndex(index) {
+      if (!currentPlaces || !currentPlaces[index]) return;
+      showSelectedPlace(currentPlaces[index]);
     }
-function selectPlaceByIndex(index) {
-  if (!window.currentPlaces || !window.currentPlaces[index]) return;
-  showSelectedPlace(window.currentPlaces[index]);
-}
-    const topPlace = results[0];
 
-    let html =
-      '<div class="top-pick">' +
-      '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
-      (topPlace.vicinity || topPlace.name) + '<br>' +
-      '<em>Tap a result below or click a letter on the map.</em>' +
-      '</div>';
+    function searchNearby(mid, keyword) {
+      placesService.nearbySearch({
+        location: mid,
+        radius: 1000,
+        keyword: keyword || undefined
+      }, function(results, status) {
+        if (status !== "OK" || !results.length) {
+          document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
+          return;
+        }
 
-    html += '<div style="margin-top:10px;">';
+        currentPlaces = results.slice(0, 5);
+        const topPlace = currentPlaces[0];
 
-    results.slice(0, 5).forEach((place, index) => {
-      const label = String.fromCharCode(65 + index);
+        let html =
+          '<div class="top-pick">' +
+          '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
+          (topPlace.vicinity || topPlace.name) + '<br>' +
+          '<em>Tap a result below or click a letter on the map.</em>' +
+          '</div>';
 
-      html +=
-        '<button type="button" onclick="selectPlaceByIndex(' + index + ')" ' +
-        'style="margin-bottom:8px; text-align:left;">' +
-        label + '. ' + place.name +
-        (place.vicinity ? ' — ' + place.vicinity : '') +
-        '</button>';
-    });
+        html += '<div style="margin-top:10px;">';
 
-    html += '</div>';
+        currentPlaces.forEach((place, index) => {
+          const label = String.fromCharCode(65 + index);
 
-    document.getElementById("selectedPlace").innerHTML = html;
+          html +=
+            '<button class="place-list-btn" type="button" onclick="selectPlaceByIndex(' + index + ')">' +
+            label + '. ' + place.name +
+            (place.vicinity ? ' — ' + place.vicinity : '') +
+            '</button>';
+        });
 
-    window.currentPlaces = results.slice(0, 5);
+        html += '</div>';
 
-    // 🔥 IMPORTANT: clear old markers BEFORE adding new ones
-    markers.forEach(m => m.setMap(null));
-    markers = [];
+        document.getElementById("selectedPlace").innerHTML = html;
 
-    results.slice(0, 5).forEach((place, index) => {
-      const marker = new google.maps.Marker({
-        map: map,
-        position: place.geometry.location,
-        title: place.name,
-        label: String.fromCharCode(65 + index)
+        currentPlaces.forEach((place, index) => {
+          const marker = new google.maps.Marker({
+            map: map,
+            position: place.geometry.location,
+            title: place.name,
+            label: String.fromCharCode(65 + index)
+          });
+
+          markers.push(marker);
+
+          marker.addListener("click", function() {
+            showSelectedPlace(place);
+          });
+        });
       });
+    }
 
-      markers.push(marker);
-
-      marker.addListener("click", function() {
-        showSelectedPlace(place);
-      });
-    });
-  });
-}
-
-    const topPlace = results[0];
-
-    let html =
-      '<div class="top-pick">' +
-      '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
-      (topPlace.vicinity || topPlace.name) + '<br>' +
-      '<em>Tap a result below or click a letter on the map.</em>' +
-      '</div>';
-
-    html += '<div style="margin-top:10px;">';
-
-    results.slice(0, 5).forEach((place, index) => {
-      const label = String.fromCharCode(65 + index);
-
-      html +=
-        '<button type="button" onclick="selectPlaceByIndex(' + index + ')" ' +
-        'style="margin-bottom:8px; text-align:left;">' +
-        label + '. ' + place.name +
-        (place.vicinity ? ' — ' + place.vicinity : '') +
-        '</button>';
-    });
-
-    html += '</div>';
-
-    document.getElementById("selectedPlace").innerHTML = html;
-
-    window.currentPlaces = results.slice(0, 5);
-
-    results.slice(0, 5).forEach((place, index) => {
-      const marker = new google.maps.Marker({
-        map: map,
-        position: place.geometry.location,
-        title: place.name,
-        label: String.fromCharCode(65 + index)
-      });
-
-      markers.push(marker);
-
-      marker.addListener("click", function() {
-        showSelectedPlace(place);
-      });
-    });
-  });
-}
     function showDestinationFromSession(destinationText) {
       geocoder.geocode({ address: destinationText }, function(results, status) {
         if (status !== "OK" || !results.length) return;
@@ -650,17 +612,17 @@ function selectPlaceByIndex(index) {
         }
 
         if (data.name && data.destination) {
-  const origin1 = (data.address1 || "").trim();
-  const origin2 = (data.address2 || "").trim();
+          const origin1 = (data.address1 || "").trim();
+          const origin2 = (data.address2 || "").trim();
 
-  document.getElementById("selectedPlace").innerHTML =
-    "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-    data.destination +
-    '<div class="action-row">' +
-      '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(data.destination) + ')">Navigate User 1</button>' +
-      '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(data.destination) + ')">Navigate User 2</button>' +
-    '</div>';
-}
+          document.getElementById("selectedPlace").innerHTML =
+            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+            data.destination +
+            '<div class="action-row">' +
+              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(data.destination) + ')">Navigate User 1</button>' +
+              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(data.destination) + ')">Navigate User 2</button>' +
+            '</div>';
+        }
 
         listenToLiveUsers(sessionId);
       });
