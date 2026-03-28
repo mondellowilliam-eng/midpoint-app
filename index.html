@@ -521,7 +521,33 @@
 
   window.location.href = link;
 }
+function openMyRoute() {
+  if (!selectedRole) {
+    alert("Please choose Person 1 or Person 2 first.");
+    return;
+  }
 
+  let origin = "";
+
+  if (selectedRole === "user1") {
+    origin = document.getElementById("address1").value.trim();
+  } else {
+    origin = document.getElementById("address2").value.trim();
+  }
+
+  if (!origin || !selectedShareDestination) {
+    alert("Missing route information.");
+    return;
+  }
+
+  const link =
+    "https://www.google.com/maps/dir/?api=1" +
+    "&origin=" + encodeURIComponent(origin) +
+    "&destination=" + encodeURIComponent(selectedShareDestination) +
+    "&travelmode=driving";
+
+  window.location.href = link;
+}
     function showSelectedPlace(place) {
   const destination = place.vicinity || place.name;
 
