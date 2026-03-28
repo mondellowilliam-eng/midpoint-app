@@ -388,7 +388,7 @@
     function chooseRole(role) {
       selectedRole = role;
       document.getElementById("liveInfo").innerHTML =
-        'Live sharing role selected: <span class="status-ok">' + role.toUpperCase() + '</span>';
+  'Selected <span class="status-ok">' + (role === "user1" ? "Person 1" : "Person 2") + '</span>. Now tap Start Live Sharing.';
     }
 
     function startLiveSharing() {
