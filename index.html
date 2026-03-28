@@ -329,7 +329,7 @@
       })
       .then(() => {
         const link =
-          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId + "&v=30";
+          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId + "&v=31";
 
         if (navigator.share) {
           navigator.share({
@@ -475,14 +475,22 @@
       sessionLiveRefs.push({ ref: user2Ref, handler: user2Handler });
     }
 
-    function openNavigation(origin, destination) {
-      const link =
-        "https://www.google.com/maps/dir/?api=1&origin=" +
-        encodeURIComponent(origin) +
-        "&destination=" +
-        encodeURIComponent(destination);
+    function buildNavigationLink(origin, destination) {
+      return "https://www.google.com/maps/dir/?api=1" +
+        "&origin=" + encodeURIComponent(origin) +
+        "&destination=" + encodeURIComponent(destination) +
+        "&travelmode=driving" +
+        "&dir_action=navigate";
+    }
 
-      window.location.href = link;
+    function openNavigation(origin, destination) {
+      if (!origin || !destination) {
+        alert("Missing address or destination.");
+        return;
+      }
+
+      const link = buildNavigationLink(origin, destination);
+      window.open(link, "_blank");
     }
 
     function showSelectedPlace(place) {
@@ -588,8 +596,8 @@
           (data.name || "") + '<br>' +
           (data.destination || "") +
           '<div class="action-row">' +
-            '<button class="session-btn" type="button" onclick="joinAsRole(\'user1\')">Join as User 1 & Share Live Location</button>' +
-            '<button class="session-btn" type="button" onclick="joinAsRole(\'user2\')">Join as User 2 & Share Live Location</button>' +
+            '<button class="session-btn" type="button" onclick="joinAsRole(\'user1\')">Join as User 1 & Start Live Sharing</button>' +
+            '<button class="session-btn" type="button" onclick="joinAsRole(\'user2\')">Join as User 2 & Start Live Sharing</button>' +
           '</div>' +
           '</div>';
 
