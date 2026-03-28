@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Midpoint</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="midpoint_icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="midpoint_icon.png" />
 
   <style>
     body {
@@ -92,6 +92,7 @@
       height: 430px;
       margin-top: 20px;
       border-radius: 10px;
+      background: #dbeafe;
     }
 
     #selectedPlace {
@@ -180,7 +181,7 @@
 <body>
 
   <header>
-    <img src="midpoint_icon.png" alt="Midpoint Logo">
+    <img src="midpoint_icon.png" alt="Midpoint Logo" />
   </header>
 
   <div class="container">
@@ -191,10 +192,10 @@
 
       <div id="sharedSessionInfo"></div>
 
-      <input id="address1" placeholder="First location" autocomplete="off">
-      <input id="address2" placeholder="Second location" autocomplete="off">
+      <input id="address1" placeholder="First location" autocomplete="off" />
+      <input id="address2" placeholder="Second location" autocomplete="off" />
 
-      <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc.">
+      <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc." />
 
       <div class="filters">
         <button type="button" onclick="setFilter('cafe')">☕ Cafe</button>
@@ -206,7 +207,7 @@
 
       <div id="weightWrap">
         <label for="weightSlider">Adjust midpoint <span id="weightValue">50%</span></label>
-        <input type="range" id="weightSlider" min="0" max="100" value="50">
+        <input type="range" id="weightSlider" min="0" max="100" value="50" />
       </div>
 
       <button id="findBtn" type="button" onclick="findMidpoint()">Find Meetup Spot</button>
@@ -236,7 +237,10 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let map, geocoder, placesService;
+    let map;
+    let geocoder;
+    let placesService;
+
     let markers = [];
     let midpointMarker = null;
     let m1 = null;
@@ -248,13 +252,16 @@
     let currentSessionId = "";
     let selectedRole = "";
     let liveWatchId = null;
+    let lastLiveWrite = 0;
+    let isFindingMidpoint = false;
 
     let liveUser1Marker = null;
     let liveUser2Marker = null;
 
-    let isFindingMidpoint = false;
-    let lastLiveWrite = 0;
-    let sessionLiveRefs = [];
+    let user1LiveRef = null;
+    let user2LiveRef = null;
+    let user1LiveHandler = null;
+    let user2LiveHandler = null;
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -280,18 +287,16 @@
     }
 
     function clearMarkers() {
-      markers.forEach(m => m.setMap(null));
+      markers.forEach(marker => marker.setMap(null));
       markers = [];
 
       if (midpointMarker) midpointMarker.setMap(null);
       if (m1) m1.setMap(null);
       if (m2) m2.setMap(null);
-      if (destinationMarker) destinationMarker.setMap(null);
 
       midpointMarker = null;
       m1 = null;
       m2 = null;
-      destinationMarker = null;
 
       document.getElementById("selectedPlace").innerHTML = "";
       document.getElementById("distanceInfo").innerHTML = "";
@@ -326,10 +331,8 @@
         address1: document.getElementById("address1").value.trim(),
         address2: document.getElementById("address2").value.trim(),
         created: Date.now()
-      })
-      .then(() => {
-        const link =
-          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId + "&v=32";
+      }).then(() => {
+        const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId + "&v=33";
 
         if (navigator.share) {
           navigator.share({
@@ -342,187 +345,9 @@
         } else {
           prompt("Copy and send this session link:", link);
         }
-      })
-      .catch((error) => {
+      }).catch((error) => {
         alert("Firebase error: " + error.message);
       });
-    }
-
-  function joinAsRole(role) {
-  selectedRole = role;
-
-  document.getElementById("liveInfo").innerHTML =
-    'Button pressed. Joining as <span class="status-ok">' + role.toUpperCase() + '</span>...';
-
-  startLiveSharing();
-}
-
-function startLiveSharing() {
-  if (!currentSessionId) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-error">No shared session loaded.</span>';
-    return;
-  }
-
-  if (!selectedRole) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-warn">Choose User 1 or User 2 first.</span>';
-    return;
-  }
-
-  if (!navigator.geolocation) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-error">Geolocation is not supported on this device.</span>';
-    return;
-  }
-
-  document.getElementById("liveInfo").innerHTML =
-    'Requesting location for <span class="status-ok">' + selectedRole.toUpperCase() + '</span>...';
-
-  if (liveWatchId !== null) {
-    navigator.geolocation.clearWatch(liveWatchId);
-    liveWatchId = null;
-  }
-
-  lastLiveWrite = 0;
-
-  let locationResolved = false;
-
-  setTimeout(function () {
-    if (!locationResolved) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Still waiting for location. Open this link in Chrome or Safari and allow location access.</span>';
-    }
-  }, 12000);
-
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      locationResolved = true;
-
-      const now = Date.now();
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      const speed = position.coords.speed || 0;
-
-      db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
-        lat: lat,
-        lng: lng,
-        speed: speed,
-        updated: now
-      });
-
-      document.getElementById("liveInfo").innerHTML =
-        'Live sharing active as <span class="status-ok">' + selectedRole.toUpperCase() + '</span>';
-
-      liveWatchId = navigator.geolocation.watchPosition(
-        function(position) {
-          const now = Date.now();
-
-          if (now - lastLiveWrite < 3000) return;
-          lastLiveWrite = now;
-
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const speed = position.coords.speed || 0;
-
-          db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
-            lat: lat,
-            lng: lng,
-            speed: speed,
-            updated: now
-          });
-        },
-        function(error) {
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-error">Live tracking error: ' + error.message + '</span>';
-        },
-        {
-          enableHighAccuracy: false,
-          maximumAge: 5000,
-          timeout: 10000
-        }
-      );
-    },
-    function(error) {
-      locationResolved = true;
-
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Location permission failed: ' + error.message + '</span>';
-    },
-    {
-      enableHighAccuracy: false,
-      maximumAge: 5000,
-      timeout: 10000
-    }
-  );
-} 
-        function(error) {
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-error">Location permission failed: ' + error.message + '</span>';
-          alert("Location permission failed: " + error.message);
-        },
-        {
-          enableHighAccuracy: false,
-          maximumAge: 5000,
-          timeout: 10000
-        }
-      );
-    }
-
-    function cleanupLiveListeners() {
-      sessionLiveRefs.forEach(item => {
-        item.ref.off("value", item.handler);
-      });
-      sessionLiveRefs = [];
-    }
-
-    function listenToLiveUsers(sessionId) {
-      cleanupLiveListeners();
-
-      const user1Ref = db.ref("sessions/" + sessionId + "/live/user1");
-      const user2Ref = db.ref("sessions/" + sessionId + "/live/user2");
-
-      const user1Handler = snapshot => {
-        const data = snapshot.val();
-        if (!data || typeof data.lat !== "number" || typeof data.lng !== "number") return;
-
-        const pos = { lat: data.lat, lng: data.lng };
-
-        if (!liveUser1Marker) {
-          liveUser1Marker = new google.maps.Marker({
-            position: pos,
-            map: map,
-            label: "1",
-            title: "User 1 Live"
-          });
-        } else {
-          liveUser1Marker.setPosition(pos);
-        }
-      };
-
-      const user2Handler = snapshot => {
-        const data = snapshot.val();
-        if (!data || typeof data.lat !== "number" || typeof data.lng !== "number") return;
-
-        const pos = { lat: data.lat, lng: data.lng };
-
-        if (!liveUser2Marker) {
-          liveUser2Marker = new google.maps.Marker({
-            position: pos,
-            map: map,
-            label: "2",
-            title: "User 2 Live"
-          });
-        } else {
-          liveUser2Marker.setPosition(pos);
-        }
-      };
-
-      user1Ref.on("value", user1Handler);
-      user2Ref.on("value", user2Handler);
-
-      sessionLiveRefs.push({ ref: user1Ref, handler: user1Handler });
-      sessionLiveRefs.push({ ref: user2Ref, handler: user2Handler });
     }
 
     function buildNavigationLink(origin, destination) {
@@ -602,76 +427,6 @@ function startLiveSharing() {
             showSelectedPlace(place);
           });
         });
-      });
-    }
-
-    function showDestinationFromSession(destinationText) {
-      geocoder.geocode({ address: destinationText }, function(results, status) {
-        if (status !== "OK" || !results.length) return;
-
-        const location = results[0].geometry.location;
-
-        if (destinationMarker) destinationMarker.setMap(null);
-
-        destinationMarker = new google.maps.Marker({
-          position: location,
-          map: map,
-          title: destinationText,
-          icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
-        });
-
-        map.setCenter(location);
-        map.setZoom(13);
-      });
-    }
-
-    function loadSession() {
-      const params = new URLSearchParams(window.location.search);
-      const sessionId = params.get("session");
-
-      if (!sessionId) return;
-
-      currentSessionId = sessionId;
-
-      db.ref("sessions/" + sessionId).once("value", snapshot => {
-        const data = snapshot.val();
-        if (!data) return;
-
-        selectedShareDestination = data.destination || "";
-        selectedShareName = data.name || "";
-
-        document.getElementById("sharedSessionInfo").innerHTML =
-          '<div class="shared-box">' +
-          '🔗 <strong>Shared Session Loaded</strong><br>' +
-          (data.name || "") + '<br>' +
-          (data.destination || "") +
-          '<div class="action-row">' +
-            '<button class="session-btn" type="button" onclick="joinAsRole(\'user1\')">Join as User 1 & Start Live Sharing</button>' +
-            '<button class="session-btn" type="button" onclick="joinAsRole(\'user2\')">Join as User 2 & Start Live Sharing</button>' +
-          '</div>' +
-          '</div>';
-
-        if (data.address1) document.getElementById("address1").value = data.address1;
-        if (data.address2) document.getElementById("address2").value = data.address2;
-
-        if (data.destination) {
-          showDestinationFromSession(data.destination);
-        }
-
-        if (data.name && data.destination) {
-          const origin1 = (data.address1 || "").trim();
-          const origin2 = (data.address2 || "").trim();
-
-          document.getElementById("selectedPlace").innerHTML =
-            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-            data.destination +
-            '<div class="action-row">' +
-              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(data.destination) + ')">Navigate User 1</button>' +
-              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(data.destination) + ')">Navigate User 2</button>' +
-            '</div>';
-        }
-
-        listenToLiveUsers(sessionId);
       });
     }
 
@@ -763,6 +518,237 @@ function startLiveSharing() {
           findBtn.disabled = false;
           findBtn.textContent = "Find Meetup Spot";
         });
+      });
+    }
+
+    function showDestinationFromSession(destinationText) {
+      geocoder.geocode({ address: destinationText }, function(results, status) {
+        if (status !== "OK" || !results.length) return;
+
+        const location = results[0].geometry.location;
+
+        if (destinationMarker) destinationMarker.setMap(null);
+
+        destinationMarker = new google.maps.Marker({
+          position: location,
+          map: map,
+          title: destinationText,
+          icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+        });
+
+        map.setCenter(location);
+        map.setZoom(13);
+      });
+    }
+
+    function cleanupLiveListeners() {
+      if (user1LiveRef && user1LiveHandler) user1LiveRef.off("value", user1LiveHandler);
+      if (user2LiveRef && user2LiveHandler) user2LiveRef.off("value", user2LiveHandler);
+      user1LiveRef = null;
+      user2LiveRef = null;
+      user1LiveHandler = null;
+      user2LiveHandler = null;
+    }
+
+    function listenToLiveUsers(sessionId) {
+      cleanupLiveListeners();
+
+      user1LiveRef = db.ref("sessions/" + sessionId + "/live/user1");
+      user2LiveRef = db.ref("sessions/" + sessionId + "/live/user2");
+
+      user1LiveHandler = snapshot => {
+        const data = snapshot.val();
+        if (!data || typeof data.lat !== "number" || typeof data.lng !== "number") return;
+
+        const pos = { lat: data.lat, lng: data.lng };
+
+        if (!liveUser1Marker) {
+          liveUser1Marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            label: "1",
+            title: "User 1 Live"
+          });
+        } else {
+          liveUser1Marker.setPosition(pos);
+        }
+      };
+
+      user2LiveHandler = snapshot => {
+        const data = snapshot.val();
+        if (!data || typeof data.lat !== "number" || typeof data.lng !== "number") return;
+
+        const pos = { lat: data.lat, lng: data.lng };
+
+        if (!liveUser2Marker) {
+          liveUser2Marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            label: "2",
+            title: "User 2 Live"
+          });
+        } else {
+          liveUser2Marker.setPosition(pos);
+        }
+      };
+
+      user1LiveRef.on("value", user1LiveHandler);
+      user2LiveRef.on("value", user2LiveHandler);
+    }
+
+    function joinAsRole(role) {
+      selectedRole = role;
+      document.getElementById("liveInfo").innerHTML =
+        'Button pressed. Joining as <span class="status-ok">' + role.toUpperCase() + '</span>...';
+
+      startLiveSharing();
+    }
+
+    function startLiveSharing() {
+      if (!currentSessionId) {
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-error">No shared session loaded.</span>';
+        return;
+      }
+
+      if (!selectedRole) {
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-warn">Choose User 1 or User 2 first.</span>';
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-error">Geolocation is not supported on this device.</span>';
+        return;
+      }
+
+      document.getElementById("liveInfo").innerHTML =
+        'Requesting location for <span class="status-ok">' + selectedRole.toUpperCase() + '</span>...';
+
+      if (liveWatchId !== null) {
+        navigator.geolocation.clearWatch(liveWatchId);
+        liveWatchId = null;
+      }
+
+      lastLiveWrite = 0;
+      let locationResolved = false;
+
+      setTimeout(function () {
+        if (!locationResolved) {
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Still waiting for location. Open this link in Chrome or Safari and allow location access.</span>';
+        }
+      }, 12000);
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          locationResolved = true;
+
+          const now = Date.now();
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const speed = position.coords.speed || 0;
+
+          db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
+            lat: lat,
+            lng: lng,
+            speed: speed,
+            updated: now
+          });
+
+          document.getElementById("liveInfo").innerHTML =
+            'Live sharing active as <span class="status-ok">' + selectedRole.toUpperCase() + '</span>';
+
+          liveWatchId = navigator.geolocation.watchPosition(
+            function(position) {
+              const now = Date.now();
+
+              if (now - lastLiveWrite < 3000) return;
+              lastLiveWrite = now;
+
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              const speed = position.coords.speed || 0;
+
+              db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
+                lat: lat,
+                lng: lng,
+                speed: speed,
+                updated: now
+              });
+            },
+            function(error) {
+              document.getElementById("liveInfo").innerHTML =
+                '<span class="status-error">Live tracking error: ' + error.message + '</span>';
+            },
+            {
+              enableHighAccuracy: false,
+              maximumAge: 5000,
+              timeout: 10000
+            }
+          );
+        },
+        function(error) {
+          locationResolved = true;
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Location permission failed: ' + error.message + '</span>';
+        },
+        {
+          enableHighAccuracy: false,
+          maximumAge: 5000,
+          timeout: 10000
+        }
+      );
+    }
+
+    function loadSession() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session");
+
+      if (!sessionId) return;
+
+      currentSessionId = sessionId;
+
+      db.ref("sessions/" + sessionId).once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        selectedShareDestination = data.destination || "";
+        selectedShareName = data.name || "";
+
+        document.getElementById("sharedSessionInfo").innerHTML =
+          '<div class="shared-box">' +
+            '🔗 <strong>Shared Session Loaded</strong><br>' +
+            (data.name || "") + '<br>' +
+            (data.destination || "") +
+            '<div class="action-row">' +
+              '<button class="session-btn" type="button" onclick="joinAsRole(\'user1\')">Join as User 1 & Start Live Sharing</button>' +
+              '<button class="session-btn" type="button" onclick="joinAsRole(\'user2\')">Join as User 2 & Start Live Sharing</button>' +
+            '</div>' +
+          '</div>';
+
+        if (data.address1) document.getElementById("address1").value = data.address1;
+        if (data.address2) document.getElementById("address2").value = data.address2;
+
+        if (data.destination) {
+          showDestinationFromSession(data.destination);
+        }
+
+        if (data.name && data.destination) {
+          const origin1 = (data.address1 || "").trim();
+          const origin2 = (data.address2 || "").trim();
+
+          document.getElementById("selectedPlace").innerHTML =
+            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+            data.destination +
+            '<div class="action-row">' +
+              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(data.destination) + ')">Navigate User 1</button>' +
+              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(data.destination) + ')">Navigate User 2</button>' +
+            '</div>';
+        }
+
+        listenToLiveUsers(sessionId);
       });
     }
 
