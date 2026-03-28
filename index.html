@@ -329,7 +329,7 @@
       })
       .then(() => {
         const link =
-          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId + "&v=31";
+          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId + "&v=32";
 
         if (navigator.share) {
           navigator.share({
@@ -386,13 +386,9 @@
 
       lastLiveWrite = 0;
 
-      liveWatchId = navigator.geolocation.watchPosition(
+      navigator.geolocation.getCurrentPosition(
         function(position) {
           const now = Date.now();
-
-          if (now - lastLiveWrite < 3000) return;
-          lastLiveWrite = now;
-
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           const speed = position.coords.speed || 0;
@@ -406,10 +402,41 @@
 
           document.getElementById("liveInfo").innerHTML =
             'Live sharing active as <span class="status-ok">' + selectedRole.toUpperCase() + '</span>';
+
+          liveWatchId = navigator.geolocation.watchPosition(
+            function(position) {
+              const now = Date.now();
+
+              if (now - lastLiveWrite < 3000) return;
+              lastLiveWrite = now;
+
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              const speed = position.coords.speed || 0;
+
+              db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
+                lat: lat,
+                lng: lng,
+                speed: speed,
+                updated: now
+              });
+            },
+            function(error) {
+              document.getElementById("liveInfo").innerHTML =
+                '<span class="status-error">Live tracking error: ' + error.message + '</span>';
+              alert("Live tracking error: " + error.message);
+            },
+            {
+              enableHighAccuracy: false,
+              maximumAge: 5000,
+              timeout: 10000
+            }
+          );
         },
         function(error) {
           document.getElementById("liveInfo").innerHTML =
-            '<span class="status-error">Location error: ' + error.message + '</span>';
+            '<span class="status-error">Location permission failed: ' + error.message + '</span>';
+          alert("Location permission failed: " + error.message);
         },
         {
           enableHighAccuracy: false,
