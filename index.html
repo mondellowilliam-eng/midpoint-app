@@ -489,36 +489,60 @@ function joinAsRole(role) {
     }
 
     function searchNearby(mid, keyword) {
-      placesService.nearbySearch({
-        location: mid,
-        radius: 1000,
-        keyword: keyword || undefined
-      }, function(results, status) {
-        if (status !== "OK" || !results.length) {
-          document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
-          return;
-        }
-
-        const topPlace = results[0];
-        showTopPick(topPlace);
-
-        results.slice(0, 5).forEach((place, index) => {
-          const marker = new google.maps.Marker({
-            map: map,
-            position: place.geometry.location,
-            title: place.name,
-            label: String.fromCharCode(65 + index)
-          });
-
-          markers.push(marker);
-
-          marker.addListener("click", function() {
-            showSelectedPlace(place);
-          });
-        });
-      });
+  placesService.nearbySearch({
+    location: mid,
+    radius: 1000,
+    keyword: keyword || undefined
+  }, function(results, status) {
+    if (status !== "OK" || !results.length) {
+      document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
+      return;
     }
 
+    const topPlace = results[0];
+
+    let html =
+      '<div class="top-pick">' +
+      '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
+      (topPlace.vicinity || topPlace.name) + '<br>' +
+      '<em>Tap a result below or click a letter on the map.</em>' +
+      '</div>';
+
+    html += '<div style="margin-top:10px;">';
+
+    results.slice(0, 5).forEach((place, index) => {
+      const label = String.fromCharCode(65 + index);
+
+      html +=
+        '<button type="button" onclick="selectPlaceByIndex(' + index + ')" ' +
+        'style="margin-bottom:8px; text-align:left;">' +
+        label + '. ' + place.name +
+        (place.vicinity ? ' — ' + place.vicinity : '') +
+        '</button>';
+    });
+
+    html += '</div>';
+
+    document.getElementById("selectedPlace").innerHTML = html;
+
+    window.currentPlaces = results.slice(0, 5);
+
+    results.slice(0, 5).forEach((place, index) => {
+      const marker = new google.maps.Marker({
+        map: map,
+        position: place.geometry.location,
+        title: place.name,
+        label: String.fromCharCode(65 + index)
+      });
+
+      markers.push(marker);
+
+      marker.addListener("click", function() {
+        showSelectedPlace(place);
+      });
+    });
+  });
+}
     function showDestinationFromSession(destinationText) {
       geocoder.geocode({ address: destinationText }, function(results, status) {
         if (status !== "OK" || !results.length) return;
