@@ -524,31 +524,46 @@
   window.location.href = link;
 }
 function openMyRoute() {
-  if (!selectedRole) {
-    alert("Please choose Person 1 or Person 2 first.");
+  if (!selectedShareDestination) {
+    alert("Missing destination.");
     return;
   }
 
-  let origin = "";
-
-  if (selectedRole === "user1") {
-    origin = document.getElementById("address1").value.trim();
-  } else {
-    origin = document.getElementById("address2").value.trim();
-  }
-
-  if (!origin || !selectedShareDestination) {
-    alert("Missing route information.");
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported on this device.");
     return;
   }
 
-  const link =
-    "https://www.google.com/maps/dir/?api=1" +
-    "&origin=" + encodeURIComponent(origin) +
-    "&destination=" + encodeURIComponent(selectedShareDestination) +
-    "&travelmode=driving";
+  const statusLabel = selectedRole === "user1" ? "Person 1" : selectedRole === "user2" ? "Person 2" : "this user";
 
-  window.location.href = link;
+  document.getElementById("liveInfo").innerHTML =
+    'Getting current location for <span class="status-ok">' + statusLabel + '</span>...';
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      const link =
+        "https://www.google.com/maps/dir/?api=1" +
+        "&origin=" + encodeURIComponent(lat + "," + lng) +
+        "&destination=" + encodeURIComponent(selectedShareDestination) +
+        "&travelmode=driving" +
+        "&dir_action=navigate";
+
+      window.location.href = link;
+    },
+    function(error) {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-error">Could not get current location: ' + error.message + '</span>';
+      alert("Could not get current location. Please allow location access.");
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000
+    }
+  );
 }
     function showSelectedPlace(place) {
   const destination = place.vicinity || place.name;
