@@ -685,12 +685,11 @@ function openMyRoute() {
           '🔗 <strong>Shared Session Loaded</strong><br>' +
           (data.name || "") + '<br>' +
           (data.destination || "") +
-          '<div class="action-row">' +
+         '<div class="action-row">' +
   '<button class="session-btn" type="button" onclick="chooseRole(\'user1\')">Start as Person 1</button>' +
   '<button class="session-btn" type="button" onclick="chooseRole(\'user2\')">Start as Person 2</button>' +
   '<button class="live-btn" type="button" onclick="startLiveSharing()">Start Live Sharing</button>' +
 '</div>'
-          '</div>';
 
         if (data.address1) document.getElementById("address1").value = data.address1;
         if (data.address2) document.getElementById("address2").value = data.address2;
