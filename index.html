@@ -44,7 +44,7 @@
       line-height: 1.5;
     }
 
-    input, button {
+    input, button, .place-list-btn {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -52,7 +52,7 @@
       font-size: 16px;
     }
 
-    button {
+    button, .place-list-btn {
       border: none;
       background: #007BFF;
       color: white;
@@ -60,7 +60,7 @@
       cursor: pointer;
     }
 
-    button:hover {
+    button:hover, .place-list-btn:hover {
       background: #0062cc;
     }
 
@@ -188,13 +188,13 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → find a spot → click a result letter or list item → navigate or share the full session
+        Enter two locations → find a spot → click a result letter or result button → navigate or share the full session
       </div>
 
       <div id="sharedSessionInfo"></div>
 
-      <input id="address1" placeholder="First location">
-      <input id="address2" placeholder="Second location">
+      <input id="address1" placeholder="First location" autocomplete="off">
+      <input id="address2" placeholder="Second location" autocomplete="off">
 
       <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc.">
 
@@ -253,7 +253,6 @@
 
     let liveUser1Marker = null;
     let liveUser2Marker = null;
-
     let currentPlaces = [];
 
     function initMap() {
@@ -347,13 +346,6 @@
       .catch((error) => {
         alert("Firebase error: " + error.message);
       });
-    }
-
-    function joinAsRole(role) {
-      selectedRole = role;
-      document.getElementById("liveInfo").innerHTML =
-        'Requesting location for <span class="status-ok">' + role.toUpperCase() + '</span>...';
-      startLiveSharing();
     }
 
     function chooseRole(role) {
@@ -453,63 +445,42 @@
         }
       });
     }
-function buildNavigationLink(origin, destination) {
-  return "https://www.google.com/maps/dir/?api=1" +
-    "&origin=" + encodeURIComponent(origin) +
-    "&destination=" + encodeURIComponent(destination) +
-    "&travelmode=driving" +
-    "&dir_action=navigate";
-}
-   function openNavigation(origin, destination) {
-  const link =
-    "https://www.google.com/maps/dir/?api=1" +
-    "&origin=" + encodeURIComponent(origin) +
-    "&destination=" + encodeURIComponent(destination) +
-    "&travelmode=driving" +
-    "&dir_action=navigate";
 
-  window.open(link, "_blank");
-}
+    function openNavigation(origin, destination) {
+      const link =
+        "https://www.google.com/maps/dir/?api=1&origin=" +
+        encodeURIComponent(origin) +
+        "&destination=" +
+        encodeURIComponent(destination);
 
-   function showSelectedPlace(place) {
-  const destination = place.vicinity || place.name;
-  const origin1 = document.getElementById("address1").value.trim();
-  const origin2 = document.getElementById("address2").value.trim();
+      window.location.href = link;
+    }
 
-  selectedShareName = place.name;
-  selectedShareDestination = destination;
-
-  const nav1 = buildNavigationLink(origin1, destination);
-  const nav2 = buildNavigationLink(origin2, destination);
-
-  document.getElementById("selectedPlace").innerHTML =
-    "<strong>✅ " + place.name + "</strong><br>" +
-    destination +
-    '<div class="action-row">' +
-      '<a class="action-link" href="' + nav1 + '" target="_blank" rel="noopener noreferrer">Navigate User 1</a>' +
-      '<a class="action-link" href="' + nav2 + '" target="_blank" rel="noopener noreferrer">Navigate User 2</a>' +
-      '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-    '</div>';
-
-  document.getElementById("selectedPlace").scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-}
-
-    function showTopPick(place) {
+    function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
+      const origin1 = document.getElementById("address1").value.trim();
+      const origin2 = document.getElementById("address2").value.trim();
+
+      selectedShareName = place.name;
+      selectedShareDestination = destination;
 
       document.getElementById("selectedPlace").innerHTML =
-        '<div class="top-pick">' +
-        '⭐ <strong>Top Pick: ' + place.name + '</strong><br>' +
-        destination + '<br>' +
-        '<em>Tap a result below or click a letter on the map.</em>' +
+        "<strong>✅ " + place.name + "</strong><br>" +
+        destination +
+        '<div class="action-row">' +
+          '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(destination) + ')">Navigate User 1</button>' +
+          '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(destination) + ')">Navigate User 2</button>' +
+          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
         '</div>';
+
+      document.getElementById("selectedPlace").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
     }
 
     function selectPlaceByIndex(index) {
-      if (!currentPlaces || !currentPlaces[index]) return;
+      if (!currentPlaces[index]) return;
       showSelectedPlace(currentPlaces[index]);
     }
 
@@ -519,7 +490,7 @@ function buildNavigationLink(origin, destination) {
         radius: 1000,
         keyword: keyword || undefined
       }, function(results, status) {
-        if (status !== "OK" || !results.length) {
+        if (status !== "OK" || !results || !results.length) {
           document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
           return;
         }
@@ -538,7 +509,6 @@ function buildNavigationLink(origin, destination) {
 
         currentPlaces.forEach((place, index) => {
           const label = String.fromCharCode(65 + index);
-
           html +=
             '<button class="place-list-btn" type="button" onclick="selectPlaceByIndex(' + index + ')">' +
             label + '. ' + place.name +
@@ -622,19 +592,21 @@ function buildNavigationLink(origin, destination) {
         }
 
         if (data.name && data.destination) {
-  const origin1 = (data.address1 || "").trim();
-  const origin2 = (data.address2 || "").trim();
-  const nav1 = buildNavigationLink(origin1, data.destination);
-  const nav2 = buildNavigationLink(origin2, data.destination);
+          const origin1 = (data.address1 || "").trim();
+          const origin2 = (data.address2 || "").trim();
 
-  document.getElementById("selectedPlace").innerHTML =
-    "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-    data.destination +
-    '<div class="action-row">' +
-      '<a class="action-link" href="' + nav1 + '" target="_blank" rel="noopener noreferrer">Navigate User 1</a>' +
-      '<a class="action-link" href="' + nav2 + '" target="_blank" rel="noopener noreferrer">Navigate User 2</a>' +
-    '</div>';
-}
+          document.getElementById("selectedPlace").innerHTML =
+            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+            data.destination +
+            '<div class="action-row">' +
+              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(data.destination) + ')">Navigate User 1</button>' +
+              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(data.destination) + ')">Navigate User 2</button>' +
+            '</div>';
+        }
+
+        listenToLiveUsers(sessionId);
+      });
+    }
 
     function findMidpoint() {
       const a1 = document.getElementById("address1").value.trim();
