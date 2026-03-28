@@ -455,14 +455,15 @@
     }
 
     function openNavigation(origin, destination) {
-      const link =
-        "https://www.google.com/maps/dir/?api=1&origin=" +
-        encodeURIComponent(origin) +
-        "&destination=" +
-        encodeURIComponent(destination);
+  const link =
+    "https://www.google.com/maps/dir/?api=1" +
+    "&origin=" + encodeURIComponent(origin) +
+    "&destination=" + encodeURIComponent(destination) +
+    "&travelmode=driving" +
+    "&dir_action=navigate";
 
-      window.location.href = link;
-    }
+  window.location.href = link;
+}
 
     function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
