@@ -498,7 +498,10 @@ function joinAsRole(role) {
       document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
       return;
     }
-
+function selectPlaceByIndex(index) {
+  if (!window.currentPlaces || !window.currentPlaces[index]) return;
+  showSelectedPlace(window.currentPlaces[index]);
+}
     const topPlace = results[0];
 
     let html =
