@@ -698,18 +698,14 @@ function openMyRoute() {
           showDestinationFromSession(data.destination);
         }
 
-        if (data.name && data.destination) {
-          const origin1 = (data.address1 || "").trim();
-          const origin2 = (data.address2 || "").trim();
-
-          document.getElementById("selectedPlace").innerHTML =
-            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-            data.destination +
-            '<div class="action-row">' +
-            '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(data.destination) + ')">Open User 1 in Google Maps</button>' +
-'<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(data.destination) + ')">Open User 2 in Google Maps</button>' +
-            '</div>';
-        }
+       if (data.name && data.destination) {
+  document.getElementById("selectedPlace").innerHTML =
+    "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+    data.destination +
+    '<div class="action-row">' +
+      '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route in Google Maps</button>' +
+    '</div>';
+}
 
         listenToLiveUsers(sessionId);
       });
