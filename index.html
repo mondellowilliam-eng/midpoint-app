@@ -44,7 +44,7 @@
       line-height: 1.5;
     }
 
-    input, button, .place-list-btn {
+    input, button {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -52,7 +52,7 @@
       font-size: 16px;
     }
 
-    button, .place-list-btn {
+    button {
       border: none;
       background: #007BFF;
       color: white;
@@ -60,7 +60,7 @@
       cursor: pointer;
     }
 
-    button:hover, .place-list-btn:hover {
+    button:hover {
       background: #0062cc;
     }
 
@@ -188,7 +188,7 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → find a spot → click a result letter or result button → navigate or share the full session
+        Enter two locations → find a spot → click a result letter or result button → navigate, share the full session, or view both live routes on the map
       </div>
 
       <div id="sharedSessionInfo"></div>
@@ -238,7 +238,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let map, geocoder, placesService;
+    let map, geocoder, placesService, directionsService;
     let markers = [];
     let midpointMarker = null;
     let m1 = null;
@@ -247,6 +247,7 @@
 
     let selectedShareName = "";
     let selectedShareDestination = "";
+    let selectedDestinationLatLng = null;
     let currentSessionId = "";
     let selectedRole = "";
     let liveWatchId = null;
@@ -254,6 +255,11 @@
     let liveUser1Marker = null;
     let liveUser2Marker = null;
     let currentPlaces = [];
+
+    let directionsRenderer1 = null;
+    let directionsRenderer2 = null;
+    let latestUser1Pos = null;
+    let latestUser2Pos = null;
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -263,6 +269,29 @@
 
       geocoder = new google.maps.Geocoder();
       placesService = new google.maps.places.PlacesService(map);
+      directionsService = new google.maps.DirectionsService();
+
+      directionsRenderer1 = new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        preserveViewport: true,
+        polylineOptions: {
+          strokeColor: "#007BFF",
+          strokeOpacity: 0.8,
+          strokeWeight: 5
+        }
+      });
+      directionsRenderer1.setMap(map);
+
+      directionsRenderer2 = new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        preserveViewport: true,
+        polylineOptions: {
+          strokeColor: "#ff7a00",
+          strokeOpacity: 0.8,
+          strokeWeight: 5
+        }
+      });
+      directionsRenderer2.setMap(map);
 
       new google.maps.places.Autocomplete(document.getElementById("address1"));
       new google.maps.places.Autocomplete(document.getElementById("address2"));
@@ -276,6 +305,11 @@
 
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
+    }
+
+    function clearRouteLines() {
+      if (directionsRenderer1) directionsRenderer1.set("directions", null);
+      if (directionsRenderer2) directionsRenderer2.set("directions", null);
     }
 
     function clearMarkers() {
@@ -292,6 +326,9 @@
       m2 = null;
       destinationMarker = null;
       currentPlaces = [];
+      selectedDestinationLatLng = null;
+
+      clearRouteLines();
 
       document.getElementById("selectedPlace").innerHTML = "";
       document.getElementById("distanceInfo").innerHTML = "";
@@ -408,12 +445,39 @@
       );
     }
 
+    function updateRouteForUser(userNumber, originPos) {
+      if (!selectedDestinationLatLng || !originPos) return;
+
+      directionsService.route(
+        {
+          origin: originPos,
+          destination: selectedDestinationLatLng,
+          travelMode: google.maps.TravelMode.DRIVING
+        },
+        function(result, status) {
+          if (status !== "OK") return;
+
+          if (userNumber === 1) {
+            directionsRenderer1.setDirections(result);
+          } else {
+            directionsRenderer2.setDirections(result);
+          }
+        }
+      );
+    }
+
+    function refreshBothRoutes() {
+      if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
+      if (latestUser2Pos) updateRouteForUser(2, latestUser2Pos);
+    }
+
     function listenToLiveUsers(sessionId) {
       db.ref("sessions/" + sessionId + "/live/user1").on("value", snapshot => {
         const data = snapshot.val();
         if (!data) return;
 
         const pos = { lat: data.lat, lng: data.lng };
+        latestUser1Pos = pos;
 
         if (!liveUser1Marker) {
           liveUser1Marker = new google.maps.Marker({
@@ -425,6 +489,8 @@
         } else {
           liveUser1Marker.setPosition(pos);
         }
+
+        refreshBothRoutes();
       });
 
       db.ref("sessions/" + sessionId + "/live/user2").on("value", snapshot => {
@@ -432,6 +498,7 @@
         if (!data) return;
 
         const pos = { lat: data.lat, lng: data.lng };
+        latestUser2Pos = pos;
 
         if (!liveUser2Marker) {
           liveUser2Marker = new google.maps.Marker({
@@ -443,6 +510,8 @@
         } else {
           liveUser2Marker.setPosition(pos);
         }
+
+        refreshBothRoutes();
       });
     }
 
@@ -463,6 +532,18 @@
 
       selectedShareName = place.name;
       selectedShareDestination = destination;
+      selectedDestinationLatLng = {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng()
+      };
+
+      if (destinationMarker) destinationMarker.setMap(null);
+      destinationMarker = new google.maps.Marker({
+        position: place.geometry.location,
+        map: map,
+        title: place.name,
+        icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+      });
 
       document.getElementById("selectedPlace").innerHTML =
         "<strong>✅ " + place.name + "</strong><br>" +
@@ -472,6 +553,8 @@
           '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(destination) + ')">Navigate User 2</button>' +
           '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
         '</div>';
+
+      refreshBothRoutes();
 
       document.getElementById("selectedPlace").scrollIntoView({
         behavior: "smooth",
@@ -542,6 +625,10 @@
         if (status !== "OK" || !results.length) return;
 
         const location = results[0].geometry.location;
+        selectedDestinationLatLng = {
+          lat: location.lat(),
+          lng: location.lng()
+        };
 
         if (destinationMarker) destinationMarker.setMap(null);
 
@@ -549,11 +636,13 @@
           position: location,
           map: map,
           title: destinationText,
-          icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+          icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
         });
 
         map.setCenter(location);
         map.setZoom(13);
+
+        refreshBothRoutes();
       });
     }
 
@@ -661,7 +750,7 @@
           midpointMarker = new google.maps.Marker({
             position: mid,
             map: map,
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
           });
 
           const d1 = getDistanceKm(c1.lat(), c1.lng(), mid.lat, mid.lng).toFixed(1);
