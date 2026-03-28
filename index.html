@@ -471,28 +471,31 @@ function buildNavigationLink(origin, destination) {
   window.open(link, "_blank");
 }
 
-    function showSelectedPlace(place) {
-      const destination = place.vicinity || place.name;
-      const origin1 = document.getElementById("address1").value.trim();
-      const origin2 = document.getElementById("address2").value.trim();
+   function showSelectedPlace(place) {
+  const destination = place.vicinity || place.name;
+  const origin1 = document.getElementById("address1").value.trim();
+  const origin2 = document.getElementById("address2").value.trim();
 
-      selectedShareName = place.name;
-      selectedShareDestination = destination;
+  selectedShareName = place.name;
+  selectedShareDestination = destination;
 
-      document.getElementById("selectedPlace").innerHTML =
-        "<strong>✅ " + place.name + "</strong><br>" +
-        destination +
-        '<div class="action-row">' +
-          '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(destination) + ')">Navigate User 1</button>' +
-          '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(destination) + ')">Navigate User 2</button>' +
-          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-        '</div>';
+  const nav1 = buildNavigationLink(origin1, destination);
+  const nav2 = buildNavigationLink(origin2, destination);
 
-      document.getElementById("selectedPlace").scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-    }
+  document.getElementById("selectedPlace").innerHTML =
+    "<strong>✅ " + place.name + "</strong><br>" +
+    destination +
+    '<div class="action-row">' +
+      '<a class="action-link" href="' + nav1 + '" target="_blank" rel="noopener noreferrer">Navigate User 1</a>' +
+      '<a class="action-link" href="' + nav2 + '" target="_blank" rel="noopener noreferrer">Navigate User 2</a>' +
+      '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+    '</div>';
+
+  document.getElementById("selectedPlace").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
 
     function showTopPick(place) {
       const destination = place.vicinity || place.name;
