@@ -622,21 +622,19 @@ function buildNavigationLink(origin, destination) {
         }
 
         if (data.name && data.destination) {
-          const origin1 = (data.address1 || "").trim();
-          const origin2 = (data.address2 || "").trim();
+  const origin1 = (data.address1 || "").trim();
+  const origin2 = (data.address2 || "").trim();
+  const nav1 = buildNavigationLink(origin1, data.destination);
+  const nav2 = buildNavigationLink(origin2, data.destination);
 
-          document.getElementById("selectedPlace").innerHTML =
-            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-            data.destination +
-            '<div class="action-row">' +
-              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(data.destination) + ')">Navigate User 1</button>' +
-              '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(data.destination) + ')">Navigate User 2</button>' +
-            '</div>';
-        }
-
-        listenToLiveUsers(sessionId);
-      });
-    }
+  document.getElementById("selectedPlace").innerHTML =
+    "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+    data.destination +
+    '<div class="action-row">' +
+      '<a class="action-link" href="' + nav1 + '" target="_blank" rel="noopener noreferrer">Navigate User 1</a>' +
+      '<a class="action-link" href="' + nav2 + '" target="_blank" rel="noopener noreferrer">Navigate User 2</a>' +
+    '</div>';
+}
 
     function findMidpoint() {
       const a1 = document.getElementById("address1").value.trim();
