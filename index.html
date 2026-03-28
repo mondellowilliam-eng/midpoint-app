@@ -465,11 +465,10 @@ function joinAsRole(role) {
       document.getElementById("selectedPlace").innerHTML =
         "<strong>✅ " + place.name + "</strong><br>" +
         destination +
-        '<div class="action-row">' +
-          '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin1) + ',' + JSON.stringify(destination) + ')">Navigate User 1</button>' +
-          '<button class="action-link" type="button" onclick="openNavigation(' + JSON.stringify(origin2) + ',' + JSON.stringify(destination) + ')">Navigate User 2</button>' +
-          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-        '</div>';
+       '<div class="action-row">' +
+  '<button class="session-btn" type="button" onclick="joinAsRole(\'user1\')">Join as User 1</button>' +
+  '<button class="session-btn" type="button" onclick="joinAsRole(\'user2\')">Join as User 2</button>' +
+'</div>'
     }
 
     function showTopPick(place) {
