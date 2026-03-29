@@ -405,9 +405,10 @@ function checkTrackingHealth() {
 }
     function chooseRole(role) {
   selectedRole = role;
+
   document.getElementById("liveInfo").innerHTML =
     'Selected <span class="status-ok">' +
-    (role === "user1" ? "Person 1" : "Person 2") +
+    (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
     '</span>. Now tap Start Live Sharing.';
 }
 
