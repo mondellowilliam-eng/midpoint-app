@@ -394,58 +394,81 @@
 }
 
     function startLiveSharing() {
-      if (!currentSessionId) {
-        document.getElementById("liveInfo").innerHTML =
-          '<span class="status-error">No shared session loaded.</span>';
-        return;
-      }
+  if (!currentSessionId) {
+    document.getElementById("liveInfo").innerHTML =
+      '<span class="status-error">No shared session loaded.</span>';
+    return;
+  }
 
-      if (!selectedRole) {
-        document.getElementById("liveInfo").innerHTML =
-          '<span class="status-warn">Choose User 1 or User 2 first.</span>';
-        return;
-      }
+  if (!selectedRole) {
+    document.getElementById("liveInfo").innerHTML =
+      '<span class="status-warn">Choose Person 1 or Person 2 first.</span>';
+    return;
+  }
 
-      if (!navigator.geolocation) {
-        document.getElementById("liveInfo").innerHTML =
-          '<span class="status-error">Geolocation is not supported on this device.</span>';
-        return;
-      }
+  if (!navigator.geolocation) {
+    document.getElementById("liveInfo").innerHTML =
+      '<span class="status-error">Geolocation not supported.</span>';
+    return;
+  }
+
+  document.getElementById("liveInfo").innerHTML =
+    'Getting location...';
+
+  // 🔥 STEP 1: get location immediately
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
+        lat: lat,
+        lng: lng,
+        updated: Date.now()
+      });
 
       document.getElementById("liveInfo").innerHTML =
-        'Requesting location for <span class="status-ok">' + selectedRole.toUpperCase() + '</span>...';
-
-      if (liveWatchId !== null) {
-        navigator.geolocation.clearWatch(liveWatchId);
-      }
-
-      liveWatchId = navigator.geolocation.watchPosition(
-        function(position) {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const speed = position.coords.speed || 0;
-
-          db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
-            lat: lat,
-            lng: lng,
-            speed: speed,
-            updated: Date.now()
-          });
-
-          document.getElementById("liveInfo").innerHTML =
-            'Live sharing active as <span class="status-ok">' + selectedRole.toUpperCase() + '</span>';
-        },
-        function(error) {
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-error">Location error: ' + error.message + '</span>';
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 15000
-        }
-      );
+        'Live sharing started as <span class="status-ok">' +
+        (selectedRole === "user1" ? "Person 1" : "Person 2") +
+        '</span>';
+    },
+    function(error) {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-error">Location error: ' + error.message + '</span>';
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000
     }
+  );
+
+  // 🔥 STEP 2: continuous tracking
+  if (liveWatchId !== null) {
+    navigator.geolocation.clearWatch(liveWatchId);
+  }
+
+  liveWatchId = navigator.geolocation.watchPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
+        lat: lat,
+        lng: lng,
+        updated: Date.now()
+      });
+    },
+    function(error) {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-error">Tracking stopped: ' + error.message + '</span>';
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 3000,
+      timeout: 15000
+    }
+  );
+}
 
     function updateRouteForUser(userNumber, originPos) {
       if (!selectedDestinationLatLng || !originPos) return;
