@@ -310,7 +310,70 @@ const ROUTE_UPDATE_MS = 8000;
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
     }
+function joinLiveSession() {
+  if (!currentSessionId) {
+    alert("No session loaded.");
+    return;
+  }
 
+  if (!navigator.geolocation) {
+    alert("Geolocation not supported.");
+    return;
+  }
+
+  document.getElementById("liveInfo").innerHTML = "Connecting...";
+
+  navigator.geolocation.getCurrentPosition(function(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+
+    // 🔥 Check which slot is free
+    db.ref("sessions/" + currentSessionId + "/live").once("value", snapshot => {
+      const data = snapshot.val() || {};
+
+      let role = "";
+
+      if (!data.user1) {
+        role = "user1";
+      } else {
+        role = "user2";
+      }
+
+      selectedRole = role;
+
+      // 🔥 Write initial position
+      db.ref("sessions/" + currentSessionId + "/live/" + role).set({
+        lat: lat,
+        lng: lng,
+        updated: Date.now()
+      });
+
+      document.getElementById("liveInfo").innerHTML =
+        'You are connected as <span class="status-ok">' +
+        (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
+        '</span>';
+
+      // 🔥 Start continuous tracking
+      if (liveWatchId !== null) {
+        navigator.geolocation.clearWatch(liveWatchId);
+      }
+
+      liveWatchId = navigator.geolocation.watchPosition(function(pos) {
+        db.ref("sessions/" + currentSessionId + "/live/" + role).set({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          updated: Date.now()
+        });
+      });
+    });
+
+  }, function(error) {
+    alert("Location error: " + error.message);
+  }, {
+    enableHighAccuracy: true,
+    timeout: 10000
+  });
+}
     function clearRouteLines() {
       if (directionsRenderer1) directionsRenderer1.set("directions", null);
       if (directionsRenderer2) directionsRenderer2.set("directions", null);
