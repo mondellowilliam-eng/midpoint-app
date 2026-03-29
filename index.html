@@ -519,8 +519,7 @@ function checkTrackingHealth() {
         const data = snapshot.val();
         if (!data) return;
 
-        const pos = { lat: data.lat, lng: data.lng };
-        latestUser1Pos = pos;
+        const pos = { lat: data.lat, lng: data.lng, updated: data.updated };
 
         if (!liveUser1Marker) {
           liveUser1Marker = new google.maps.Marker({
