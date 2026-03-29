@@ -44,7 +44,9 @@
       line-height: 1.5;
     }
 
-    input, button {
+    input,
+    button,
+    .place-list-btn {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -52,7 +54,8 @@
       font-size: 16px;
     }
 
-    button {
+    button,
+    .place-list-btn {
       border: none;
       background: #007BFF;
       color: white;
@@ -60,7 +63,8 @@
       cursor: pointer;
     }
 
-    button:hover {
+    button:hover,
+    .place-list-btn:hover {
       background: #0062cc;
     }
 
@@ -105,9 +109,9 @@
       flex-wrap: wrap;
     }
 
-    .action-link,
     .session-btn,
-    .live-btn {
+    .live-btn,
+    .action-link {
       display: inline-block;
       padding: 10px 14px;
       border-radius: 8px;
@@ -120,9 +124,9 @@
       width: auto;
     }
 
-    .action-link { background: #007BFF; }
     .session-btn { background: #6f42c1; }
     .live-btn { background: #ff7a00; }
+    .action-link { background: #007BFF; }
 
     #distanceInfo,
     #liveInfo {
@@ -188,7 +192,7 @@
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → find a spot → click a result letter or result button → navigate, share the full session, or view both live routes on the map
+        Enter two locations → find a spot → share the session → each person taps “I’m Here Now”
       </div>
 
       <div id="sharedSessionInfo"></div>
@@ -211,7 +215,7 @@
         <input type="range" id="weightSlider" min="0" max="100" value="50">
       </div>
 
-      <button type="button" onclick="findMidpoint()">Find Meetup Spot</button>
+      <button id="findBtn" type="button" onclick="findMidpoint()">Find Meetup Spot</button>
 
       <div id="distanceInfo"></div>
       <div id="selectedPlace"></div>
@@ -238,6 +242,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    const clientId = (() => {
+      const existing = localStorage.getItem("midpointClientId");
+      if (existing) return existing;
+      const created = "client_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("midpointClientId", created);
+      return created;
+    })();
+
     let map, geocoder, placesService, directionsService;
     let markers = [];
     let midpointMarker = null;
@@ -248,21 +260,24 @@
     let selectedShareName = "";
     let selectedShareDestination = "";
     let selectedDestinationLatLng = null;
+
     let currentSessionId = "";
     let selectedRole = "";
     let liveWatchId = null;
 
     let liveUser1Marker = null;
     let liveUser2Marker = null;
-    let currentPlaces = [];
 
     let directionsRenderer1 = null;
     let directionsRenderer2 = null;
     let latestUser1Pos = null;
     let latestUser2Pos = null;
-let lastRouteUpdate1 = 0;
-let lastRouteUpdate2 = 0;
-const ROUTE_UPDATE_MS = 8000;
+
+    let currentPlaces = [];
+    let lastRouteUpdate1 = 0;
+    let lastRouteUpdate2 = 0;
+    const ROUTE_UPDATE_MS = 8000;
+
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 11,
@@ -278,7 +293,7 @@ const ROUTE_UPDATE_MS = 8000;
         preserveViewport: true,
         polylineOptions: {
           strokeColor: "#007BFF",
-          strokeOpacity: 0.8,
+          strokeOpacity: 0.9,
           strokeWeight: 5
         }
       });
@@ -289,7 +304,7 @@ const ROUTE_UPDATE_MS = 8000;
         preserveViewport: true,
         polylineOptions: {
           strokeColor: "#ff7a00",
-          strokeOpacity: 0.8,
+          strokeOpacity: 0.9,
           strokeWeight: 5
         }
       });
@@ -302,81 +317,20 @@ const ROUTE_UPDATE_MS = 8000;
         document.getElementById("weightValue").textContent = this.value + "%";
       });
 
-      loadSession();setInterval
-        (checkTrackingHealth, 5000);
-    
+      loadSession();
     }
 
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
     }
-function joinLiveSession() {
-  if (!currentSessionId) {
-    alert("No session loaded.");
-    return;
-  }
 
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported.");
-    return;
-  }
-
-  document.getElementById("liveInfo").innerHTML = "Connecting...";
-
-  navigator.geolocation.getCurrentPosition(function(position) {
-    const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-
-    // 🔥 Check which slot is free
-    db.ref("sessions/" + currentSessionId + "/live").once("value", snapshot => {
-      const data = snapshot.val() || {};
-
-      let role = "";
-
-      if (!data.user1) {
-        role = "user1";
-      } else {
-        role = "user2";
-      }
-
-      selectedRole = role;
-
-      // 🔥 Write initial position
-      db.ref("sessions/" + currentSessionId + "/live/" + role).set({
-        lat: lat,
-        lng: lng,
-        updated: Date.now()
-      });
-
-      document.getElementById("liveInfo").innerHTML =
-        'You are connected as <span class="status-ok">' +
-        (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
-        '</span>';
-
-      // 🔥 Start continuous tracking
-      if (liveWatchId !== null) {
-        navigator.geolocation.clearWatch(liveWatchId);
-      }
-
-      liveWatchId = navigator.geolocation.watchPosition(function(pos) {
-        db.ref("sessions/" + currentSessionId + "/live/" + role).set({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          updated: Date.now()
-        });
-      });
-    });
-
-  }, function(error) {
-    alert("Location error: " + error.message);
-  }, {
-    enableHighAccuracy: true,
-    timeout: 10000
-  });
-}
     function clearRouteLines() {
       if (directionsRenderer1) directionsRenderer1.set("directions", null);
       if (directionsRenderer2) directionsRenderer2.set("directions", null);
+      latestUser1Pos = null;
+      latestUser2Pos = null;
+      lastRouteUpdate1 = 0;
+      lastRouteUpdate2 = 0;
     }
 
     function clearMarkers() {
@@ -392,8 +346,11 @@ function joinLiveSession() {
       m1 = null;
       m2 = null;
       destinationMarker = null;
+
       currentPlaces = [];
       selectedDestinationLatLng = null;
+      selectedShareName = "";
+      selectedShareDestination = "";
 
       clearRouteLines();
 
@@ -418,7 +375,7 @@ function joinLiveSession() {
 
     function createSession() {
       if (!selectedShareDestination) {
-        alert("Pick a place first by clicking A–E.");
+        alert("Pick a place first.");
         return;
       }
 
@@ -430,10 +387,8 @@ function joinLiveSession() {
         address1: document.getElementById("address1").value.trim(),
         address2: document.getElementById("address2").value.trim(),
         created: Date.now()
-      })
-      .then(() => {
-        const link =
-          "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+      }).then(() => {
+        const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
 
         if (navigator.share) {
           navigator.share({
@@ -446,278 +401,97 @@ function joinLiveSession() {
         } else {
           prompt("Copy and send this session link:", link);
         }
-      })
-      .catch((error) => {
+      }).catch((error) => {
         alert("Firebase error: " + error.message);
       });
     }
-function checkTrackingHealth() {
-  const now = Date.now();
 
-  if (latestUser1Pos && latestUser1Pos.updated) {
-    if (now - latestUser1Pos.updated > 15000) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-warn">User 1 tracking paused</span>';
+    function buildNavigationLink(origin, destination) {
+      return "https://www.google.com/maps/dir/?api=1" +
+        "&origin=" + encodeURIComponent(origin) +
+        "&destination=" + encodeURIComponent(destination) +
+        "&travelmode=driving";
     }
-  }
 
-  if (latestUser2Pos && latestUser2Pos.updated) {
-    if (now - latestUser2Pos.updated > 15000) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-warn">User 2 tracking paused</span>';
+    function openNavigation(origin, destination) {
+      window.location.href = buildNavigationLink(origin, destination);
     }
-  }
-}
-    function chooseRole(role) {
-  if (selectedRole) {
-    alert("Role already selected.");
-    return;
-  }
 
-  selectedRole = role;
-
-  document.getElementById("liveInfo").innerHTML =
-    'You are <span class="status-ok">' +
-    (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
-    '</span>. Now tap Start Live Sharing.';
-}
-
-    function startLiveSharing() {
-  if (!currentSessionId) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-error">No shared session loaded.</span>';
-    return;
-  }
-
-  if (!selectedRole) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-warn">Choose Person 1 or Person 2 first.</span>';
-    return;
-  }
-
-  if (!navigator.geolocation) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-error">Geolocation not supported.</span>';
-    return;
-  }
-
-  document.getElementById("liveInfo").innerHTML =
-    'Getting location...';
-
-  // 🔥 STEP 1: get location immediately
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
-        lat: lat,
-        lng: lng,
-        updated: Date.now()
-      });
-
-     document.getElementById("liveInfo").innerHTML =
-  'Live sharing active as <span class="status-ok">' +
-  (selectedRole === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
-  '</span>';
-    },
-    function(error) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Location error: ' + error.message + '</span>';
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000
-    }
-  );
-
-  // 🔥 STEP 2: continuous tracking
-  if (liveWatchId !== null) {
-    navigator.geolocation.clearWatch(liveWatchId);
-  }
-
-  liveWatchId = navigator.geolocation.watchPosition(
-    function(position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
-        lat: lat,
-        lng: lng,
-        updated: Date.now()
-      });
-    },
-    function(error) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Tracking stopped: ' + error.message + '</span>';
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 3000,
-      timeout: 15000
-    }
-  );
-}
-
-    function updateRouteForUser(userNumber, originPos) {
-  if (!selectedDestinationLatLng || !originPos) return;
-
-  const now = Date.now();
-
-  if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
-  if (userNumber === 2 && now - lastRouteUpdate2 < ROUTE_UPDATE_MS) return;
-
-  directionsService.route(
-    {
-      origin: originPos,
-      destination: selectedDestinationLatLng,
-      travelMode: google.maps.TravelMode.DRIVING
-    },
-    function(result, status) {
-      if (status !== "OK") {
-        console.log("Route error for user " + userNumber + ": " + status);
+    function openMyRoute() {
+      if (!selectedShareDestination) {
+        alert("Missing destination.");
         return;
       }
 
-      if (userNumber === 1) {
-        lastRouteUpdate1 = now;
-        directionsRenderer1.setDirections(result);
-      } else {
-        lastRouteUpdate2 = now;
-        directionsRenderer2.setDirections(result);
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported on this device.");
+        return;
       }
-    }
-  );
-}
 
-    function refreshBothRoutes() {
-      if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
-      if (latestUser2Pos) updateRouteForUser(2, latestUser2Pos);
-    }
+      document.getElementById("liveInfo").innerHTML = "Getting your current location...";
 
-    function listenToLiveUsers(sessionId) {
-      db.ref("sessions/" + sessionId + "/live/user1").on("value", snapshot => {
-        const data = snapshot.val();
-        if (!data) return;
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
 
-        const pos = { lat: data.lat, lng: data.lng, updated: data.updated };
+          document.getElementById("liveInfo").innerHTML = "Opening Google Maps...";
 
-        if (!liveUser1Marker) {
-          liveUser1Marker = new google.maps.Marker({
-            position: pos,
-            map: map,
-            label: "1",
-            title: "User 1 Live"
-          });
-        } else {
-          liveUser1Marker.setPosition(pos);
+          const link =
+            "https://www.google.com/maps/dir/?api=1" +
+            "&origin=" + encodeURIComponent(lat + "," + lng) +
+            "&destination=" + encodeURIComponent(selectedShareDestination) +
+            "&travelmode=driving" +
+            "&dir_action=navigate";
+
+          window.location.href = link;
+        },
+        function(error) {
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Could not get current location: ' + error.message + '</span>';
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 10000
         }
-
-        refreshBothRoutes();
-      });
-
-      db.ref("sessions/" + sessionId + "/live/user2").on("value", snapshot => {
-        const data = snapshot.val();
-        if (!data) return;
-
-        const pos = { lat: data.lat, lng: data.lng };
-        latestUser2Pos = pos;
-
-        if (!liveUser2Marker) {
-          liveUser2Marker = new google.maps.Marker({
-            position: pos,
-            map: map,
-            label: "2",
-            title: "User 2 Live"
-          });
-        } else {
-          liveUser2Marker.setPosition(pos);
-        }
-
-        refreshBothRoutes();
-      });
+      );
     }
 
-  function openNavigation(origin, destination) {
-  const link =
-    "google.navigation:q=" + encodeURIComponent(destination) + "&mode=d";
-
-  window.location.href = link;
-}
-function openMyRoute() {
-  if (!selectedShareDestination) {
-    alert("Missing destination.");
-    return;
-  }
-
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported on this device.");
-    return;
-  }
-
-  const statusLabel = selectedRole === "user1" ? "Person 1" : selectedRole === "user2" ? "Person 2" : "this user";
-
-  document.getElementById("liveInfo").innerHTML =
-    'Getting current location for <span class="status-ok">' + statusLabel + '</span>...';
-
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      const link =
-        "https://www.google.com/maps/dir/?api=1" +
-        "&origin=" + encodeURIComponent(lat + "," + lng) +
-        "&destination=" + encodeURIComponent(selectedShareDestination) +
-        "&travelmode=driving" +
-        "&dir_action=navigate";
-
-      window.location.href = link;
-    },
-    function(error) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Could not get current location: ' + error.message + '</span>';
-      alert("Could not get current location. Please allow location access.");
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 10000
-    }
-  );
-}
     function showSelectedPlace(place) {
-  const destination = place.vicinity || place.name;
+      const destination = place.vicinity || place.name;
 
-  selectedShareName = place.name;
-  selectedShareDestination = destination;
-  selectedDestinationLatLng = {
-    lat: place.geometry.location.lat(),
-    lng: place.geometry.location.lng()
-  };
+      selectedShareName = place.name;
+      selectedShareDestination = destination;
+      selectedDestinationLatLng = {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng()
+      };
+      lastRouteUpdate1 = 0;
+      lastRouteUpdate2 = 0;
 
-  if (destinationMarker) destinationMarker.setMap(null);
-  destinationMarker = new google.maps.Marker({
-    position: place.geometry.location,
-    map: map,
-    title: place.name,
-    icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
-  });
+      if (destinationMarker) destinationMarker.setMap(null);
+      destinationMarker = new google.maps.Marker({
+        position: place.geometry.location,
+        map: map,
+        title: place.name,
+        icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+      });
 
-  document.getElementById("selectedPlace").innerHTML =
-    "<strong>✅ " + place.name + "</strong><br>" +
-    destination +
-    '<div class="action-row">' +
-      '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-    '</div>';
+      document.getElementById("selectedPlace").innerHTML =
+        "<strong>✅ " + place.name + "</strong><br>" +
+        destination +
+        '<div class="action-row">' +
+          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+        '</div>';
 
-  refreshBothRoutes();
+      refreshBothRoutes();
 
-  document.getElementById("selectedPlace").scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-}
+      document.getElementById("selectedPlace").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
 
     function selectPlaceByIndex(index) {
       if (!currentPlaces[index]) return;
@@ -757,7 +531,6 @@ function openMyRoute() {
         });
 
         html += '</div>';
-
         document.getElementById("selectedPlace").innerHTML = html;
 
         currentPlaces.forEach((place, index) => {
@@ -777,15 +550,76 @@ function openMyRoute() {
       });
     }
 
+    function updateRouteForUser(userNumber, originPos) {
+      if (!selectedDestinationLatLng || !originPos) return;
+
+      const now = Date.now();
+
+      if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
+      if (userNumber === 2 && now - lastRouteUpdate2 < ROUTE_UPDATE_MS) return;
+
+      directionsService.route(
+        {
+          origin: { lat: originPos.lat, lng: originPos.lng },
+          destination: selectedDestinationLatLng,
+          travelMode: google.maps.TravelMode.DRIVING
+        },
+        function(result, status) {
+          if (status !== "OK") return;
+
+          if (userNumber === 1) {
+            lastRouteUpdate1 = now;
+            directionsRenderer1.setDirections(result);
+          } else {
+            lastRouteUpdate2 = now;
+            directionsRenderer2.setDirections(result);
+          }
+        }
+      );
+    }
+
+    function updateLiveMapBounds() {
+      const bounds = new google.maps.LatLngBounds();
+      let hasPoint = false;
+
+      if (liveUser1Marker) {
+        bounds.extend(liveUser1Marker.getPosition());
+        hasPoint = true;
+      }
+
+      if (liveUser2Marker) {
+        bounds.extend(liveUser2Marker.getPosition());
+        hasPoint = true;
+      }
+
+      if (destinationMarker) {
+        bounds.extend(destinationMarker.getPosition());
+        hasPoint = true;
+      }
+
+      if (hasPoint) {
+        map.fitBounds(bounds);
+      }
+    }
+
+    function refreshBothRoutes() {
+      if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
+      if (latestUser2Pos) updateRouteForUser(2, latestUser2Pos);
+      updateLiveMapBounds();
+    }
+
     function showDestinationFromSession(destinationText) {
       geocoder.geocode({ address: destinationText }, function(results, status) {
         if (status !== "OK" || !results.length) return;
 
         const location = results[0].geometry.location;
+
         selectedDestinationLatLng = {
           lat: location.lat(),
           lng: location.lng()
         };
+        lastRouteUpdate1 = 0;
+        lastRouteUpdate2 = 0;
 
         if (destinationMarker) destinationMarker.setMap(null);
 
@@ -796,11 +630,152 @@ function openMyRoute() {
           icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
         });
 
-        map.setCenter(location);
-        map.setZoom(13);
+        refreshBothRoutes();
+      });
+    }
+
+    function listenToLiveUsers(sessionId) {
+      db.ref("sessions/" + sessionId + "/live/user1").on("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const pos = { lat: data.lat, lng: data.lng, updated: data.updated };
+        latestUser1Pos = pos;
+
+        if (!liveUser1Marker) {
+          liveUser1Marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            label: "1",
+            title: "Person 1"
+          });
+        } else {
+          liveUser1Marker.setPosition(pos);
+        }
 
         refreshBothRoutes();
       });
+
+      db.ref("sessions/" + sessionId + "/live/user2").on("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const pos = { lat: data.lat, lng: data.lng, updated: data.updated };
+        latestUser2Pos = pos;
+
+        if (!liveUser2Marker) {
+          liveUser2Marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            label: "2",
+            title: "Person 2"
+          });
+        } else {
+          liveUser2Marker.setPosition(pos);
+        }
+
+        refreshBothRoutes();
+      });
+    }
+
+    function claimRole(callback) {
+      if (selectedRole) {
+        callback(selectedRole);
+        return;
+      }
+
+      const user1ClaimRef = db.ref("sessions/" + currentSessionId + "/claims/user1");
+      const user2ClaimRef = db.ref("sessions/" + currentSessionId + "/claims/user2");
+
+      user1ClaimRef.transaction(
+        current => (current === null || current === clientId) ? clientId : undefined,
+        function(error, committed, snapshot) {
+          if (!error && committed && snapshot && snapshot.val() === clientId) {
+            selectedRole = "user1";
+            callback("user1");
+            return;
+          }
+
+          user2ClaimRef.transaction(
+            current => (current === null || current === clientId) ? clientId : undefined,
+            function(error2, committed2, snapshot2) {
+              if (!error2 && committed2 && snapshot2 && snapshot2.val() === clientId) {
+                selectedRole = "user2";
+                callback("user2");
+                return;
+              }
+
+              alert("Both spots are already taken in this session.");
+            }
+          );
+        }
+      );
+    }
+
+    function startWatchForRole(role) {
+      if (liveWatchId !== null) {
+        navigator.geolocation.clearWatch(liveWatchId);
+      }
+
+      liveWatchId = navigator.geolocation.watchPosition(
+        function(position) {
+          db.ref("sessions/" + currentSessionId + "/live/" + role).set({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            updated: Date.now()
+          });
+        },
+        function(error) {
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Live tracking error: ' + error.message + '</span>';
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 15000
+        }
+      );
+    }
+
+    function joinLiveSession() {
+      if (!currentSessionId) {
+        alert("No shared session loaded.");
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported.");
+        return;
+      }
+
+      document.getElementById("liveInfo").innerHTML = "Connecting...";
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          claimRole(function(role) {
+            db.ref("sessions/" + currentSessionId + "/live/" + role).set({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              updated: Date.now()
+            }).then(() => {
+              document.getElementById("liveInfo").innerHTML =
+                'You are connected as <span class="status-ok">' +
+                (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
+                '</span>.';
+              startWatchForRole(role);
+            });
+          });
+        },
+        function(error) {
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Location error: ' + error.message + '</span>';
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 10000
+        }
+      );
     }
 
     function loadSession() {
@@ -820,101 +795,14 @@ function openMyRoute() {
 
         document.getElementById("sharedSessionInfo").innerHTML =
           '<div class="shared-box">' +
-          '🔗 <strong>Shared Session Loaded</strong><br>' +
-          (data.name || "") + '<br>' +
-          (data.destination || "") +
-         '<div class="action-row">' +
-  function startLiveSharing() {
-  alert("Start Live Sharing button clicked");
-
-  if (!currentSessionId) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-error">No shared session loaded.</span>';
-    alert("No shared session loaded.");
-    return;
-  }
-
-  if (!selectedRole) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-warn">Choose Person 1 or Person 2 first.</span>';
-    alert("Choose Person 1 or Person 2 first.");
-    return;
-  }
-
-  if (!navigator.geolocation) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-error">Geolocation is not supported on this device.</span>';
-    alert("Geolocation is not supported on this device.");
-    return;
-  }
-
-  document.getElementById("liveInfo").innerHTML =
-    'Requesting location for <span class="status-ok">' +
-    (selectedRole === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
-    '</span>...';
-
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      const speed = position.coords.speed || 0;
-
-      db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
-        lat: lat,
-        lng: lng,
-        speed: speed,
-        updated: Date.now()
-      });
-
-      document.getElementById("liveInfo").innerHTML =
-        'Live sharing active as <span class="status-ok">' +
-        (selectedRole === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
-        '</span>';
-
-      alert("Live sharing started");
-
-      if (liveWatchId !== null) {
-        navigator.geolocation.clearWatch(liveWatchId);
-      }
-
-      liveWatchId = navigator.geolocation.watchPosition(
-        function(position) {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const speed = position.coords.speed || 0;
-
-          db.ref("sessions/" + currentSessionId + "/live/" + selectedRole).set({
-            lat: lat,
-            lng: lng,
-            speed: speed,
-            updated: Date.now()
-          });
-        },
-        function(error) {
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-error">Tracking error: ' + error.message + '</span>';
-          alert("Tracking error: " + error.message);
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 5000,
-          timeout: 15000
-        }
-      );
-    },
-    function(error) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Location error: ' + error.message + '</span>';
-      alert("Location error: " + error.message);
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 15000
-    }
-  );
-}
-'</div>'
+            '🔗 <strong>Shared Session Loaded</strong><br>' +
+            (data.name || "") + '<br>' +
+            (data.destination || "") +
+            '<div class="action-row">' +
+              '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here Now</button>' +
+              '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route in Google Maps</button>' +
+            '</div>' +
+          '</div>';
 
         if (data.address1) document.getElementById("address1").value = data.address1;
         if (data.address2) document.getElementById("address2").value = data.address2;
@@ -923,14 +811,11 @@ function openMyRoute() {
           showDestinationFromSession(data.destination);
         }
 
-       if (data.name && data.destination) {
-  document.getElementById("selectedPlace").innerHTML =
-    "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-    data.destination +
-    '<div class="action-row">' +
-      '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route in Google Maps</button>' +
-    '</div>';
-}
+        if (data.name && data.destination) {
+          document.getElementById("selectedPlace").innerHTML =
+            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+            data.destination;
+        }
 
         listenToLiveUsers(sessionId);
       });
@@ -980,7 +865,6 @@ function openMyRoute() {
           const midLng0 = (c1.lng() + c2.lng()) / 2;
 
           const shift = (slider - 0.5) * 0.6;
-
           const mid = {
             lat: midLat0 + (c1.lat() - midLat0) * shift,
             lng: midLng0 + (c1.lng() - midLng0) * shift
