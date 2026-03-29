@@ -384,7 +384,23 @@
         alert("Firebase error: " + error.message);
       });
     }
+function checkTrackingHealth() {
+  const now = Date.now();
 
+  if (latestUser1Pos && latestUser1Pos.updated) {
+    if (now - latestUser1Pos.updated > 15000) {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-warn">User 1 tracking paused</span>';
+    }
+  }
+
+  if (latestUser2Pos && latestUser2Pos.updated) {
+    if (now - latestUser2Pos.updated > 15000) {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-warn">User 2 tracking paused</span>';
+    }
+  }
+}
     function chooseRole(role) {
   selectedRole = role;
   document.getElementById("liveInfo").innerHTML =
