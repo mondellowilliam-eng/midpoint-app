@@ -497,25 +497,35 @@ function checkTrackingHealth() {
 }
 
     function updateRouteForUser(userNumber, originPos) {
-      if (!selectedDestinationLatLng || !originPos) return;
+  if (!selectedDestinationLatLng || !originPos) return;
 
-      directionsService.route(
-        {
-          origin: originPos,
-          destination: selectedDestinationLatLng,
-          travelMode: google.maps.TravelMode.DRIVING
-        },
-        function(result, status) {
-          if (status !== "OK") return;
+  const now = Date.now();
 
-          if (userNumber === 1) {
-            directionsRenderer1.setDirections(result);
-          } else {
-            directionsRenderer2.setDirections(result);
-          }
-        }
-      );
+  if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
+  if (userNumber === 2 && now - lastRouteUpdate2 < ROUTE_UPDATE_MS) return;
+
+  directionsService.route(
+    {
+      origin: originPos,
+      destination: selectedDestinationLatLng,
+      travelMode: google.maps.TravelMode.DRIVING
+    },
+    function(result, status) {
+      if (status !== "OK") {
+        console.log("Route error for user " + userNumber + ": " + status);
+        return;
+      }
+
+      if (userNumber === 1) {
+        lastRouteUpdate1 = now;
+        directionsRenderer1.setDirections(result);
+      } else {
+        lastRouteUpdate2 = now;
+        directionsRenderer2.setDirections(result);
+      }
     }
+  );
+}
 
     function refreshBothRoutes() {
       if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
