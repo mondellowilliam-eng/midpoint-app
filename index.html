@@ -15,24 +15,32 @@
 
     header {
       background: #007BFF;
-      padding: 20px;
+      padding: 18px 20px;
       text-align: center;
+      color: white;
     }
 
     header img {
-      width: 120px;
+      width: 110px;
+      display: block;
+      margin: 0 auto 8px;
+    }
+
+    header .subtitle {
+      font-size: 14px;
+      opacity: 0.95;
     }
 
     .container {
       padding: 20px;
-      max-width: 720px;
+      max-width: 760px;
       margin: auto;
     }
 
     .card {
       background: white;
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 12px;
       margin-bottom: 15px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
@@ -88,9 +96,9 @@
     }
 
     #map {
-      height: 430px;
+      height: 460px;
       margin-top: 20px;
-      border-radius: 10px;
+      border-radius: 12px;
     }
 
     #selectedPlace {
@@ -111,7 +119,9 @@
 
     .session-btn,
     .live-btn,
-    .action-link {
+    .action-link,
+    .secondary-btn,
+    .danger-btn {
       display: inline-block;
       padding: 10px 14px;
       border-radius: 8px;
@@ -127,13 +137,23 @@
     .session-btn { background: #6f42c1; }
     .live-btn { background: #ff7a00; }
     .action-link { background: #007BFF; }
+    .secondary-btn { background: #0f766e; }
+    .danger-btn { background: #c62828; }
 
     #distanceInfo,
-    #liveInfo {
+    #liveInfo,
+    #connectionStatus {
       margin-top: 10px;
       font-size: 14px;
       color: #333;
       line-height: 1.4;
+    }
+
+    #connectionStatus {
+      background: #f5f9ff;
+      border: 1px solid #cfe2ff;
+      border-radius: 8px;
+      padding: 10px;
     }
 
     #weightWrap {
@@ -187,12 +207,13 @@
 
   <header>
     <img src="midpoint_icon.png" alt="Midpoint Logo">
+    <div class="subtitle">Meet in the middle. Share live routes with one tap.</div>
   </header>
 
   <div class="container">
     <div class="card">
       <div class="instructions">
-        Enter two locations → find a spot → share the session → each person taps “I’m Here Now”
+        Enter two locations → find a spot → share the session → each person taps “I’m Here”
       </div>
 
       <div id="sharedSessionInfo"></div>
@@ -218,6 +239,7 @@
       <button id="findBtn" type="button" onclick="findMidpoint()">Find Meetup Spot</button>
 
       <div id="distanceInfo"></div>
+      <div id="connectionStatus"></div>
       <div id="selectedPlace"></div>
       <div id="liveInfo"></div>
     </div>
@@ -318,6 +340,8 @@
       });
 
       loadSession();
+      updateConnectionStatus();
+      setInterval(checkTrackingHealth, 5000);
     }
 
     function setFilter(type) {
@@ -458,6 +482,29 @@
       );
     }
 
+    function recenterMap() {
+      updateLiveMapBounds(true);
+    }
+
+    function resetSession() {
+      if (!currentSessionId) {
+        location.href = "https://mondellowilliam-eng.github.io/midpoint-app/";
+        return;
+      }
+
+      if (!confirm("Reset this shared session?")) return;
+
+      if (liveWatchId !== null) {
+        navigator.geolocation.clearWatch(liveWatchId);
+        liveWatchId = null;
+      }
+
+      db.ref("sessions/" + currentSessionId + "/live").remove();
+      db.ref("sessions/" + currentSessionId + "/claims").remove();
+
+      location.href = "https://mondellowilliam-eng.github.io/midpoint-app/";
+    }
+
     function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
 
@@ -578,7 +625,7 @@
       );
     }
 
-    function updateLiveMapBounds() {
+    function updateLiveMapBounds(forceZoom) {
       const bounds = new google.maps.LatLngBounds();
       let hasPoint = false;
 
@@ -597,7 +644,7 @@
         hasPoint = true;
       }
 
-      if (hasPoint) {
+      if (hasPoint && (forceZoom || liveUser1Marker || liveUser2Marker)) {
         map.fitBounds(bounds);
       }
     }
@@ -605,7 +652,7 @@
     function refreshBothRoutes() {
       if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
       if (latestUser2Pos) updateRouteForUser(2, latestUser2Pos);
-      updateLiveMapBounds();
+      updateLiveMapBounds(false);
     }
 
     function showDestinationFromSession(destinationText) {
@@ -637,7 +684,16 @@
     function listenToLiveUsers(sessionId) {
       db.ref("sessions/" + sessionId + "/live/user1").on("value", snapshot => {
         const data = snapshot.val();
-        if (!data) return;
+        if (!data) {
+          latestUser1Pos = null;
+          if (liveUser1Marker) {
+            liveUser1Marker.setMap(null);
+            liveUser1Marker = null;
+          }
+          if (directionsRenderer1) directionsRenderer1.set("directions", null);
+          updateConnectionStatus();
+          return;
+        }
 
         const pos = { lat: data.lat, lng: data.lng, updated: data.updated };
         latestUser1Pos = pos;
@@ -653,12 +709,22 @@
           liveUser1Marker.setPosition(pos);
         }
 
+        updateConnectionStatus();
         refreshBothRoutes();
       });
 
       db.ref("sessions/" + sessionId + "/live/user2").on("value", snapshot => {
         const data = snapshot.val();
-        if (!data) return;
+        if (!data) {
+          latestUser2Pos = null;
+          if (liveUser2Marker) {
+            liveUser2Marker.setMap(null);
+            liveUser2Marker = null;
+          }
+          if (directionsRenderer2) directionsRenderer2.set("directions", null);
+          updateConnectionStatus();
+          return;
+        }
 
         const pos = { lat: data.lat, lng: data.lng, updated: data.updated };
         latestUser2Pos = pos;
@@ -674,6 +740,7 @@
           liveUser2Marker.setPosition(pos);
         }
 
+        updateConnectionStatus();
         refreshBothRoutes();
       });
     }
@@ -762,6 +829,7 @@
                 'You are connected as <span class="status-ok">' +
                 (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
                 '</span>.';
+              updateConnectionStatus();
               startWatchForRole(role);
             });
           });
@@ -776,6 +844,46 @@
           timeout: 10000
         }
       );
+    }
+
+    function updateConnectionStatus() {
+      const parts = [];
+
+      if (selectedRole) {
+        parts.push('You are <span class="status-ok">' + (selectedRole === "user1" ? 'Person 1 (Blue)' : 'Person 2 (Orange)') + '</span>.');
+      }
+
+      if (latestUser1Pos) {
+        parts.push('<span class="status-ok">Person 1 connected</span>');
+      } else {
+        parts.push('<span class="status-warn">Waiting for Person 1</span>');
+      }
+
+      if (latestUser2Pos) {
+        parts.push('<span class="status-ok">Person 2 connected</span>');
+      } else {
+        parts.push('<span class="status-warn">Waiting for Person 2</span>');
+      }
+
+      document.getElementById("connectionStatus").innerHTML = parts.join("<br>");
+    }
+
+    function checkTrackingHealth() {
+      const now = Date.now();
+      let warnings = [];
+
+      if (latestUser1Pos && latestUser1Pos.updated && now - latestUser1Pos.updated > 20000) {
+        warnings.push("Person 1 tracking paused");
+      }
+
+      if (latestUser2Pos && latestUser2Pos.updated && now - latestUser2Pos.updated > 20000) {
+        warnings.push("Person 2 tracking paused");
+      }
+
+      if (warnings.length) {
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-warn">' + warnings.join(" • ") + '</span>';
+      }
     }
 
     function loadSession() {
@@ -799,8 +907,10 @@
             (data.name || "") + '<br>' +
             (data.destination || "") +
             '<div class="action-row">' +
-              '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here Now</button>' +
-              '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route in Google Maps</button>' +
+              '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here</button>' +
+              '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route</button>' +
+              '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
+              '<button class="danger-btn" type="button" onclick="resetSession()">Reset Session</button>' +
             '</div>' +
           '</div>';
 
@@ -818,6 +928,7 @@
         }
 
         listenToLiveUsers(sessionId);
+        updateConnectionStatus();
       });
     }
 
