@@ -487,23 +487,49 @@
     }
 
     function resetSession() {
-      if (!currentSessionId) {
-        location.href = "https://mondellowilliam-eng.github.io/midpoint-app/";
-        return;
-      }
+  if (!currentSessionId) {
+    clearMarkers();
+    document.getElementById("sharedSessionInfo").innerHTML = "";
+    document.getElementById("selectedPlace").innerHTML = "";
+    document.getElementById("liveInfo").innerHTML = "";
+    document.getElementById("connectionStatus").innerHTML = "";
+    return;
+  }
 
-      if (!confirm("Reset this shared session?")) return;
+  if (!confirm("Reset this shared session?")) return;
 
-      if (liveWatchId !== null) {
-        navigator.geolocation.clearWatch(liveWatchId);
-        liveWatchId = null;
-      }
+  if (liveWatchId !== null) {
+    navigator.geolocation.clearWatch(liveWatchId);
+    liveWatchId = null;
+  }
 
-      db.ref("sessions/" + currentSessionId + "/live").remove();
-      db.ref("sessions/" + currentSessionId + "/claims").remove();
+  db.ref("sessions/" + currentSessionId + "/live").remove();
+  db.ref("sessions/" + currentSessionId + "/claims").remove();
 
-      location.href = "https://mondellowilliam-eng.github.io/midpoint-app/";
-    }
+  currentSessionId = "";
+  selectedRole = "";
+  latestUser1Pos = null;
+  latestUser2Pos = null;
+
+  if (liveUser1Marker) {
+    liveUser1Marker.setMap(null);
+    liveUser1Marker = null;
+  }
+
+  if (liveUser2Marker) {
+    liveUser2Marker.setMap(null);
+    liveUser2Marker = null;
+  }
+
+  clearRouteLines();
+
+  document.getElementById("sharedSessionInfo").innerHTML = "";
+  document.getElementById("liveInfo").innerHTML = "";
+  updateConnectionStatus();
+
+  const cleanUrl = window.location.origin + window.location.pathname;
+  window.history.replaceState({}, "", cleanUrl);
+}
 
     function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
