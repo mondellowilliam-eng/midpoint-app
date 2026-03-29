@@ -446,10 +446,10 @@ function checkTrackingHealth() {
         updated: Date.now()
       });
 
-      document.getElementById("liveInfo").innerHTML =
-        'Live sharing started as <span class="status-ok">' +
-        (selectedRole === "user1" ? "Person 1" : "Person 2") +
-        '</span>';
+     document.getElementById("liveInfo").innerHTML =
+  'Live sharing active as <span class="status-ok">' +
+  (selectedRole === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
+  '</span>';
     },
     function(error) {
       document.getElementById("liveInfo").innerHTML =
