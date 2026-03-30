@@ -404,7 +404,7 @@ Enter two locations → find a spot → share the session → each person taps �
       return R * c;
     }
 
-   function createSession() {
+  function createSession() {
   if (!selectedShareDestination) {
     alert("Pick a place first.");
     return;
@@ -422,19 +422,23 @@ Enter two locations → find a spot → share the session → each person taps �
     const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
     const message = "Join my Midpoint session: " + link;
 
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isIPhone = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
 
-    if (isMobile) {
-     const smsLink = "sms:&body=" + encodeURIComponent(message);
-      window.location.href = smsLink;
+    if (isIPhone) {
+      window.location.href = "sms:&body=" + encodeURIComponent(message);
+      return;
+    }
+
+    if (isAndroid) {
+      window.location.href = "sms:?body=" + encodeURIComponent(message);
       return;
     }
 
     if (navigator.share) {
       navigator.share({
         title: "Midpoint Session",
-        text: "Join my Midpoint session",
-        url: link
+        text: message
       }).catch(() => {
         prompt("Copy and send this session link:", link);
       });
@@ -445,7 +449,6 @@ Enter two locations → find a spot → share the session → each person taps �
     alert("Firebase error: " + error.message);
   });
 }
-
     function buildNavigationLink(origin, destination) {
       return "https://www.google.com/maps/dir/?api=1" +
         "&origin=" + encodeURIComponent(origin) +
