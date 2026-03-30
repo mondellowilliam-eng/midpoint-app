@@ -223,7 +223,10 @@ Enter two locations → find a spot → share the session → each person taps �
       <div id="sharedSessionInfo"></div>
 
       <input id="address1" placeholder="First location" autocomplete="off">
-      <input id="address2" placeholder="Second location" autocomplete="off">
+<button type="button" onclick="useMyLocation('address1')">📍 Use My Location</button>
+
+<input id="address2" placeholder="Second location" autocomplete="off">
+<button type="button" onclick="useMyLocation('address2')">📍 Use My Location</button>
 
       <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc.">
 
