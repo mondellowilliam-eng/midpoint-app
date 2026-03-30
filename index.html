@@ -425,7 +425,7 @@ Enter two locations → find a spot → share the session → each person taps �
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {
-      const smsLink = "sms:?&body=" + encodeURIComponent(message);
+     const smsLink = "sms:&body=" + encodeURIComponent(message);
       window.location.href = smsLink;
       return;
     }
