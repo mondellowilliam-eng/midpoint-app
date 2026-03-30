@@ -1012,59 +1012,56 @@ function parseLocationInput(input) {
           return;
         }
 
-        geocoder.geocode({ address: a2 }, function(r2, s2) {
-          if (s2 !== "OK" || !r2.length) {
-            alert("Could not find second address.");
-            return;
-          }
+       Promise.all([
+  parseLocationInput(a1),
+  parseLocationInput(a2)
+]).then(([c1, c2]) => {
 
-          const c1 = r1[0].geometry.location;
-          const c2 = r2[0].geometry.location;
+  m1 = new google.maps.Marker({
+    position: c1,
+    map: map,
+    label: "1"
+  });
 
-          m1 = new google.maps.Marker({
-            position: c1,
-            map: map,
-            label: "1"
-          });
+  m2 = new google.maps.Marker({
+    position: c2,
+    map: map,
+    label: "2"
+  });
 
-          m2 = new google.maps.Marker({
-            position: c2,
-            map: map,
-            label: "2"
-          });
+  const midLat0 = (c1.lat + c2.lat) / 2;
+  const midLng0 = (c1.lng + c2.lng) / 2;
 
-          const midLat0 = (c1.lat() + c2.lat()) / 2;
-          const midLng0 = (c1.lng() + c2.lng()) / 2;
+  const shift = (slider - 0.5) * 0.6;
+  const mid = {
+    lat: midLat0 + (c1.lat - midLat0) * shift,
+    lng: midLng0 + (c1.lng - midLng0) * shift
+  };
 
-          const shift = (slider - 0.5) * 0.6;
-          const mid = {
-            lat: midLat0 + (c1.lat() - midLat0) * shift,
-            lng: midLng0 + (c1.lng() - midLng0) * shift
-          };
+  midpointMarker = new google.maps.Marker({
+    position: mid,
+    map: map,
+    icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+  });
 
-          midpointMarker = new google.maps.Marker({
-            position: mid,
-            map: map,
-            icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-          });
+  const d1 = getDistanceKm(c1.lat, c1.lng, mid.lat, mid.lng).toFixed(1);
+  const d2 = getDistanceKm(c2.lat, c2.lng, mid.lat, mid.lng).toFixed(1);
 
-          const d1 = getDistanceKm(c1.lat(), c1.lng(), mid.lat, mid.lng).toFixed(1);
-          const d2 = getDistanceKm(c2.lat(), c2.lng(), mid.lat, mid.lng).toFixed(1);
+  document.getElementById("distanceInfo").innerHTML =
+    "User 1 to midpoint: " + d1 + " km<br>" +
+    "User 2 to midpoint: " + d2 + " km";
 
-          document.getElementById("distanceInfo").innerHTML =
-            "User 1 to midpoint: " + d1 + " km<br>" +
-            "User 2 to midpoint: " + d2 + " km";
+  const bounds = new google.maps.LatLngBounds();
+  bounds.extend(c1);
+  bounds.extend(c2);
+  bounds.extend(mid);
+  map.fitBounds(bounds);
 
-          const bounds = new google.maps.LatLngBounds();
-          bounds.extend(c1);
-          bounds.extend(c2);
-          bounds.extend(mid);
-          map.fitBounds(bounds);
+  searchNearby(mid, keyword);
 
-          searchNearby(mid, keyword);
-        });
-      });
-    }
+}).catch(err => {
+  alert(err);
+});
   </script>
 
   <script async
