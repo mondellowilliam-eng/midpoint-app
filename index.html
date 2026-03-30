@@ -977,35 +977,7 @@ Enter two locations → find a spot → share the session → each person taps �
         updateConnectionStatus();
       });
     }
-function useMyLocation(inputId) {
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported on this device.");
-    return;
-  }
 
-  document.getElementById("liveInfo").innerHTML = "Getting your location...";
-
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      document.getElementById(inputId).value = lat + ", " + lng;
-
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-ok">Location set successfully</span>';
-    },
-    function(error) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Location error: ' + error.message + '</span>';
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 10000
-    }
-  );
-}
    function useMyLocation(inputId) {
   if (!navigator.geolocation) {
     alert("Geolocation is not supported on this device.");
