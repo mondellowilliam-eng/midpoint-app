@@ -404,38 +404,47 @@ Enter two locations → find a spot → share the session → each person taps �
       return R * c;
     }
 
-    function createSession() {
-      if (!selectedShareDestination) {
-        alert("Pick a place first.");
-        return;
-      }
+   function createSession() {
+  if (!selectedShareDestination) {
+    alert("Pick a place first.");
+    return;
+  }
 
-      const sessionId = Math.random().toString(36).substring(2, 8);
+  const sessionId = Math.random().toString(36).substring(2, 8);
 
-      db.ref("sessions/" + sessionId).set({
-        destination: selectedShareDestination,
-        name: selectedShareName,
-        address1: document.getElementById("address1").value.trim(),
-        address2: document.getElementById("address2").value.trim(),
-        created: Date.now()
-      }).then(() => {
-        const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+  db.ref("sessions/" + sessionId).set({
+    destination: selectedShareDestination,
+    name: selectedShareName,
+    address1: document.getElementById("address1").value.trim(),
+    address2: document.getElementById("address2").value.trim(),
+    created: Date.now()
+  }).then(() => {
+    const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+    const message = "Join my Midpoint session: " + link;
 
-        if (navigator.share) {
-          navigator.share({
-            title: "Midpoint Session",
-            text: "Join my Midpoint session",
-            url: link
-          }).catch(() => {
-            prompt("Copy and send this session link:", link);
-          });
-        } else {
-          prompt("Copy and send this session link:", link);
-        }
-      }).catch((error) => {
-        alert("Firebase error: " + error.message);
-      });
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      const smsLink = "sms:?&body=" + encodeURIComponent(message);
+      window.location.href = smsLink;
+      return;
     }
+
+    if (navigator.share) {
+      navigator.share({
+        title: "Midpoint Session",
+        text: "Join my Midpoint session",
+        url: link
+      }).catch(() => {
+        prompt("Copy and send this session link:", link);
+      });
+    } else {
+      prompt("Copy and send this session link:", link);
+    }
+  }).catch((error) => {
+    alert("Firebase error: " + error.message);
+  });
+}
 
     function buildNavigationLink(origin, destination) {
       return "https://www.google.com/maps/dir/?api=1" +
