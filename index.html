@@ -404,7 +404,7 @@ Enter two locations → find a spot → share the session → each person taps �
       return R * c;
     }
 
-  function createSession() {
+ function createSession() {
   if (!selectedShareDestination) {
     alert("Pick a place first.");
     return;
@@ -418,89 +418,27 @@ Enter two locations → find a spot → share the session → each person taps �
     address1: document.getElementById("address1").value.trim(),
     address2: document.getElementById("address2").value.trim(),
     created: Date.now()
-  }).then(() => {
+  }).then(async () => {
     const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
     const message = "Join my Midpoint session: " + link;
 
-    const isIPhone = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isAndroid = /Android/i.test(navigator.userAgent);
-
-    if (isIPhone) {
-      window.location.href = "sms:&body=" + encodeURIComponent(message);
-      return;
-    }
-
-    if (isAndroid) {
-      window.location.href = "sms:?body=" + encodeURIComponent(message);
-      return;
-    }
-
     if (navigator.share) {
-      navigator.share({
-        title: "Midpoint Session",
-        text: message
-      }).catch(() => {
-        prompt("Copy and send this session link:", link);
-      });
-    } else {
-      prompt("Copy and send this session link:", link);
+      try {
+        await navigator.share({
+          title: "Midpoint Session",
+          text: message
+        });
+        return;
+      } catch (err) {
+        // If user cancels or share fails, fall through
+      }
     }
+
+    prompt("Copy and send this session link:", link);
   }).catch((error) => {
     alert("Firebase error: " + error.message);
   });
 }
-    function buildNavigationLink(origin, destination) {
-      return "https://www.google.com/maps/dir/?api=1" +
-        "&origin=" + encodeURIComponent(origin) +
-        "&destination=" + encodeURIComponent(destination) +
-        "&travelmode=driving";
-    }
-
-    function openNavigation(origin, destination) {
-      window.location.href = buildNavigationLink(origin, destination);
-    }
-
-    function openMyRoute() {
-      if (!selectedShareDestination) {
-        alert("Missing destination.");
-        return;
-      }
-
-      if (!navigator.geolocation) {
-        alert("Geolocation is not supported on this device.");
-        return;
-      }
-
-      document.getElementById("liveInfo").innerHTML = "Getting your current location...";
-
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-
-          document.getElementById("liveInfo").innerHTML = "Opening Google Maps...";
-
-          const link =
-            "https://www.google.com/maps/dir/?api=1" +
-            "&origin=" + encodeURIComponent(lat + "," + lng) +
-            "&destination=" + encodeURIComponent(selectedShareDestination) +
-            "&travelmode=driving" +
-            "&dir_action=navigate";
-
-          window.location.href = link;
-        },
-        function(error) {
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-error">Could not get current location: ' + error.message + '</span>';
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 5000,
-          timeout: 10000
-        }
-      );
-    }
-
     function recenterMap() {
       updateLiveMapBounds(true);
     }
