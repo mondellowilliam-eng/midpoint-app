@@ -890,17 +890,7 @@ Enter two locations → find a spot → share the session → each person taps �
     }
   );
 } 
-        function(error) {
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-error">Location error: ' + error.message + '</span>';
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 5000,
-          timeout: 10000
-        }
-      );
-    }
+        
 
     function updateConnectionStatus() {
       const parts = [];
