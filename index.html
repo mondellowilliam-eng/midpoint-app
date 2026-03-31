@@ -516,7 +516,7 @@ const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" 
       document.getElementById("sharedSessionInfo").innerHTML = "";
       document.getElementById("liveInfo").innerHTML = "";
       updateConnectionStatus();
-
+localStorage.removeItem("midpoint_last_session");
       const cleanUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, "", cleanUrl);
     }
