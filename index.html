@@ -516,7 +516,8 @@ const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" 
         "<strong>✅ " + place.name + "</strong><br>" +
         destination +
         '<div class="action-row">' +
-          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+         '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+'<button class="secondary-btn" type="button" onclick="copySessionLink()">Copy Link</button>'  +
         '</div>';
 
       refreshBothRoutes();
