@@ -405,7 +405,11 @@ function copySessionLink() {
     alert("Pick a place first.");
     return;
   }
-
+function hideSetupControls() {
+  document.querySelectorAll(".setup-only").forEach(el => {
+    el.style.display = "none";
+  });
+}
   const sessionId = Math.random().toString(36).substring(2, 8);
 
   db.ref("sessions/" + sessionId).set({
