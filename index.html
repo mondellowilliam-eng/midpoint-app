@@ -309,7 +309,7 @@ Enter two locations → find a spot → share the session → each person taps �
     let lastRouteUpdate1 = 0;
     let lastRouteUpdate2 = 0;
     const ROUTE_UPDATE_MS = 8000;
-
+let selectedTravelMode = "DRIVING";
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 11,
