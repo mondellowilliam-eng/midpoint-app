@@ -971,7 +971,7 @@ function openMyRoute() {
       if (!sessionId) return;
 
       currentSessionId = sessionId;
-
+hideSetupControls();
       db.ref("sessions/" + sessionId).once("value", snapshot => {
         const data = snapshot.val();
         if (!data) return;
