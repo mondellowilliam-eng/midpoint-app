@@ -358,7 +358,15 @@ let selectedTravelMode = "DRIVING";
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
     }
+function setTravelMode(mode) {
+  selectedTravelMode = mode;
+  document.getElementById("liveInfo").innerHTML =
+    '<span class="status-ok">Travel mode set to ' + (mode === "WALKING" ? "Walking" : "Driving") + '.</span>';
 
+  lastRouteUpdate1 = 0;
+  lastRouteUpdate2 = 0;
+  refreshBothRoutes();
+}
     function clearRouteLines() {
       if (directionsRenderer1) directionsRenderer1.set("directions", null);
       if (directionsRenderer2) directionsRenderer2.set("directions", null);
