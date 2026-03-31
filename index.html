@@ -242,7 +242,10 @@ Enter two locations → find a spot → share the session → each person taps �
         <label for="weightSlider">Adjust midpoint <span id="weightValue">50%</span></label>
         <input type="range" id="weightSlider" min="0" max="100" value="50">
       </div>
-
+<div class="filters">
+  <button type="button" onclick="setTravelMode('DRIVING')">🚗 Driving</button>
+  <button type="button" onclick="setTravelMode('WALKING')">🚶 Walking</button>
+</div>
       <button id="findBtn" type="button" onclick="findMidpoint()">Find Meetup Spot</button>
 
       <div id="distanceInfo"></div>
