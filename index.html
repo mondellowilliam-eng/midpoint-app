@@ -961,7 +961,32 @@ const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" 
         updateConnectionStatus();
       });
     }
+function checkLastSession() {
+  const lastSession = localStorage.getItem("midpoint_last_session");
 
+  if (!lastSession) return;
+  if (currentSessionId) return;
+
+  const container = document.getElementById("sharedSessionInfo");
+
+  container.innerHTML =
+    '<div class="shared-box">' +
+      '🔁 <strong>Resume your last session?</strong><br>' +
+      '<div class="action-row">' +
+        '<button class="live-btn" type="button" onclick="resumeSession(\'' + lastSession + '\')">Resume</button>' +
+        '<button class="secondary-btn" type="button" onclick="clearLastSession()">Start New</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function resumeSession(sessionId) {
+  window.location.href = window.location.origin + window.location.pathname + "?session=" + sessionId;
+}
+
+function clearLastSession() {
+  localStorage.removeItem("midpoint_last_session");
+  document.getElementById("sharedSessionInfo").innerHTML = "";
+}
    function useMyLocation(inputId) {
   if (!navigator.geolocation) {
     alert("Geolocation is not supported on this device.");
