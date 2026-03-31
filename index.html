@@ -420,7 +420,7 @@ Enter two locations → find a spot → share the session → each person taps �
     created: Date.now()
   }).then(async () => {
     const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
-
+localStorage.setItem("midpoint_last_session", sessionId);
 // Save last session locally
 localStorage.setItem("midpoint_last_session", sessionId);
 
