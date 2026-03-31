@@ -405,11 +405,7 @@ function copySessionLink() {
     alert("Pick a place first.");
     return;
   }
-function hideSetupControls() {
-  document.querySelectorAll(".setup-only").forEach(el => {
-    el.style.display = "none";
-  });
-}
+
   const sessionId = Math.random().toString(36).substring(2, 8);
 
   db.ref("sessions/" + sessionId).set({
@@ -448,7 +444,11 @@ function hideSetupControls() {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
-
+function hideSetupControls() {
+  document.querySelectorAll(".setup-only").forEach(el => {
+    el.style.display = "none";
+  });
+}
  function createSession() {
   if (!selectedShareDestination) {
     alert("Pick a place first.");
