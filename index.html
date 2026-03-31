@@ -229,7 +229,13 @@ Enter two locations → find a spot → share the session → each person taps �
 <button type="button" onclick="useMyLocation('address2')">📍 Use My Location (Person 2)</button>
 
       <input id="placeKeyword" placeholder="Search optional: Starbucks, McDonald's, etc.">
-
+<div class="filters">
+  <button type="button" onclick="setFilter('coffee')">☕ Coffee</button>
+  <button type="button" onclick="setFilter('food')">🍽️ Food</button>
+  <button type="button" onclick="setFilter('drinks')">🍹 Drinks</button>
+  <button type="button" onclick="setFilter('dessert')">🍰 Dessert</button>
+  <button type="button" onclick="setFilter('park')">🌳 Park</button>
+</div>
     
 
       <div id="weightWrap">
