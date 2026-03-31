@@ -637,7 +637,7 @@ localStorage.removeItem("midpoint_last_session");
         {
           origin: { lat: originPos.lat, lng: originPos.lng },
           destination: selectedDestinationLatLng,
-          travelMode: google.maps.TravelMode.DRIVING
+          travelMode: google.maps.TravelMode[selectedTravelMode]
         },
         function(result, status) {
           if (status !== "OK") return;
