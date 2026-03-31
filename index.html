@@ -396,13 +396,25 @@ function copySessionLink() {
 
   const sessionId = Math.random().toString(36).substring(2, 8);
 
-  const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+  db.ref("sessions/" + sessionId).set({
+    destination: selectedShareDestination,
+    name: selectedShareName,
+    address1: document.getElementById("address1").value.trim(),
+    address2: document.getElementById("address2").value.trim(),
+    created: Date.now()
+  }).then(() => {
+    const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
 
-  navigator.clipboard.writeText(link).then(() => {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-ok">Link copied! Paste it into a text message.</span>';
-  }).catch(() => {
-    prompt("Copy this session link:", link);
+    localStorage.setItem("midpoint_last_session", sessionId);
+
+    navigator.clipboard.writeText(link).then(() => {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-ok">Link copied! Paste it into a text message.</span>';
+    }).catch(() => {
+      prompt("Copy this session link:", link);
+    });
+  }).catch((error) => {
+    alert("Firebase error: " + error.message);
   });
 }
     function getDistanceKm(lat1, lng1, lat2, lng2) {
