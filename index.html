@@ -975,18 +975,26 @@ function openMyRoute() {
         selectedShareDestination = data.destination || "";
         selectedShareName = data.name || "";
 selectedTravelMode = data.travelMode || "DRIVING";
-        document.getElementById("sharedSessionInfo").innerHTML =
-          '<div class="shared-box">' +
-            '🔗 <strong>Shared Session Loaded</strong><br>' +
-            (data.name || "") + '<br>' +
-            (data.destination || "") +
-            '<div class="action-row">' +
-              '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here</button>' +
-              '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route</button>' +
-              '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
-              '<button class="danger-btn" type="button" onclick="resetSession()">Reset Session</button>' +
-            '</div>' +
-          '</div>';
+
+if (data.destination) {
+  showDestinationFromSession(data.destination);
+}
+
+// 👉 ADD THIS LINE RIGHT HERE
+refreshBothRoutes();
+
+document.getElementById("sharedSessionInfo").innerHTML =
+  '<div class="shared-box">' +
+    '🔗 <strong>Shared Session Loaded</strong><br>' +
+    (data.name || "") + '<br>' +
+    (data.destination || "") +
+    '<div class="action-row">' +
+      '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here</button>' +
+      '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route</button>' +
+      '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
+      '<button class="danger-btn" type="button" onclick="resetSession()">Reset Session</button>' +
+    '</div>' +
+  '</div>';
 
         if (data.address1) document.getElementById("address1").value = data.address1;
         if (data.address2) document.getElementById("address2").value = data.address2;
