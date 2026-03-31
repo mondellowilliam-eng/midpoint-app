@@ -531,7 +531,38 @@ localStorage.removeItem("midpoint_last_session");
       const cleanUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, "", cleanUrl);
     }
+function openMyRoute() {
+  if (!selectedDestinationLatLng) {
+    alert("No destination selected.");
+    return;
+  }
 
+  if (!selectedRole) {
+    alert("Tap 'I’m Here' first.");
+    return;
+  }
+
+  let userPos = null;
+
+  if (selectedRole === "user1" && latestUser1Pos) {
+    userPos = latestUser1Pos;
+  } else if (selectedRole === "user2" && latestUser2Pos) {
+    userPos = latestUser2Pos;
+  }
+
+  if (!userPos) {
+    alert("Your location is not available yet.");
+    return;
+  }
+
+  const url =
+    "https://www.google.com/maps/dir/?api=1" +
+    "&origin=" + userPos.lat + "," + userPos.lng +
+    "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
+    "&travelmode=" + selectedTravelMode.toLowerCase();
+
+  window.open(url, "_blank");
+}
     function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
 
