@@ -409,12 +409,13 @@ function copySessionLink() {
   const sessionId = Math.random().toString(36).substring(2, 8);
 
   db.ref("sessions/" + sessionId).set({
-    destination: selectedShareDestination,
-    name: selectedShareName,
-    address1: document.getElementById("address1").value.trim(),
-    address2: document.getElementById("address2").value.trim(),
-    created: Date.now()
-  }).then(() => {
+  destination: selectedShareDestination,
+  name: selectedShareName,
+  address1: document.getElementById("address1").value.trim(),
+  address2: document.getElementById("address2").value.trim(),
+  travelMode: selectedTravelMode,
+  created: Date.now()
+}).then(() => {
     const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
 
     localStorage.setItem("midpoint_last_session", sessionId);
