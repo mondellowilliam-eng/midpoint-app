@@ -494,7 +494,7 @@
       }).then(async () => {
         const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
         localStorage.setItem("midpoint_last_session", sessionId);
-
+window.location.href = "?session=" + sessionId;
         const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" + link;
 
         if (navigator.share) {
