@@ -1066,6 +1066,7 @@ updateTripSummary();
           document.getElementById("selectedPlace").innerHTML =
             "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
             data.destination;
+         updateTripSummary(); 
         }
 
         listenToLiveUsers(sessionId);
