@@ -476,7 +476,7 @@
       });
     }
 
-    function createSession() {
+   function createSession() {
   if (!selectedShareDestination) {
     alert("Pick a place first.");
     return;
@@ -493,10 +493,15 @@
     created: Date.now()
   }).then(async () => {
     const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+    const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" + link;
 
     localStorage.setItem("midpoint_last_session", sessionId);
 
-    const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" + link;
+    // Put YOUR phone into the session without reloading
+    currentSessionId = sessionId;
+    window.history.replaceState({}, "", "?session=" + sessionId);
+    hideSetupControls();
+    loadSession();
 
     if (navigator.share) {
       try {
@@ -504,11 +509,9 @@
           title: "Midpoint Session",
           text: message
         });
-
-        window.location.href = "?session=" + sessionId;
         return;
       } catch (err) {
-        // fall through to prompt
+        // fall through
       }
     }
 
@@ -516,7 +519,7 @@
   }).catch((error) => {
     alert("Firebase error: " + error.message);
   });
-}
+} 
 
     function recenterMap() {
       updateLiveMapBounds(true);
