@@ -222,7 +222,1198 @@ Enter two locations → find a spot → share the session → each person taps �
 
       <div id="sharedSessionInfo"></div>
 
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Midpoint</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="midpoint_icon.png">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e6f0ff;
+    }
+
+    header {
+      background: #007BFF;
+      padding: 18px 20px;
+      text-align: center;
+      color: white;
+    }
+
+    header img {
+      width: 110px;
+      display: block;
+      margin: 0 auto 8px;
+    }
+
+    header .subtitle {
+      font-size: 14px;
+      opacity: 0.95;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 760px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .instructions {
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    input,
+    button,
+    .place-list-btn {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button,
+    .place-list-btn {
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover,
+    .place-list-btn:hover {
+      background: #0062cc;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .filters button {
+      width: auto;
+      flex: 1 1 auto;
+      min-width: 90px;
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .filters button:hover {
+      background: #bbdefb;
+    }
+
+    #map {
+      height: 460px;
+      margin-top: 20px;
+      border-radius: 12px;
+    }
+
+    #selectedPlace {
+      margin-top: 12px;
+      padding: 12px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      line-height: 1.6;
+      min-height: 24px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .session-btn,
+    .live-btn,
+    .action-link,
+    .secondary-btn,
+    .danger-btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      font-size: 15px;
+      color: white;
+      width: auto;
+    }
+
+    .session-btn { background: #6f42c1; }
+    .live-btn { background: #ff7a00; }
+    .action-link { background: #007BFF; }
+    .secondary-btn { background: #0f766e; }
+    .danger-btn { background: #c62828; }
+
+    #distanceInfo,
+    #liveInfo,
+    #connectionStatus {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.4;
+    }
+
+    #connectionStatus {
+      background: #f5f9ff;
+      border: 1px solid #cfe2ff;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    #weightWrap {
+      margin-top: 10px;
+    }
+
+    #weightValue {
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+    .top-pick {
+      background: #fff8e1;
+      border: 1px solid #f2d675;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .shared-box {
+      background: #eef6ff;
+      border: 1px solid #9cc3ff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .status-ok {
+      color: #1a7f37;
+      font-weight: bold;
+    }
+
+    .status-warn {
+      color: #b45309;
+      font-weight: bold;
+    }
+
+    .status-error {
+      color: #b91c1c;
+      font-weight: bold;
+    }
+
+    .place-list-btn {
+      margin-bottom: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="midpoint_icon.png" alt="Midpoint Logo">
+    <div class="subtitle">Meet in the middle. Share live routes with one tap.</div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="instructions">
+Enter two locations → find a spot → share the session → each person taps “I’m Here”<br><br>
+<small>
+✔ Works: address, coordinates (43.7, -79.4), full Google Maps link<br>
+❌ Not supported: shortened maps.app.goo.gl links
+</small>
+</div>
+
+      <div id="sharedSessionInfo"></div>
+
      <input id="address1" placeholder="First location" autocomplete="off" class="setup-only"> 
+<button type="button" onclick="useMyLocation('address1')">📍 Use My Location (Person 1)</button>
+
+<input id="address2" placeholder="Second location" autocomplete="off" class="setup-only">
+<button type="button" onclick="useMyLocation('address2')">📍 Use My Location (Person 2)</button>
+
+     <input id="placeKeyword" placeholder="What kind of place? Coffee, pizza, park..."> 
+<div class="filters">
+  <button type="button" onclick="setFilter('coffee')">☕ Coffee</button>
+  <button type="button" onclick="setFilter('food')">🍽️ Food</button>
+  <button type="button" onclick="setFilter('drinks')">🍹 Drinks</button>
+  <button type="button" onclick="setFilter('dessert')">🍰 Dessert</button>
+  <button type="button" onclick="setFilter('park')">🌳 Park</button>
+</div>
+    
+
+      <div id="weightWrap">
+        <label for="weightSlider">Adjust midpoint <span id="weightValue">50%</span></label>
+        <input type="range" id="weightSlider" min="0" max="100" value="50">
+      </div>
+<div class="filters">
+  <button type="button" onclick="setTravelMode('DRIVING')">🚗 Driving</button>
+  <button type="button" onclick="setTravelMode('WALKING')">🚶 Walking</button>
+</div>
+     <button id="findBtn" type="button" onclick="findMidpoint()" class="setup-only">Find Meetup Spot</button>
+
+      <div id="distanceInfo"></div>
+      <div id="connectionStatus"></div>
+      <div id="selectedPlace"></div>
+      <div id="liveInfo"></div>
+    </div>
+
+    <div id="map"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJD0P-O892D1qzB0_zNfhylKMTqHHIfYM",
+      authDomain: "midpoint-web.firebaseapp.com",
+      databaseURL: "https://midpoint-web-default-rtdb.firebaseio.com/",
+      projectId: "midpoint-web",
+      storageBucket: "midpoint-web.firebasestorage.app",
+      messagingSenderId: "73084785329",
+      appId: "1:73084785329:web:2586e545c1fa599f648890"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const clientId = (() => {
+      const existing = localStorage.getItem("midpointClientId");
+      if (existing) return existing;
+      const created = "client_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("midpointClientId", created);
+      return created;
+    })();
+
+    let map, geocoder, placesService, directionsService;
+    let markers = [];
+    let midpointMarker = null;
+    let m1 = null;
+    let m2 = null;
+    let destinationMarker = null;
+
+    let selectedShareName = "";
+    let selectedShareDestination = "";
+    let selectedDestinationLatLng = null;
+
+    let currentSessionId = "";
+    let selectedRole = "";
+    let liveWatchId = null;
+
+    let liveUser1Marker = null;
+    let liveUser2Marker = null;
+
+    let directionsRenderer1 = null;
+    let directionsRenderer2 = null;
+    let latestUser1Pos = null;
+    let latestUser2Pos = null;
+
+    let currentPlaces = [];
+    let lastRouteUpdate1 = 0;
+    let lastRouteUpdate2 = 0;
+    const ROUTE_UPDATE_MS = 8000;
+let selectedTravelMode = "DRIVING";
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 11,
+        center: { lat: 43.7, lng: -79.4 }
+      });
+
+      geocoder = new google.maps.Geocoder();
+      placesService = new google.maps.places.PlacesService(map);
+      directionsService = new google.maps.DirectionsService();
+
+      directionsRenderer1 = new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        preserveViewport: true,
+        polylineOptions: {
+          strokeColor: "#007BFF",
+          strokeOpacity: 0.9,
+          strokeWeight: 5
+        }
+      });
+      directionsRenderer1.setMap(map);
+
+      directionsRenderer2 = new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        preserveViewport: true,
+        polylineOptions: {
+          strokeColor: "#ff7a00",
+          strokeOpacity: 0.9,
+          strokeWeight: 5
+        }
+      });
+      directionsRenderer2.setMap(map);
+
+      new google.maps.places.Autocomplete(document.getElementById("address1"));
+      new google.maps.places.Autocomplete(document.getElementById("address2"));
+
+      document.getElementById("weightSlider").addEventListener("input", function () {
+        document.getElementById("weightValue").textContent = this.value + "%";
+      });
+
+      loadSession();
+      updateConnectionStatus();
+      setInterval(checkTrackingHealth, 5000);
+      checkLastSession();
+    }
+
+    function setFilter(type) {
+      document.getElementById("placeKeyword").value = type;
+    }
+function setTravelMode(mode) {
+  selectedTravelMode = mode;
+  document.getElementById("liveInfo").innerHTML =
+    '<span class="status-ok">Travel mode set to ' + (mode === "WALKING" ? "Walking" : "Driving") + '.</span>';
+
+  lastRouteUpdate1 = 0;
+  lastRouteUpdate2 = 0;
+  refreshBothRoutes();
+}
+    function clearRouteLines() {
+      if (directionsRenderer1) directionsRenderer1.set("directions", null);
+      if (directionsRenderer2) directionsRenderer2.set("directions", null);
+      latestUser1Pos = null;
+      latestUser2Pos = null;
+      lastRouteUpdate1 = 0;
+      lastRouteUpdate2 = 0;
+    }
+
+    function clearMarkers() {
+      markers.forEach(m => m.setMap(null));
+      markers = [];
+
+      if (midpointMarker) midpointMarker.setMap(null);
+      if (m1) m1.setMap(null);
+      if (m2) m2.setMap(null);
+      if (destinationMarker) destinationMarker.setMap(null);
+
+      midpointMarker = null;
+      m1 = null;
+      m2 = null;
+      destinationMarker = null;
+
+      currentPlaces = [];
+      selectedDestinationLatLng = null;
+      selectedShareName = "";
+      selectedShareDestination = "";
+
+      clearRouteLines();
+
+      document.getElementById("selectedPlace").innerHTML = "";
+      document.getElementById("distanceInfo").innerHTML = "";
+    }
+function copySessionLink() {
+  if (!selectedShareDestination) {
+    alert("Pick a place first.");
+    return;
+  }
+
+  const sessionId = Math.random().toString(36).substring(2, 8);
+
+  db.ref("sessions/" + sessionId).set({
+  destination: selectedShareDestination,
+  name: selectedShareName,
+  address1: document.getElementById("address1").value.trim(),
+  address2: document.getElementById("address2").value.trim(),
+  travelMode: selectedTravelMode,
+  created: Date.now()
+}).then(() => {
+    const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+
+    localStorage.setItem("midpoint_last_session", sessionId);
+
+    navigator.clipboard.writeText(link).then(() => {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-ok">Link copied! Paste it into a text message.</span>';
+    }).catch(() => {
+      prompt("Copy this session link:", link);
+    });
+  }).catch((error) => {
+    alert("Firebase error: " + error.message);
+  });
+}
+    function getDistanceKm(lat1, lng1, lat2, lng2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+function hideSetupControls() {
+  document.querySelectorAll(".setup-only").forEach(el => {
+    el.style.display = "none";
+  });
+}
+ function createSession() {
+  if (!selectedShareDestination) {
+    alert("Pick a place first.");
+    return;
+  }
+
+  const sessionId = Math.random().toString(36).substring(2, 8);
+
+  db.ref("sessions/" + sessionId).set({
+  destination: selectedShareDestination,
+  name: selectedShareName,
+  address1: document.getElementById("address1").value.trim(),
+  address2: document.getElementById("address2").value.trim(),
+  travelMode: selectedTravelMode,
+  created: Date.now()
+}).then(async () => {
+   const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+
+// Save last session locally
+localStorage.setItem("midpoint_last_session", sessionId); 
+
+const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" + link;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Midpoint Session",
+          text: message
+        });
+        return;
+      } catch (err) {
+        // If user cancels or share fails, fall through
+      }
+    }
+
+    prompt("Copy and send this session link:", link);
+  }).catch((error) => {
+    alert("Firebase error: " + error.message);
+  });
+}
+    function recenterMap() {
+      updateLiveMapBounds(true);
+    }
+
+    function resetSession() {
+      if (!currentSessionId) {
+        clearMarkers();
+        document.getElementById("sharedSessionInfo").innerHTML = "";
+        document.getElementById("selectedPlace").innerHTML = "";
+        document.getElementById("liveInfo").innerHTML = "";
+        document.getElementById("connectionStatus").innerHTML = "";
+        return;
+      }
+
+      if (!confirm("Reset this shared session?")) return;
+
+      if (liveWatchId !== null) {
+        navigator.geolocation.clearWatch(liveWatchId);
+        liveWatchId = null;
+      }
+
+      db.ref("sessions/" + currentSessionId + "/live").remove();
+      db.ref("sessions/" + currentSessionId + "/claims").remove();
+
+      currentSessionId = "";
+      selectedRole = "";
+      latestUser1Pos = null;
+      latestUser2Pos = null;
+
+      if (liveUser1Marker) {
+        liveUser1Marker.setMap(null);
+        liveUser1Marker = null;
+      }
+
+      if (liveUser2Marker) {
+        liveUser2Marker.setMap(null);
+        liveUser2Marker = null;
+      }
+
+      clearRouteLines();
+
+      document.getElementById("sharedSessionInfo").innerHTML = "";
+      document.getElementById("liveInfo").innerHTML = "";
+      updateConnectionStatus();
+localStorage.removeItem("midpoint_last_session");
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, "", cleanUrl);
+    }
+function openMyRoute() {
+  if (!selectedDestinationLatLng) {
+    alert("No destination selected.");
+    return;
+  }
+
+  if (!selectedRole) {
+    alert("Tap 'I’m Here' first.");
+    return;
+  }
+
+  let userPos = null;
+
+  if (selectedRole === "user1" && latestUser1Pos) {
+    userPos = latestUser1Pos;
+  } else if (selectedRole === "user2" && latestUser2Pos) {
+    userPos = latestUser2Pos;
+  }
+
+  if (!userPos) {
+    alert("Your location is not available yet.");
+    return;
+  }
+
+  const url =
+    "https://www.google.com/maps/dir/?api=1" +
+    "&origin=" + userPos.lat + "," + userPos.lng +
+    "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
+    "&travelmode=" + selectedTravelMode.toLowerCase();
+
+  window.open(url, "_blank");
+}
+    function showSelectedPlace(place) {
+      const destination = place.vicinity || place.name;
+
+      selectedShareName = place.name;
+      selectedShareDestination = destination;
+      selectedDestinationLatLng = {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng()
+      };
+      lastRouteUpdate1 = 0;
+      lastRouteUpdate2 = 0;
+
+      if (destinationMarker) destinationMarker.setMap(null);
+      destinationMarker = new google.maps.Marker({
+        position: place.geometry.location,
+        map: map,
+        title: place.name,
+        icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+      });
+
+      document.getElementById("selectedPlace").innerHTML =
+        "<strong>✅ " + place.name + "</strong><br>" +
+        destination +
+        '<div class="action-row">' +
+         '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+'<button class="secondary-btn" type="button" onclick="copySessionLink()">Copy Link</button>'  +
+        '</div>';
+
+      refreshBothRoutes();
+
+      document.getElementById("selectedPlace").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    function selectPlaceByIndex(index) {
+      if (!currentPlaces[index]) return;
+      showSelectedPlace(currentPlaces[index]);
+    }
+
+    function searchNearby(mid, keyword) {
+      placesService.nearbySearch({
+        location: mid,
+        radius: 1000,
+        keyword: keyword || undefined
+      }, function(results, status) {
+        if (status !== "OK" || !results || !results.length) {
+          document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
+          return;
+        }
+
+        currentPlaces = results.slice(0, 5);
+        const topPlace = currentPlaces[0];
+
+        let html =
+          '<div class="top-pick">' +
+          '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
+          (topPlace.vicinity || topPlace.name) + '<br>' +
+          '<em>Tap a result below or click a letter on the map.</em>' +
+          '</div>';
+
+        html += '<div style="margin-top:10px;">';
+
+        currentPlaces.forEach((place, index) => {
+          const label = String.fromCharCode(65 + index);
+          html +=
+            '<button class="place-list-btn" type="button" onclick="selectPlaceByIndex(' + index + ')">' +
+            label + '. ' + place.name +
+            (place.vicinity ? ' — ' + place.vicinity : '') +
+            '</button>';
+        });
+
+        html += '</div>';
+        document.getElementById("selectedPlace").innerHTML = html;
+
+        currentPlaces.forEach((place, index) => {
+          const marker = new google.maps.Marker({
+            map: map,
+            position: place.geometry.location,
+            title: place.name,
+            label: String.fromCharCode(65 + index)
+          });
+
+          markers.push(marker);
+
+          marker.addListener("click", function() {
+            showSelectedPlace(place);
+          });
+        });
+      });
+    }
+
+    function updateRouteForUser(userNumber, originPos) {
+      if (!selectedDestinationLatLng || !originPos) return;
+
+      const now = Date.now();
+
+      if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
+      if (userNumber === 2 && now - lastRouteUpdate2 < ROUTE_UPDATE_MS) return;
+
+      directionsService.route(
+        {
+          origin: { lat: originPos.lat, lng: originPos.lng },
+          destination: selectedDestinationLatLng,
+          travelMode: google.maps.TravelMode[selectedTravelMode]
+        },
+        function(result, status) {
+          if (status !== "OK") return;
+
+          if (userNumber === 1) {
+            lastRouteUpdate1 = now;
+            directionsRenderer1.setDirections(result);
+          } else {
+            lastRouteUpdate2 = now;
+            directionsRenderer2.setDirections(result);
+          }
+        }
+      );
+    }
+
+    function updateLiveMapBounds(forceZoom) {
+      const bounds = new google.maps.LatLngBounds();
+      let hasPoint = false;
+
+      if (liveUser1Marker) {
+        bounds.extend(liveUser1Marker.getPosition());
+        hasPoint = true;
+      }
+
+      if (liveUser2Marker) {
+        bounds.extend(liveUser2Marker.getPosition());
+        hasPoint = true;
+      }
+
+      if (destinationMarker) {
+        bounds.extend(destinationMarker.getPosition());
+        hasPoint = true;
+      }
+
+      if (hasPoint && (forceZoom || liveUser1Marker || liveUser2Marker)) {
+        map.fitBounds(bounds);
+      }
+    }
+
+    function refreshBothRoutes() {
+      if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
+      if (latestUser2Pos) updateRouteForUser(2, latestUser2Pos);
+      updateLiveMapBounds(false);
+    }
+
+    function showDestinationFromSession(destinationText) {
+      geocoder.geocode({ address: destinationText }, function(results, status) {
+        if (status !== "OK" || !results.length) return;
+
+        const location = results[0].geometry.location;
+
+        selectedDestinationLatLng = {
+          lat: location.lat(),
+          lng: location.lng()
+        };
+        lastRouteUpdate1 = 0;
+        lastRouteUpdate2 = 0;
+
+        if (destinationMarker) destinationMarker.setMap(null);
+
+        destinationMarker = new google.maps.Marker({
+          position: location,
+          map: map,
+          title: destinationText,
+          icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+        });
+
+        refreshBothRoutes();
+      });
+    }
+
+    function listenToLiveUsers(sessionId) {
+      db.ref("sessions/" + sessionId + "/live/user1").on("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          latestUser1Pos = null;
+          if (liveUser1Marker) {
+            liveUser1Marker.setMap(null);
+            liveUser1Marker = null;
+          }
+          if (directionsRenderer1) directionsRenderer1.set("directions", null);
+          updateConnectionStatus();
+          return;
+        }
+
+        const pos = { lat: data.lat, lng: data.lng, updated: data.updated };
+        latestUser1Pos = pos;
+
+        if (!liveUser1Marker) {
+          liveUser1Marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            label: "1",
+            title: "Person 1"
+          });
+        } else {
+          liveUser1Marker.setPosition(pos);
+        }
+
+        updateConnectionStatus();
+        refreshBothRoutes();
+      });
+
+      db.ref("sessions/" + sessionId + "/live/user2").on("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          latestUser2Pos = null;
+          if (liveUser2Marker) {
+            liveUser2Marker.setMap(null);
+            liveUser2Marker = null;
+          }
+          if (directionsRenderer2) directionsRenderer2.set("directions", null);
+          updateConnectionStatus();
+          return;
+        }
+
+        const pos = { lat: data.lat, lng: data.lng, updated: data.updated };
+        latestUser2Pos = pos;
+
+        if (!liveUser2Marker) {
+          liveUser2Marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            label: "2",
+            title: "Person 2"
+          });
+        } else {
+          liveUser2Marker.setPosition(pos);
+        }
+
+        updateConnectionStatus();
+        refreshBothRoutes();
+      });
+    }
+
+    function claimRole(callback) {
+      if (selectedRole) {
+        callback(selectedRole);
+        return;
+      }
+
+      const user1ClaimRef = db.ref("sessions/" + currentSessionId + "/claims/user1");
+      const user2ClaimRef = db.ref("sessions/" + currentSessionId + "/claims/user2");
+
+      user1ClaimRef.transaction(
+        current => (current === null || current === clientId) ? clientId : undefined,
+        function(error, committed, snapshot) {
+          if (!error && committed && snapshot && snapshot.val() === clientId) {
+            selectedRole = "user1";
+            callback("user1");
+            return;
+          }
+
+          user2ClaimRef.transaction(
+            current => (current === null || current === clientId) ? clientId : undefined,
+            function(error2, committed2, snapshot2) {
+              if (!error2 && committed2 && snapshot2 && snapshot2.val() === clientId) {
+                selectedRole = "user2";
+                callback("user2");
+                return;
+              }
+
+              alert("Both spots are already taken in this session.");
+            }
+          );
+        }
+      );
+    }
+
+    function startWatchForRole(role) {
+      if (liveWatchId !== null) {
+        navigator.geolocation.clearWatch(liveWatchId);
+      }
+
+      liveWatchId = navigator.geolocation.watchPosition(
+        function(position) {
+          db.ref("sessions/" + currentSessionId + "/live/" + role).set({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            updated: Date.now()
+          });
+        },
+        function(error) {
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Live tracking error: ' + error.message + '</span>';
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 15000
+        }
+      );
+    }
+
+   function joinLiveSession() {
+  if (!currentSessionId) {
+    alert("No shared session loaded.");
+    return;
+  }
+
+  if (!navigator.geolocation) {
+    document.getElementById("liveInfo").innerHTML =
+      '<span class="status-error">Geolocation is not supported on this device.</span>';
+    return;
+  }
+
+  document.getElementById("liveInfo").innerHTML =
+    '<span class="status-warn">Requesting location access... If your browser asks, tap Allow.</span>';
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      claimRole(function(role) {
+        db.ref("sessions/" + currentSessionId + "/live/" + role).set({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          updated: Date.now()
+        }).then(() => {
+          document.getElementById("liveInfo").innerHTML =
+            'You are connected as <span class="status-ok">' +
+            (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
+            '</span>. Live tracking is on.';
+          updateConnectionStatus();
+          startWatchForRole(role);
+        });
+      });
+    },
+    function(error) {
+      let message = "Could not get your location.";
+
+      if (error.code === 1) {
+        message = "Location was blocked. Tap the lock icon in your browser address bar and allow location, then try again.";
+      } else if (error.code === 2) {
+        message = "Your location could not be determined. Make sure location services are turned on and try again.";
+      } else if (error.code === 3) {
+        message = "Location request timed out. Try again in an area with better signal.";
+      }
+
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-error">' + message + '</span>';
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000
+    }
+  );
+} 
+        
+
+    function updateConnectionStatus() {
+      const parts = [];
+
+      if (selectedRole) {
+        parts.push('You are <span class="status-ok">' + (selectedRole === "user1" ? 'Person 1 (Blue)' : 'Person 2 (Orange)') + '</span>.');
+      }
+
+      if (latestUser1Pos) {
+        parts.push('<span class="status-ok">Person 1 connected</span>');
+      } else {
+        parts.push('<span class="status-warn">Waiting for Person 1</span>');
+      }
+
+      if (latestUser2Pos) {
+        parts.push('<span class="status-ok">Person 2 connected</span>');
+      } else {
+        parts.push('<span class="status-warn">Waiting for Person 2</span>');
+      }
+
+      document.getElementById("connectionStatus").innerHTML = parts.join("<br>");
+    }
+
+    function checkTrackingHealth() {
+      const now = Date.now();
+      let warnings = [];
+
+      if (latestUser1Pos && latestUser1Pos.updated && now - latestUser1Pos.updated > 20000) {
+        warnings.push("Person 1 tracking paused");
+      }
+
+      if (latestUser2Pos && latestUser2Pos.updated && now - latestUser2Pos.updated > 20000) {
+        warnings.push("Person 2 tracking paused");
+      }
+
+      if (warnings.length) {
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-warn">' + warnings.join(" • ") + '</span>';
+      }
+    }
+
+    function loadSession() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session");
+
+      if (!sessionId) return;
+
+      currentSessionId = sessionId;
+hideSetupControls();
+      db.ref("sessions/" + sessionId).once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        selectedShareDestination = data.destination || "";
+        selectedShareName = data.name || "";
+selectedTravelMode = data.travelMode || "DRIVING";
+
+if (data.destination) {
+  showDestinationFromSession(data.destination);
+}
+
+// 👉 ADD THIS LINE RIGHT HERE
+refreshBothRoutes();
+
+document.getElementById("sharedSessionInfo").innerHTML =
+  '<div class="shared-box">' +
+    '🔗 <strong>Shared Session Loaded</strong><br>' +
+    (data.name || "") + '<br>' +
+    (data.destination || "") +
+    '<div class="action-row">' +
+      '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here</button>' +
+      '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route</button>' +
+      '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
+      '<button class="danger-btn" type="button" onclick="resetSession()">Reset Session</button>' +
+    '</div>' +
+  '</div>';
+
+        if (data.address1) document.getElementById("address1").value = data.address1;
+        if (data.address2) document.getElementById("address2").value = data.address2;
+
+        if (data.destination) {
+          showDestinationFromSession(data.destination);
+        }
+
+        if (data.name && data.destination) {
+          document.getElementById("selectedPlace").innerHTML =
+            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+            data.destination;
+        }
+
+        listenToLiveUsers(sessionId);
+        updateConnectionStatus();
+      });
+    }
+function checkLastSession() {
+  const lastSession = localStorage.getItem("midpoint_last_session");
+
+  if (!lastSession) return;
+  if (currentSessionId) return;
+
+  const container = document.getElementById("sharedSessionInfo");
+
+  container.innerHTML =
+    '<div class="shared-box">' +
+      '🔁 <strong>Resume your last session?</strong><br>' +
+      '<div class="action-row">' +
+        '<button class="live-btn" type="button" onclick="resumeSession(\'' + lastSession + '\')">Resume</button>' +
+        '<button class="secondary-btn" type="button" onclick="clearLastSession()">Start New</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function resumeSession(sessionId) {
+  window.location.href = window.location.origin + window.location.pathname + "?session=" + sessionId;
+}
+
+function clearLastSession() {
+  localStorage.removeItem("midpoint_last_session");
+  document.getElementById("sharedSessionInfo").innerHTML = "";
+}
+   function useMyLocation(inputId) {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported on this device.");
+    return;
+  }
+
+  document.getElementById("liveInfo").innerHTML = "Getting your location...";
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      document.getElementById(inputId).value = lat + ", " + lng;
+
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-ok">Location set successfully</span>';
+    },
+    function(error) {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-error">Location error: ' + error.message + '</span>';
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000
+    }
+  );
+}
+
+function parseLocationInput(input) {
+  input = input.trim();
+
+  const coordMatch = input.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+  if (coordMatch) {
+    return Promise.resolve({
+      lat: parseFloat(coordMatch[1]),
+      lng: parseFloat(coordMatch[2])
+    });
+  }
+
+  const atMatch = input.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+  if (atMatch) {
+    return Promise.resolve({
+      lat: parseFloat(atMatch[1]),
+      lng: parseFloat(atMatch[2])
+    });
+  }
+
+  const pinMatch = input.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/);
+  if (pinMatch) {
+    return Promise.resolve({
+      lat: parseFloat(pinMatch[1]),
+      lng: parseFloat(pinMatch[2])
+    });
+  }
+
+  if (input.includes("goo.gl")) {
+    return Promise.reject(
+      "Google short pin links are not supported yet. Please paste coordinates, a full Google Maps link, or a normal address."
+    );
+  }
+
+  return new Promise((resolve, reject) => {
+    geocoder.geocode({ address: input }, function(results, status) {
+      if (status === "OK" && results.length) {
+        const loc = results[0].geometry.location;
+        resolve({
+          lat: loc.lat(),
+          lng: loc.lng()
+        });
+      } else {
+        reject("Could not find location: " + input);
+      }
+    });
+  });
+}
+    function findMidpoint() {
+      const a1 = document.getElementById("address1").value.trim();
+      const a2 = document.getElementById("address2").value.trim();
+      const keyword = document.getElementById("placeKeyword").value.trim();
+      const slider = document.getElementById("weightSlider").value / 100;
+
+      if (!a1 || !a2) {
+        alert("Enter both addresses");
+        return;
+      }
+
+      clearMarkers();
+
+      Promise.all([
+        parseLocationInput(a1),
+        parseLocationInput(a2)
+      ]).then(([c1, c2]) => {
+        m1 = new google.maps.Marker({
+          position: c1,
+          map: map,
+          label: "1"
+        });
+
+        m2 = new google.maps.Marker({
+          position: c2,
+          map: map,
+          label: "2"
+        });
+
+        const midLat0 = (c1.lat + c2.lat) / 2;
+        const midLng0 = (c1.lng + c2.lng) / 2;
+
+        const shift = (slider - 0.5) * 0.6;
+        const mid = {
+          lat: midLat0 + (c1.lat - midLat0) * shift,
+          lng: midLng0 + (c1.lng - midLng0) * shift
+        };
+
+        midpointMarker = new google.maps.Marker({
+          position: mid,
+          map: map,
+          icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        });
+
+        const d1 = getDistanceKm(c1.lat, c1.lng, mid.lat, mid.lng).toFixed(1);
+        const d2 = getDistanceKm(c2.lat, c2.lng, mid.lat, mid.lng).toFixed(1);
+
+        document.getElementById("distanceInfo").innerHTML =
+          "User 1 to midpoint: " + d1 + " km<br>" +
+          "User 2 to midpoint: " + d2 + " km";
+
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(c1);
+        bounds.extend(c2);
+        bounds.extend(mid);
+        map.fitBounds(bounds);
+
+        searchNearby(mid, keyword);
+      }).catch(err => {
+        alert(err);
+      });
+    }
+  </script>
+
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs8oXRXd_vPW8Ww5cCBS-aDaic8YgB9F4&loading=async&libraries=places&callback=initMap">
+  </script>
+
+</body>
+</html>
 <button type="button" onclick="useMyLocation('address1')">📍 Use My Location (Person 1)</button>
 
 <input id="address2" placeholder="Second location" autocomplete="off" class="setup-only">
