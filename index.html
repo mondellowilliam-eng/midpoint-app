@@ -624,6 +624,11 @@ function setTravelMode(mode) {
       document.getElementById("selectedPlace").innerHTML = "";
       document.getElementById("distanceInfo").innerHTML = "";
     }
+    function hideSetupControls() {
+  document.querySelectorAll(".setup-only").forEach(el => {
+    el.style.display = "none";
+  });
+}
 function copySessionLink() {
   if (!selectedShareDestination) {
     alert("Pick a place first.");
@@ -668,11 +673,7 @@ function copySessionLink() {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
-function hideSetupControls() {
-  document.querySelectorAll(".setup-only").forEach(el => {
-    el.style.display = "none";
-  });
-}
+
  function createSession() {
   if (!selectedShareDestination) {
     alert("Pick a place first.");
