@@ -599,7 +599,7 @@ function updateTripSummary() {
       "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
       "&travelmode=" + selectedTravelMode.toLowerCase();
 
-    window.open(url, "_blank");
+   window.location.href = url;
   }
 
   let userPos = null;
