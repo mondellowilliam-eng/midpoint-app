@@ -521,34 +521,24 @@ function updateTripSummary() {
 
     localStorage.setItem("midpoint_last_session", sessionId);
 
-    // Put YOUR phone into the session without reloading
-    currentSessionId = sessionId;
-    window.history.replaceState({}, "", "?session=" + sessionId);
-    hideSetupControls();
-    loadSession();
-
     if (navigator.share) {
       try {
         await navigator.share({
           title: "Midpoint Session",
           text: message
         });
-        return;
       } catch (err) {
-        // fall through
+        // ignore and fall back below
       }
+    } else {
+      prompt("Copy and send this session link:", link);
     }
 
-    prompt("Copy and send this session link:", link);
+    window.location.href = "?session=" + sessionId;
   }).catch((error) => {
     alert("Firebase error: " + error.message);
   });
-} 
-
-    function recenterMap() {
-      updateLiveMapBounds(true);
-    }
-
+}
     function resetSession() {
       if (!currentSessionId) {
         clearMarkers();
