@@ -411,13 +411,17 @@
 
       box.style.display = "block";
 
-      const person1Text = latestUser1Pos
-        ? (user1ETA ? user1ETA + " away" : "Connected")
-        : "Waiting";
+      const person1Text = !latestUser1Pos
+  ? "Waiting"
+  : user1Arrived
+    ? "Arrived"
+    : (user1ETA ? user1ETA + " away" : "Connected");
 
-      const person2Text = latestUser2Pos
-        ? (user2ETA ? user2ETA + " away" : "Connected")
-        : "Waiting";
+const person2Text = !latestUser2Pos
+  ? "Waiting"
+  : user2Arrived
+    ? "Arrived"
+    : (user2ETA ? user2ETA + " away" : "Connected");
 
       box.innerHTML =
         '<strong>📍 Meetup Status</strong><br>' +
