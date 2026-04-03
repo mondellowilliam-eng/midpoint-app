@@ -926,55 +926,53 @@ user2Arrived = false;
     }
 
     function updateRouteForUser(userNumber, originPos) {
-      if (!selectedDestinationLatLng || !originPos) return;
-const metersAway = getDistanceMeters(if (userNumber === 1) {
-  user1Distance = metersAway;
-} else {
-  user2Distance = metersAway;
-}
-  
-  originPos.lat,
-  originPos.lng,
-  selectedDestinationLatLng.lat,
-  selectedDestinationLatLng.lng
-);
+  if (!selectedDestinationLatLng || !originPos) return;
 
-if (userNumber === 1) {
-  user1Arrived = metersAway <= 100;
-} else {
-  user2Arrived = metersAway <= 100;
-}
-      const now = Date.now();
+  const metersAway = getDistanceMeters(
+    originPos.lat,
+    originPos.lng,
+    selectedDestinationLatLng.lat,
+    selectedDestinationLatLng.lng
+  );
 
-      if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
-      if (userNumber === 2 && now - lastRouteUpdate2 < ROUTE_UPDATE_MS) return;
+  if (userNumber === 1) {
+    user1Distance = metersAway;
+    user1Arrived = metersAway <= 100;
+  } else {
+    user2Distance = metersAway;
+    user2Arrived = metersAway <= 100;
+  }
 
-      directionsService.route(
-        {
-          origin: { lat: originPos.lat, lng: originPos.lng },
-          destination: selectedDestinationLatLng,
-          travelMode: google.maps.TravelMode[selectedTravelMode]
-        },
-        function(result, status) {
-          if (status !== "OK") return;
+  const now = Date.now();
 
-          const durationText = result.routes[0].legs[0].duration.text;
+  if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
+  if (userNumber === 2 && now - lastRouteUpdate2 < ROUTE_UPDATE_MS) return;
 
-          if (userNumber === 1) {
-            user1ETA = durationText;
-            lastRouteUpdate1 = now;
-            directionsRenderer1.setDirections(result);
-          } else {
-            user2ETA = durationText;
-            lastRouteUpdate2 = now;
-            directionsRenderer2.setDirections(result);
-          }
+  directionsService.route(
+    {
+      origin: { lat: originPos.lat, lng: originPos.lng },
+      destination: selectedDestinationLatLng,
+      travelMode: google.maps.TravelMode[selectedTravelMode]
+    },
+    function(result, status) {
+      if (status !== "OK") return;
 
-          updateTripSummary();
-        }
-      );
+      const durationText = result.routes[0].legs[0].duration.text;
+
+      if (userNumber === 1) {
+        user1ETA = durationText;
+        lastRouteUpdate1 = now;
+        directionsRenderer1.setDirections(result);
+      } else {
+        user2ETA = durationText;
+        lastRouteUpdate2 = now;
+        directionsRenderer2.setDirections(result);
+      }
+
+      updateTripSummary();
     }
-
+  );
+}
     function updateLiveMapBounds(forceZoom) {
       const bounds = new google.maps.LatLngBounds();
       let hasPoint = false;
