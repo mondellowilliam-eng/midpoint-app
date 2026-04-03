@@ -523,17 +523,17 @@ function updateTripSummary() {
     localStorage.setItem("midpoint_last_session", sessionId);
 
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Midpoint Session",
-          text: message
-        });
-      } catch (err) {
-        // ignore and fall back below
-      }
-    } else {
-      prompt("Copy and send this session link:", link);
-    }
+  try {
+    await navigator.share({
+      title: "Midpoint Session",
+      text: message
+    });
+  } catch (err) {
+    prompt("Copy and send this session link:", link);
+  }
+} else {
+  prompt("Copy and send this session link:", link);
+}
 
     window.location.href = "?session=" + sessionId;
   }).catch((error) => {
