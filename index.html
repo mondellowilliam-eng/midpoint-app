@@ -753,7 +753,13 @@ updateTripSummary();
         },
         function(result, status) {
           if (status !== "OK") return;
+const durationText = result.routes[0].legs[0].duration.text;
 
+if (userNumber === 1) {
+  user1ETA = durationText;
+} else {
+  user2ETA = durationText;
+}
           if (userNumber === 1) {
             lastRouteUpdate1 = now;
             directionsRenderer1.setDirections(result);
