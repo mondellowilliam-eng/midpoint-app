@@ -362,11 +362,10 @@ let user2Arrived = false;
         document.getElementById("weightValue").textContent = this.value + "%";
       });
 
-      updateTravelModeButtons();
-      loadSession();
-      updateConnectionStatus();
-      setInterval(checkTrackingHealth, 5000);
-      checkLastSession();
+     updateTravelModeButtons();
+loadSession();
+setInterval(checkTrackingHealth, 5000);
+checkLastSession();
     }
 
     function setFilter(type) {
