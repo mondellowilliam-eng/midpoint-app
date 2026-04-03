@@ -1242,28 +1242,43 @@ if (userNumber === 1) {
   );
 }
     function updateConnectionStatus() {
-      const parts = [];
+  const box = document.getElementById("connectionStatus");
+  if (!box) return;
 
-      if (selectedRole) {
-        parts.push('You are <span class="status-ok">' + (selectedRole === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") + '</span>.');
-      }
+  // Hide until a shared session is actually loaded
+  if (!currentSessionId) {
+    box.innerHTML = "";
+    box.style.display = "none";
+    return;
+  }
 
-      if (latestUser1Pos) {
-        parts.push('<span class="status-ok">Person 1 connected</span>');
-      } else {
-        parts.push('<span class="status-warn">Waiting for Person 1</span>');
-      }
+  box.style.display = "block";
 
-      if (latestUser2Pos) {
-        parts.push('<span class="status-ok">Person 2 connected</span>');
-      } else {
-        parts.push('<span class="status-warn">Waiting for Person 2</span>');
-      }
+  const parts = [];
 
-      document.getElementById("connectionStatus").innerHTML = parts.join("<br>");
-      updateTripSummary();
-    }
+  if (selectedRole) {
+    parts.push(
+      'You are <span class="status-ok">' +
+      (selectedRole === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
+      '</span>.'
+    );
+  }
 
+  if (latestUser1Pos) {
+    parts.push('<span class="status-ok">Person 1 connected</span>');
+  } else {
+    parts.push('<span class="status-warn">Waiting for Person 1</span>');
+  }
+
+  if (latestUser2Pos) {
+    parts.push('<span class="status-ok">Person 2 connected</span>');
+  } else {
+    parts.push('<span class="status-warn">Waiting for Person 2</span>');
+  }
+
+  box.innerHTML = parts.join("<br>");
+  updateTripSummary();
+}
     function checkTrackingHealth() {
       const now = Date.now();
       let warnings = [];
