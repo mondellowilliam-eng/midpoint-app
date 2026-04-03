@@ -422,17 +422,21 @@ function formatDistance(meters) {
 
       box.style.display = "block";
 
-      const person1Text = !latestUser1Pos
+     const person1Text = !latestUser1Pos
   ? "Waiting"
   : user1Arrived
     ? "Arrived"
-    : (user1ETA ? user1ETA + " away" : "Connected");
+    : (user1ETA
+        ? user1ETA + " away" + (user1Distance ? " (" + formatDistance(user1Distance) + ")" : "")
+        : "Connected");
 
 const person2Text = !latestUser2Pos
   ? "Waiting"
   : user2Arrived
     ? "Arrived"
-    : (user2ETA ? user2ETA + " away" : "Connected");
+    : (user2ETA
+        ? user2ETA + " away" + (user2Distance ? " (" + formatDistance(user2Distance) + ")" : "")
+        : "Connected");
 
       box.innerHTML =
         '<strong>📍 Meetup Status</strong><br>' +
