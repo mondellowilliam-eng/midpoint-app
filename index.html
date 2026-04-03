@@ -401,6 +401,7 @@ function updateTripSummary() {
   const box = document.getElementById("tripSummary");
   if (!box) return;
 
+  // hide if no destination
   if (!selectedShareDestination) {
     box.style.display = "none";
     box.innerHTML = "";
@@ -409,20 +410,16 @@ function updateTripSummary() {
 
   box.style.display = "block";
 
-  const modeText = selectedTravelMode === "WALKING" ? "Walking" : "Driving";
   const person1Text = latestUser1Pos
-  ? (user1ETA ? user1ETA + " away" : "Connected")
-  : "Waiting";
+    ? (user1ETA ? user1ETA + " away" : "Connected")
+    : "Waiting";
 
-const person2Text = latestUser2Pos
-  ? (user2ETA ? user2ETA + " away" : "Connected")
-  : "Waiting";
+  const person2Text = latestUser2Pos
+    ? (user2ETA ? user2ETA + " away" : "Connected")
+    : "Waiting";
 
   box.innerHTML =
-    '<strong>📍 Trip Summary</strong><br>' +
-    '<strong>Destination:</strong> ' + (selectedShareName || "Meetup spot") + '<br>' +
-    selectedShareDestination + '<br><br>' +
-    '<strong>Mode:</strong> ' + modeText + '<br>' +
+    '<strong>📍 Meetup Status</strong><br>' +
     '<strong>Person 1:</strong> ' + person1Text + '<br>' +
     '<strong>Person 2:</strong> ' + person2Text;
 }
