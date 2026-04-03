@@ -385,7 +385,15 @@ checkLastSession();
       lastRouteUpdate2 = 0;
       refreshBothRoutes();
     }
+function formatDistance(meters) {
+  if (meters === null) return "";
 
+  if (meters < 1000) {
+    return Math.round(meters) + " m";
+  }
+
+  return (meters / 1000).toFixed(1) + " km";
+}
     function updateTravelModeButtons() {
       const drivingBtn = document.getElementById("modeDriving");
       const walkingBtn = document.getElementById("modeWalking");
