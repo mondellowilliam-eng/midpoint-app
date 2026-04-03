@@ -429,6 +429,11 @@ const person2Text = !latestUser2Pos
         '<strong>📍 Meetup Status</strong><br>' +
         '<strong>Person 1:</strong> ' + person1Text + '<br>' +
         '<strong>Person 2:</strong> ' + person2Text;
+      const closerText = getCloserStatus();
+
+if (closerText) {
+  box.innerHTML += "<br><br><strong>" + closerText + "</strong>";
+}
     }
 function getCloserStatus() {
   if (!user1ETA || !user2ETA) return "";
