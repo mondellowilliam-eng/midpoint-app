@@ -430,7 +430,27 @@ const person2Text = !latestUser2Pos
         '<strong>Person 1:</strong> ' + person1Text + '<br>' +
         '<strong>Person 2:</strong> ' + person2Text;
     }
+function getCloserStatus() {
+  if (!user1ETA || !user2ETA) return "";
 
+  const getMinutes = (text) => {
+    const match = text.match(/\d+/);
+    return match ? parseInt(match[0]) : null;
+  };
+
+  const m1 = getMinutes(user1ETA);
+  const m2 = getMinutes(user2ETA);
+
+  if (m1 === null || m2 === null) return "";
+
+  if (Math.abs(m1 - m2) <= 1) {
+    return "🟡 Both are about the same distance";
+  }
+
+  return m1 < m2
+    ? "🟢 Person 1 is closer"
+    : "🟠 Person 2 is closer";
+}
     function clearRouteLines() {
       if (directionsRenderer1) directionsRenderer1.set("directions", null);
       if (directionsRenderer2) directionsRenderer2.set("directions", null);
