@@ -430,7 +430,11 @@ const person2Text = !latestUser2Pos
         '<strong>Person 1:</strong> ' + person1Text + '<br>' +
         '<strong>Person 2:</strong> ' + person2Text;
       const closerText = getCloserStatus();
+const arrivalMessage = getArrivalStatusMessage();
 
+if (arrivalMessage) {
+  box.innerHTML += "<br><br><strong>" + arrivalMessage + "</strong>";
+}
 if (closerText) {
   box.innerHTML += "<br><br><strong>" + closerText + "</strong>";
 }
