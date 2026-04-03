@@ -400,7 +400,15 @@ function formatDistance(meters) {
       const walkingBtn = document.getElementById("modeWalking");
 
       if (!drivingBtn || !walkingBtn) return;
+const drivingBtn = document.getElementById("modeDriving");
+const walkingBtn = document.getElementById("modeWalking");
+const transitBtn = document.getElementById("modeTransit");
 
+if (!drivingBtn || !walkingBtn || !transitBtn) return;
+
+drivingBtn.classList.toggle("mode-active", selectedTravelMode === "DRIVING");
+walkingBtn.classList.toggle("mode-active", selectedTravelMode === "WALKING");
+transitBtn.classList.toggle("mode-active", selectedTravelMode === "TRANSIT");
       drivingBtn.classList.toggle("mode-active", selectedTravelMode === "DRIVING");
       walkingBtn.classList.toggle("mode-active", selectedTravelMode === "WALKING");
     }
