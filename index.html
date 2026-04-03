@@ -380,7 +380,7 @@ checkLastSession();
       updateTravelModeButtons();
 
       document.getElementById("liveInfo").innerHTML =
-        '<span class="status-ok">Travel mode set to ' + (mode === "WALKING" ? "Walking" : "Driving") + '.</span>';
+       (mode === "WALKING" ? "Walking" : mode === "TRANSIT" ? "Transit" : "Driving")
 
       lastRouteUpdate1 = 0;
       lastRouteUpdate2 = 0;
