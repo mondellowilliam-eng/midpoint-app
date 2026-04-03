@@ -821,7 +821,18 @@ let user2Arrived = false;
 
     function updateRouteForUser(userNumber, originPos) {
       if (!selectedDestinationLatLng || !originPos) return;
+const metersAway = getDistanceMeters(
+  originPos.lat,
+  originPos.lng,
+  selectedDestinationLatLng.lat,
+  selectedDestinationLatLng.lng
+);
 
+if (userNumber === 1) {
+  user1Arrived = metersAway <= 100;
+} else {
+  user2Arrived = metersAway <= 100;
+}
       const now = Date.now();
 
       if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
