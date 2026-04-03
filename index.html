@@ -395,24 +395,17 @@ function formatDistance(meters) {
 
   return (meters / 1000).toFixed(1) + " km";
 }
-    function updateTravelModeButtons() {
-      const drivingBtn = document.getElementById("modeDriving");
-      const walkingBtn = document.getElementById("modeWalking");
+   function updateTravelModeButtons() {
+  const drivingBtn = document.getElementById("modeDriving");
+  const walkingBtn = document.getElementById("modeWalking");
+  const transitBtn = document.getElementById("modeTransit");
 
-      if (!drivingBtn || !walkingBtn) return;
-const drivingBtn = document.getElementById("modeDriving");
-const walkingBtn = document.getElementById("modeWalking");
-const transitBtn = document.getElementById("modeTransit");
+  if (!drivingBtn || !walkingBtn || !transitBtn) return;
 
-if (!drivingBtn || !walkingBtn || !transitBtn) return;
-
-drivingBtn.classList.toggle("mode-active", selectedTravelMode === "DRIVING");
-walkingBtn.classList.toggle("mode-active", selectedTravelMode === "WALKING");
-transitBtn.classList.toggle("mode-active", selectedTravelMode === "TRANSIT");
-      drivingBtn.classList.toggle("mode-active", selectedTravelMode === "DRIVING");
-      walkingBtn.classList.toggle("mode-active", selectedTravelMode === "WALKING");
-    }
-
+  drivingBtn.classList.toggle("mode-active", selectedTravelMode === "DRIVING");
+  walkingBtn.classList.toggle("mode-active", selectedTravelMode === "WALKING");
+  transitBtn.classList.toggle("mode-active", selectedTravelMode === "TRANSIT");
+} 
     function hideSetupControls() {
       document.querySelectorAll(".setup-only").forEach(el => {
         el.style.display = "none";
