@@ -312,13 +312,14 @@
     let directionsRenderer2 = null;
     let latestUser1Pos = null;
     let latestUser2Pos = null;
-let user1ETA = null;
-let user2ETA = null;
+    let user1ETA = null;
+    let user2ETA = null;
     let currentPlaces = [];
     let lastRouteUpdate1 = 0;
     let lastRouteUpdate2 = 0;
     const ROUTE_UPDATE_MS = 8000;
     let selectedTravelMode = "DRIVING";
+    let cancelListenerRef = null;
 
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
@@ -397,37 +398,40 @@ let user2ETA = null;
         el.style.display = "none";
       });
     }
-function updateTripSummary() {
-  const box = document.getElementById("tripSummary");
-  if (!box) return;
 
-  // hide if no destination
-  if (!selectedShareDestination) {
-    box.style.display = "none";
-    box.innerHTML = "";
-    return;
-  }
+    function updateTripSummary() {
+      const box = document.getElementById("tripSummary");
+      if (!box) return;
 
-  box.style.display = "block";
+      if (!selectedShareDestination) {
+        box.style.display = "none";
+        box.innerHTML = "";
+        return;
+      }
 
-  const person1Text = latestUser1Pos
-    ? (user1ETA ? user1ETA + " away" : "Connected")
-    : "Waiting";
+      box.style.display = "block";
 
-  const person2Text = latestUser2Pos
-    ? (user2ETA ? user2ETA + " away" : "Connected")
-    : "Waiting";
+      const person1Text = latestUser1Pos
+        ? (user1ETA ? user1ETA + " away" : "Connected")
+        : "Waiting";
 
-  box.innerHTML =
-    '<strong>📍 Meetup Status</strong><br>' +
-    '<strong>Person 1:</strong> ' + person1Text + '<br>' +
-    '<strong>Person 2:</strong> ' + person2Text;
-}
+      const person2Text = latestUser2Pos
+        ? (user2ETA ? user2ETA + " away" : "Connected")
+        : "Waiting";
+
+      box.innerHTML =
+        '<strong>📍 Meetup Status</strong><br>' +
+        '<strong>Person 1:</strong> ' + person1Text + '<br>' +
+        '<strong>Person 2:</strong> ' + person2Text;
+    }
+
     function clearRouteLines() {
       if (directionsRenderer1) directionsRenderer1.set("directions", null);
       if (directionsRenderer2) directionsRenderer2.set("directions", null);
       latestUser1Pos = null;
       latestUser2Pos = null;
+      user1ETA = null;
+      user2ETA = null;
       lastRouteUpdate1 = 0;
       lastRouteUpdate2 = 0;
     }
@@ -455,6 +459,7 @@ function updateTripSummary() {
 
       document.getElementById("selectedPlace").innerHTML = "";
       document.getElementById("distanceInfo").innerHTML = "";
+      updateTripSummary();
     }
 
     function getDistanceKm(lat1, lng1, lat2, lng2) {
@@ -486,7 +491,8 @@ function updateTripSummary() {
         address1: document.getElementById("address1").value.trim(),
         address2: document.getElementById("address2").value.trim(),
         travelMode: selectedTravelMode,
-        created: Date.now()
+        created: Date.now(),
+        cancelled: false
       }).then(() => {
         const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
 
@@ -503,48 +509,51 @@ function updateTripSummary() {
       });
     }
 
-   function createSession() {
-  if (!selectedShareDestination) {
-    alert("Pick a place first.");
-    return;
-  }
+    function createSession() {
+      if (!selectedShareDestination) {
+        alert("Pick a place first.");
+        return;
+      }
 
-  const sessionId = Math.random().toString(36).substring(2, 8);
+      const sessionId = Math.random().toString(36).substring(2, 8);
 
-  db.ref("sessions/" + sessionId).set({
-    destination: selectedShareDestination,
-    name: selectedShareName,
-    address1: document.getElementById("address1").value.trim(),
-    address2: document.getElementById("address2").value.trim(),
-    travelMode: selectedTravelMode,
-    created: Date.now()
-  }).then(async () => {
-    const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
-    const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" + link;
+      db.ref("sessions/" + sessionId).set({
+        destination: selectedShareDestination,
+        name: selectedShareName,
+        address1: document.getElementById("address1").value.trim(),
+        address2: document.getElementById("address2").value.trim(),
+        travelMode: selectedTravelMode,
+        created: Date.now(),
+        cancelled: false
+      }).then(async () => {
+        const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+        const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" + link;
 
-    localStorage.setItem("midpoint_last_session", sessionId);
+        localStorage.setItem("midpoint_last_session", sessionId);
 
-    if (navigator.share) {
-  try {
-    await navigator.share({
-      title: "Midpoint Session",
-      text: message
-    });
-  } catch (err) {
-    prompt("Copy and send this session link:", link);
-  }
-} else {
-  prompt("Copy and send this session link:", link);
-}
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "Midpoint Session",
+              text: message
+            });
+          } catch (err) {
+            prompt("Copy and send this session link:", link);
+          }
+        } else {
+          prompt("Copy and send this session link:", link);
+        }
 
-    window.location.href = "?session=" + sessionId;
-  }).catch((error) => {
-    alert("Firebase error: " + error.message);
-  });
-}
+        window.location.href = "?session=" + sessionId;
+      }).catch((error) => {
+        alert("Firebase error: " + error.message);
+      });
+    }
+
     function recenterMap() {
-  updateLiveMapBounds(true);
-}
+      updateLiveMapBounds(true);
+    }
+
     function resetSession() {
       if (!currentSessionId) {
         clearMarkers();
@@ -552,6 +561,7 @@ function updateTripSummary() {
         document.getElementById("selectedPlace").innerHTML = "";
         document.getElementById("liveInfo").innerHTML = "";
         document.getElementById("connectionStatus").innerHTML = "";
+        document.getElementById("tripSummary").style.display = "none";
         return;
       }
 
@@ -592,109 +602,59 @@ function updateTripSummary() {
       location.reload();
     }
 
-   function openMyRoute() {
-  if (!selectedDestinationLatLng) {
-    alert("No destination selected.");
-    return;
-  }
+    function openMyRoute() {
+      if (!selectedDestinationLatLng) {
+        alert("No destination selected.");
+        return;
+      }
 
-  function openRouteFromPosition(lat, lng) {
-    const url =
-      "https://www.google.com/maps/dir/?api=1" +
-      "&origin=" + lat + "," + lng +
-      "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
-      "&travelmode=" + selectedTravelMode.toLowerCase();
+      function openRouteFromPosition(lat, lng) {
+        const url =
+          "https://www.google.com/maps/dir/?api=1" +
+          "&origin=" + lat + "," + lng +
+          "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
+          "&travelmode=" + selectedTravelMode.toLowerCase();
 
-    window.location.href = url;
-  }
+        window.location.href = url;
+      }
 
-  let userPos = null;
+      let userPos = null;
 
-  if (selectedRole === "user1" && latestUser1Pos) {
-    userPos = latestUser1Pos;
-  } else if (selectedRole === "user2" && latestUser2Pos) {
-    userPos = latestUser2Pos;
-  }
+      if (selectedRole === "user1" && latestUser1Pos) {
+        userPos = latestUser1Pos;
+      } else if (selectedRole === "user2" && latestUser2Pos) {
+        userPos = latestUser2Pos;
+      }
 
-  if (userPos) {
-    openRouteFromPosition(userPos.lat, userPos.lng);
-    return;
-  }
+      if (userPos) {
+        openRouteFromPosition(userPos.lat, userPos.lng);
+        return;
+      }
 
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported on this device.");
-    return;
-  }
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported on this device.");
+        return;
+      }
 
-  document.getElementById("liveInfo").innerHTML =
-    '<span class="status-warn">Getting your current location for directions...</span>';
-
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      openRouteFromPosition(position.coords.latitude, position.coords.longitude);
-    },
-    function(error) {
       document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Could not get your current location for directions: ' + error.message + '</span>';
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 10000
-    }
-  );
-}
-  function openRouteFromPosition(lat, lng) {
-    const url =
-      "https://www.google.com/maps/dir/?api=1" +
-      "&origin=" + lat + "," + lng +
-      "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
-      "&travelmode=" + selectedTravelMode.toLowerCase();
+        '<span class="status-warn">Getting your current location for directions...</span>';
 
-   window.location.href = url;
-   
-    
-  }
-
-  let userPos = null;
-
-  if (selectedRole === "user1" && latestUser1Pos) {
-    userPos = latestUser1Pos;
-  } else if (selectedRole === "user2" && latestUser2Pos) {
-    userPos = latestUser2Pos;
-  }
-
-  if (userPos) {
-    openRouteFromPosition(userPos.lat, userPos.lng);
-    return;
-  }
-
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported on this device.");
-    return;
-  }
-
-  document.getElementById("liveInfo").innerHTML =
-    '<span class="status-warn">Getting your current location for directions...</span>';
-
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      openRouteFromPosition(
-        position.coords.latitude,
-        position.coords.longitude
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          openRouteFromPosition(position.coords.latitude, position.coords.longitude);
+        },
+        function(error) {
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Could not get your current location for directions: ' + error.message + '</span>';
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 10000
+        }
       );
-    },
-    function(error) {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Could not get your current location for directions: ' + error.message + '</span>';
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 10000
     }
-  );
-}
+
     function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
 
@@ -724,71 +684,81 @@ function updateTripSummary() {
         '</div>';
 
       refreshBothRoutes();
-updateTripSummary();
+      updateTripSummary();
+
       document.getElementById("selectedPlace").scrollIntoView({
         behavior: "smooth",
         block: "center"
       });
     }
-function cancelTrip() {
-  if (!currentSessionId) return;
 
-  if (!confirm("Cancel this trip for everyone?")) return;
+    function cleanupLiveUI() {
+      if (liveWatchId !== null) {
+        navigator.geolocation.clearWatch(liveWatchId);
+        liveWatchId = null;
+      }
 
-  if (liveWatchId !== null) {
-    navigator.geolocation.clearWatch(liveWatchId);
-    liveWatchId = null;
-  }
+      currentSessionId = "";
+      selectedRole = "";
+      latestUser1Pos = null;
+      latestUser2Pos = null;
+      user1ETA = null;
+      user2ETA = null;
 
-  db.ref("sessions/" + currentSessionId + "/live").remove();
-  db.ref("sessions/" + currentSessionId + "/claims").remove();
-  db.ref("sessions/" + currentSessionId + "/cancelled").set(true);
+      if (liveUser1Marker) {
+        liveUser1Marker.setMap(null);
+        liveUser1Marker = null;
+      }
 
-  currentSessionId = "";
-  selectedRole = "";
-  latestUser1Pos = null;
-  latestUser2Pos = null;
-  user1ETA = null;
-  user2ETA = null;
+      if (liveUser2Marker) {
+        liveUser2Marker.setMap(null);
+        liveUser2Marker = null;
+      }
 
-  if (liveUser1Marker) {
-    liveUser1Marker.setMap(null);
-    liveUser1Marker = null;
-  }
+      if (destinationMarker) {
+        destinationMarker.setMap(null);
+        destinationMarker = null;
+      }
 
-  if (liveUser2Marker) {
-    liveUser2Marker.setMap(null);
-    liveUser2Marker = null;
-  }
+      clearRouteLines();
 
-  if (destinationMarker) {
-    destinationMarker.setMap(null);
-    destinationMarker = null;
-  }
+      selectedShareName = "";
+      selectedShareDestination = "";
+      selectedDestinationLatLng = null;
 
-  clearRouteLines();
+      document.getElementById("sharedSessionInfo").innerHTML = "";
+      document.getElementById("liveInfo").innerHTML = "";
+      document.getElementById("connectionStatus").innerHTML = "";
+      document.getElementById("selectedPlace").innerHTML = "";
+      document.getElementById("distanceInfo").innerHTML = "";
 
-  selectedShareName = "";
-  selectedShareDestination = "";
-  selectedDestinationLatLng = null;
+      const tripBox = document.getElementById("tripSummary");
+      tripBox.innerHTML = "";
+      tripBox.style.display = "none";
 
-  document.getElementById("sharedSessionInfo").innerHTML = "";
-  document.getElementById("liveInfo").innerHTML = "";
-  document.getElementById("connectionStatus").innerHTML = "";
-  document.getElementById("selectedPlace").innerHTML = "";
-  document.getElementById("distanceInfo").innerHTML = "";
+      localStorage.removeItem("midpoint_last_session");
 
-  const tripBox = document.getElementById("tripSummary");
-  tripBox.innerHTML = "";
-  tripBox.style.display = "none";
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, "", cleanUrl);
+    }
 
-  localStorage.removeItem("midpoint_last_session");
+    function cancelTrip() {
+      if (!currentSessionId) return;
 
-  const cleanUrl = window.location.origin + window.location.pathname;
-  window.history.replaceState({}, "", cleanUrl);
+      if (!confirm("Cancel this trip for everyone?")) return;
 
-  location.reload();
-}
+      db.ref("sessions/" + currentSessionId + "/cancelled").set({
+        value: true,
+        cancelledAt: Date.now()
+      }).then(() => {
+        db.ref("sessions/" + currentSessionId + "/live").remove();
+        db.ref("sessions/" + currentSessionId + "/claims").remove();
+        cleanupLiveUI();
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-warn">Trip cancelled.</span>';
+      });
+    }
+
     function selectPlaceByIndex(index) {
       if (!currentPlaces[index]) return;
       showSelectedPlace(currentPlaces[index]);
@@ -862,21 +832,20 @@ function cancelTrip() {
         },
         function(result, status) {
           if (status !== "OK") return;
-const durationText = result.routes[0].legs[0].duration.text;
 
-if (userNumber === 1) {
-  user1ETA = durationText;
-} else {
-  user2ETA = durationText;
-}
- updateTripSummary();         
+          const durationText = result.routes[0].legs[0].duration.text;
+
           if (userNumber === 1) {
+            user1ETA = durationText;
             lastRouteUpdate1 = now;
             directionsRenderer1.setDirections(result);
           } else {
+            user2ETA = durationText;
             lastRouteUpdate2 = now;
             directionsRenderer2.setDirections(result);
           }
+
+          updateTripSummary();
         }
       );
     }
@@ -942,6 +911,7 @@ if (userNumber === 1) {
         const data = snapshot.val();
         if (!data) {
           latestUser1Pos = null;
+          user1ETA = null;
           if (liveUser1Marker) {
             liveUser1Marker.setMap(null);
             liveUser1Marker = null;
@@ -973,6 +943,7 @@ if (userNumber === 1) {
         const data = snapshot.val();
         if (!data) {
           latestUser2Pos = null;
+          user2ETA = null;
           if (liveUser2Marker) {
             liveUser2Marker.setMap(null);
             liveUser2Marker = null;
@@ -998,6 +969,22 @@ if (userNumber === 1) {
 
         updateConnectionStatus();
         refreshBothRoutes();
+      });
+    }
+
+    function listenForCancellation(sessionId) {
+      if (cancelListenerRef) cancelListenerRef.off();
+
+      cancelListenerRef = db.ref("sessions/" + sessionId + "/cancelled");
+      cancelListenerRef.on("value", snapshot => {
+        const data = snapshot.val();
+        const isCancelled = data === true || (data && data.value === true);
+
+        if (!isCancelled) return;
+
+        cleanupLiveUI();
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-warn">This trip was cancelled.</span>';
       });
     }
 
@@ -1134,7 +1121,7 @@ if (userNumber === 1) {
       }
 
       document.getElementById("connectionStatus").innerHTML = parts.join("<br>");
-updateTripSummary();
+      updateTripSummary();
     }
 
     function checkTrackingHealth() {
@@ -1168,6 +1155,14 @@ updateTripSummary();
         const data = snapshot.val();
         if (!data) return;
 
+        const isCancelled = data.cancelled === true || (data.cancelled && data.cancelled.value === true);
+        if (isCancelled) {
+          cleanupLiveUI();
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-warn">This trip was already cancelled.</span>';
+          return;
+        }
+
         selectedShareDestination = data.destination || "";
         selectedShareName = data.name || "";
         selectedTravelMode = data.travelMode || "DRIVING";
@@ -1189,7 +1184,7 @@ updateTripSummary();
               '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here</button>' +
               '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route</button>' +
               '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
-             '<button class="danger-btn" type="button" onclick="cancelTrip()">Cancel Trip</button>' +
+              '<button class="danger-btn" type="button" onclick="cancelTrip()">Cancel Trip</button>' +
             '</div>' +
           '</div>';
 
@@ -1197,10 +1192,11 @@ updateTripSummary();
           document.getElementById("selectedPlace").innerHTML =
             "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
             data.destination;
-         updateTripSummary(); 
+          updateTripSummary();
         }
 
         listenToLiveUsers(sessionId);
+        listenForCancellation(sessionId);
         updateConnectionStatus();
       });
     }
