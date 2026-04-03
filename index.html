@@ -542,6 +542,9 @@ function updateTripSummary() {
     alert("Firebase error: " + error.message);
   });
 }
+    function recenterMap() {
+  updateLiveMapBounds(true);
+}
     function resetSession() {
       if (!currentSessionId) {
         clearMarkers();
