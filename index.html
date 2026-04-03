@@ -735,11 +735,60 @@ function cancelTrip() {
 
   if (!confirm("Cancel this trip for everyone?")) return;
 
-  // stop your own tracking
   if (liveWatchId !== null) {
     navigator.geolocation.clearWatch(liveWatchId);
     liveWatchId = null;
   }
+
+  db.ref("sessions/" + currentSessionId + "/live").remove();
+  db.ref("sessions/" + currentSessionId + "/claims").remove();
+  db.ref("sessions/" + currentSessionId + "/cancelled").set(true);
+
+  currentSessionId = "";
+  selectedRole = "";
+  latestUser1Pos = null;
+  latestUser2Pos = null;
+  user1ETA = null;
+  user2ETA = null;
+
+  if (liveUser1Marker) {
+    liveUser1Marker.setMap(null);
+    liveUser1Marker = null;
+  }
+
+  if (liveUser2Marker) {
+    liveUser2Marker.setMap(null);
+    liveUser2Marker = null;
+  }
+
+  if (destinationMarker) {
+    destinationMarker.setMap(null);
+    destinationMarker = null;
+  }
+
+  clearRouteLines();
+
+  selectedShareName = "";
+  selectedShareDestination = "";
+  selectedDestinationLatLng = null;
+
+  document.getElementById("sharedSessionInfo").innerHTML = "";
+  document.getElementById("liveInfo").innerHTML = "";
+  document.getElementById("connectionStatus").innerHTML = "";
+  document.getElementById("selectedPlace").innerHTML = "";
+  document.getElementById("distanceInfo").innerHTML = "";
+
+  const tripBox = document.getElementById("tripSummary");
+  tripBox.innerHTML = "";
+  tripBox.style.display = "none";
+
+  localStorage.removeItem("midpoint_last_session");
+
+  const cleanUrl = window.location.origin + window.location.pathname;
+  window.history.replaceState({}, "", cleanUrl);
+
+  location.reload();
+}
     function selectPlaceByIndex(index) {
       if (!currentPlaces[index]) return;
       showSelectedPlace(currentPlaces[index]);
