@@ -410,8 +410,13 @@ function updateTripSummary() {
   box.style.display = "block";
 
   const modeText = selectedTravelMode === "WALKING" ? "Walking" : "Driving";
-  const person1Text = latestUser1Pos ? "Connected" : "Waiting";
-  const person2Text = latestUser2Pos ? "Connected" : "Waiting";
+  const person1Text = latestUser1Pos
+  ? (user1ETA ? user1ETA + " away" : "Connected")
+  : "Waiting";
+
+const person2Text = latestUser2Pos
+  ? (user2ETA ? user2ETA + " away" : "Connected")
+  : "Waiting";
 
   box.innerHTML =
     '<strong>📍 Trip Summary</strong><br>' +
