@@ -592,49 +592,57 @@ function updateTripSummary() {
       location.reload();
     }
 
-    function openMyRoute() {
+   function openMyRoute() {
   if (!selectedDestinationLatLng) {
     alert("No destination selected.");
     return;
   }
 
+  function openRouteFromPosition(lat, lng) {
+    const url =
+      "https://www.google.com/maps/dir/?api=1" +
+      "&origin=" + lat + "," + lng +
+      "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
+      "&travelmode=" + selectedTravelMode.toLowerCase();
 
-  // remove live data
-  db.ref("sessions/" + currentSessionId + "/live").remove();
-  db.ref("sessions/" + currentSessionId + "/claims").remove();
-
-  // optional: mark session as cancelled
-  db.ref("sessions/" + currentSessionId + "/cancelled").set(true);
-
-  currentSessionId = "";
-  selectedRole = "";
-  latestUser1Pos = null;
-  latestUser2Pos = null;
-
-  if (liveUser1Marker) {
-    liveUser1Marker.setMap(null);
-    liveUser1Marker = null;
+    window.location.href = url;
   }
 
-  if (liveUser2Marker) {
-    liveUser2Marker.setMap(null);
-    liveUser2Marker = null;
+  let userPos = null;
+
+  if (selectedRole === "user1" && latestUser1Pos) {
+    userPos = latestUser1Pos;
+  } else if (selectedRole === "user2" && latestUser2Pos) {
+    userPos = latestUser2Pos;
   }
 
-  clearRouteLines();
+  if (userPos) {
+    openRouteFromPosition(userPos.lat, userPos.lng);
+    return;
+  }
 
-  document.getElementById("sharedSessionInfo").innerHTML = "";
-  document.getElementById("liveInfo").innerHTML = "";
-  document.getElementById("connectionStatus").innerHTML = "";
-  document.getElementById("tripSummary").innerHTML = "";
-  document.getElementById("selectedPlace").innerHTML = "";
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported on this device.");
+    return;
+  }
 
-  localStorage.removeItem("midpoint_last_session");
+  document.getElementById("liveInfo").innerHTML =
+    '<span class="status-warn">Getting your current location for directions...</span>';
 
-  const cleanUrl = window.location.origin + window.location.pathname;
-  window.history.replaceState({}, "", cleanUrl);
-
-  location.reload();
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      openRouteFromPosition(position.coords.latitude, position.coords.longitude);
+    },
+    function(error) {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-error">Could not get your current location for directions: ' + error.message + '</span>';
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000
+    }
+  );
 }
   function openRouteFromPosition(lat, lng) {
     const url =
