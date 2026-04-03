@@ -594,16 +594,7 @@ function updateTripSummary() {
     alert("No destination selected.");
     return;
   }
-function cancelTrip() {
-  if (!currentSessionId) return;
 
-  if (!confirm("Cancel this trip for everyone?")) return;
-
-  // stop your own tracking
-  if (liveWatchId !== null) {
-    navigator.geolocation.clearWatch(liveWatchId);
-    liveWatchId = null;
-  }
 
   // remove live data
   db.ref("sessions/" + currentSessionId + "/live").remove();
@@ -728,7 +719,16 @@ updateTripSummary();
         block: "center"
       });
     }
+function cancelTrip() {
+  if (!currentSessionId) return;
 
+  if (!confirm("Cancel this trip for everyone?")) return;
+
+  // stop your own tracking
+  if (liveWatchId !== null) {
+    navigator.geolocation.clearWatch(liveWatchId);
+    liveWatchId = null;
+  }
     function selectPlaceByIndex(index) {
       if (!currentPlaces[index]) return;
       showSelectedPlace(currentPlaces[index]);
