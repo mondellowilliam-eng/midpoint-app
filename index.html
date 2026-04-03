@@ -750,22 +750,72 @@ let user2Arrived = false;
     }
 
     function cancelTrip() {
-      if (!currentSessionId) return;
+  if (!currentSessionId) return;
 
-      if (!confirm("Cancel this trip for everyone?")) return;
+  if (!confirm("Cancel this trip for everyone?")) return;
 
-      db.ref("sessions/" + currentSessionId + "/cancelled").set({
-        value: true,
-        cancelledAt: Date.now()
-      }).then(() => {
-        db.ref("sessions/" + currentSessionId + "/live").remove();
-        db.ref("sessions/" + currentSessionId + "/claims").remove();
-        cleanupLiveUI();
-        document.getElementById("liveInfo").innerHTML =
-          '<span class="status-warn">Trip cancelled.</span>';
-      });
+  db.ref("sessions/" + currentSessionId + "/cancelled").set({
+    value: true,
+    cancelledAt: Date.now()
+  }).then(() => {
+
+    // remove live tracking + claims
+    db.ref("sessions/" + currentSessionId + "/live").remove();
+    db.ref("sessions/" + currentSessionId + "/claims").remove();
+
+    // reset local state
+    currentSessionId = "";
+    selectedRole = "";
+    latestUser1Pos = null;
+    latestUser2Pos = null;
+
+    user1ETA = null;
+    user2ETA = null;
+
+    user1Arrived = false;
+    user2Arrived = false;
+
+    // clear markers
+    if (liveUser1Marker) {
+      liveUser1Marker.setMap(null);
+      liveUser1Marker = null;
     }
 
+    if (liveUser2Marker) {
+      liveUser2Marker.setMap(null);
+      liveUser2Marker = null;
+    }
+
+    if (destinationMarker) {
+      destinationMarker.setMap(null);
+      destinationMarker = null;
+    }
+
+    clearRouteLines();
+
+    // clear UI
+    document.getElementById("sharedSessionInfo").innerHTML = "";
+    document.getElementById("liveInfo").innerHTML =
+      '<span class="status-warn">Trip cancelled.</span>';
+    document.getElementById("connectionStatus").innerHTML = "";
+    document.getElementById("selectedPlace").innerHTML = "";
+    document.getElementById("distanceInfo").innerHTML = "";
+
+    const tripBox = document.getElementById("tripSummary");
+    tripBox.innerHTML = "";
+    tripBox.style.display = "none";
+
+    // clear saved session
+    localStorage.removeItem("midpoint_last_session");
+
+    // clean URL
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, "", cleanUrl);
+
+    // reload app
+    location.reload();
+  });
+}
     function selectPlaceByIndex(index) {
       if (!currentPlaces[index]) return;
       showSelectedPlace(currentPlaces[index]);
