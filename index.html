@@ -594,7 +594,54 @@ function updateTripSummary() {
     alert("No destination selected.");
     return;
   }
+function cancelTrip() {
+  if (!currentSessionId) return;
 
+  if (!confirm("Cancel this trip for everyone?")) return;
+
+  // stop your own tracking
+  if (liveWatchId !== null) {
+    navigator.geolocation.clearWatch(liveWatchId);
+    liveWatchId = null;
+  }
+
+  // remove live data
+  db.ref("sessions/" + currentSessionId + "/live").remove();
+  db.ref("sessions/" + currentSessionId + "/claims").remove();
+
+  // optional: mark session as cancelled
+  db.ref("sessions/" + currentSessionId + "/cancelled").set(true);
+
+  currentSessionId = "";
+  selectedRole = "";
+  latestUser1Pos = null;
+  latestUser2Pos = null;
+
+  if (liveUser1Marker) {
+    liveUser1Marker.setMap(null);
+    liveUser1Marker = null;
+  }
+
+  if (liveUser2Marker) {
+    liveUser2Marker.setMap(null);
+    liveUser2Marker = null;
+  }
+
+  clearRouteLines();
+
+  document.getElementById("sharedSessionInfo").innerHTML = "";
+  document.getElementById("liveInfo").innerHTML = "";
+  document.getElementById("connectionStatus").innerHTML = "";
+  document.getElementById("tripSummary").innerHTML = "";
+  document.getElementById("selectedPlace").innerHTML = "";
+
+  localStorage.removeItem("midpoint_last_session");
+
+  const cleanUrl = window.location.origin + window.location.pathname;
+  window.history.replaceState({}, "", cleanUrl);
+
+  location.reload();
+}
   function openRouteFromPosition(lat, lng) {
     const url =
       "https://www.google.com/maps/dir/?api=1" +
