@@ -476,7 +476,9 @@
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
-
+function getDistanceMeters(lat1, lng1, lat2, lng2) {
+  return getDistanceKm(lat1, lng1, lat2, lng2) * 1000;
+}
     function copySessionLink() {
       if (!selectedShareDestination) {
         alert("Pick a place first.");
