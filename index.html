@@ -235,18 +235,20 @@
 
       <input id="placeKeyword" placeholder="What kind of place? Coffee, pizza, park..." class="setup-only">
 
-     
+     <div class="filters setup-only">
+  <button type="button" onclick="setFilter('coffee')">☕ Coffee</button>
+  <button type="button" onclick="setFilter('food')">🍽️ Food</button>
+  <button type="button" onclick="setFilter('drinks')">🍹 Drinks</button>
+  <button type="button" onclick="setFilter('dessert')">🍰 Dessert</button>
+  <button type="button" onclick="setFilter('park')">🌳 Park</button>
+</div>
 
       <div id="weightWrap" class="setup-only">
         <label for="weightSlider">Adjust midpoint <span id="weightValue">50%</span></label>
         <input type="range" id="weightSlider" min="0" max="100" value="50">
       </div>
 
-      <div class="filters setup-only" id="travelModeButtons">
-        <button type="button" id="modeDriving" onclick="setTravelMode('DRIVING')">🚗 Driving</button>
-        <button type="button" id="modeWalking" onclick="setTravelMode('WALKING')">🚶 Walking</button>
-        <button type="button" id="modeTransit" onclick="setTravelMode('TRANSIT')">🚌 Transit</button>
-      </div>
+      
 
       <button id="findBtn" type="button" onclick="findMidpoint()" class="setup-only">Find Meetup Spot</button>
 
