@@ -419,7 +419,11 @@ function formatDistance(meters) {
         el.style.display = "none";
       });
     }
-
+function formatTravelMode(mode) {
+  if (mode === "WALKING") return "Walking";
+  if (mode === "TRANSIT") return "Transit";
+  return "Driving";
+}
     function updateTripSummary() {
   const box = document.getElementById("tripSummary");
   if (!box) return;
