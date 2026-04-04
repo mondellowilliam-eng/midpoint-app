@@ -563,6 +563,22 @@ function getApproachingMessage() {
 
   return "";
 }
+    function getUsersDistance() {
+  if (!latestUser1Pos || !latestUser2Pos) return "";
+
+  const meters = getDistanceMeters(
+    latestUser1Pos.lat,
+    latestUser1Pos.lng,
+    latestUser2Pos.lat,
+    latestUser2Pos.lng
+  );
+
+  if (meters < 1000) {
+    return "📏 You are " + Math.round(meters) + " m apart";
+  }
+
+  return "📏 You are " + (meters / 1000).toFixed(1) + " km apart";
+}  
     function getDistanceKm(lat1, lng1, lat2, lng2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
