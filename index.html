@@ -452,13 +452,26 @@ function formatTravelMode(mode) {
           ? user2ETA + " away" + (user2Distance ? " (" + formatDistance(user2Distance) + ")" : "")
           : "Connected");
 
- box.innerHTML =
-  '<strong>📍 Meetup Status</strong><br>' +
-  '<strong>Person 1:</strong> ' + person1Text + '<br>' +
-  '<span style="font-size:13px;">Mode: ' + formatTravelMode(user1TravelMode) + '</span><br><br>' +
-  '<strong>Person 2:</strong> ' + person2Text + '<br>' +
-  '<span style="font-size:13px;">Mode: ' + formatTravelMode(user2TravelMode) + '</span>'; 
+box.innerHTML =
+  '<div class="status-card">' +
 
+    '<div class="status-title">📍 Live Meetup</div>' +
+
+    '<div class="status-row">' +
+      '<div><strong>Person 1</strong><br>' +
+      person1Text + '<br>' +
+      '<span class="mode-tag">' + formatTravelMode(user1TravelMode) + '</span></div>' +
+    '</div>' +
+
+    '<div class="status-row">' +
+      '<div><strong>Person 2</strong><br>' +
+      person2Text + '<br>' +
+      '<span class="mode-tag">' + formatTravelMode(user2TravelMode) + '</span></div>' +
+    '</div>' +
+
+    (arrivalMessage ? '<div class="status-alert">' + arrivalMessage + '</div>' : '') +
+
+  '</div>'; 
   const arrivalMessage = getArrivalStatusMessage();
   const approachingMessage = getApproachingMessage();
   const closerText = getCloserStatus();
