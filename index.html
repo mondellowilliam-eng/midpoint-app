@@ -477,13 +477,28 @@ function formatDistance(meters) {
 function getCloserStatus() {
   if (!user1ETA || !user2ETA) return "";
 
-  const getMinutes = (text) => {
-    const match = text.match(/\d+/);
-    return match ? parseInt(match[0]) : null;
-  };
+  function etaToMinutes(text) {
+    text = text.toLowerCase();
 
-  const m1 = getMinutes(user1ETA);
-  const m2 = getMinutes(user2ETA);
+    let total = 0;
+
+    const hourMatch = text.match(/(\d+)\s*hour/);
+    const minMatch = text.match(/(\d+)\s*min/);
+
+    if (hourMatch) total += parseInt(hourMatch[1], 10) * 60;
+    if (minMatch) total += parseInt(minMatch[1], 10);
+
+    // handle cases like "1 hour" with no mins, or "9 mins"
+    if (!hourMatch && !minMatch) {
+      const onlyNumber = text.match(/\d+/);
+      if (onlyNumber) total = parseInt(onlyNumber[0], 10);
+    }
+
+    return total || null;
+  }
+
+  const m1 = etaToMinutes(user1ETA);
+  const m2 = etaToMinutes(user2ETA);
 
   if (m1 === null || m2 === null) return "";
 
