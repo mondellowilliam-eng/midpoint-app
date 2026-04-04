@@ -1253,6 +1253,12 @@ user2Arrived = false;
   navigator.geolocation.getCurrentPosition(
     function(position) {
       claimRole(function(role) {
+        if (role === "user1") {
+          user1TravelMode = selectedTravelMode;
+        } else {
+          user2TravelMode = selectedTravelMode;
+        }
+
         const pos = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
