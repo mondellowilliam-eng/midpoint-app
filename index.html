@@ -665,9 +665,43 @@ function getDistanceMeters(lat1, lng1, lat2, lng2) {
       });
     }
 
-    function recenterMap() {
-      updateLiveMapBounds(true);
+  function recenterMap() {
+  if (!map) return;
+
+  const bounds = new google.maps.LatLngBounds();
+  let count = 0;
+
+  if (liveUser1Marker) {
+    bounds.extend(liveUser1Marker.getPosition());
+    count++;
+  }
+
+  if (liveUser2Marker) {
+    bounds.extend(liveUser2Marker.getPosition());
+    count++;
+  }
+
+  if (destinationMarker) {
+    bounds.extend(destinationMarker.getPosition());
+    count++;
+  }
+
+  if (count === 0) return;
+
+  if (count === 1) {
+    map.setCenter(bounds.getCenter());
+    map.setZoom(15);
+    return;
+  }
+
+  map.fitBounds(bounds);
+
+  google.maps.event.addListenerOnce(map, "bounds_changed", function() {
+    if (map.getZoom() > 15) {
+      map.setZoom(15);
     }
+  });
+} 
 
     function resetSession() {
       if (!currentSessionId) {
