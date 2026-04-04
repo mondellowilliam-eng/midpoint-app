@@ -970,58 +970,73 @@ user2Arrived = false;
       showSelectedPlace(currentPlaces[index]);
     }
 
-    function searchNearby(mid, keyword) {
-      placesService.nearbySearch({
-        location: mid,
-        radius: 1000,
-        keyword: keyword || undefined
-      }, function(results, status) {
-        if (status !== "OK" || !results || !results.length) {
-          document.getElementById("selectedPlace").innerHTML = "No places found nearby.";
-          return;
-        }
+   function searchNearby(mid, keyword) {
+  const radii = [1000, 3000, 5000]; // 1km → 3km → 5km
 
-        currentPlaces = results.slice(0, 5);
-        const topPlace = currentPlaces[0];
-
-        let html =
-          '<div class="top-pick">' +
-          '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
-          (topPlace.vicinity || topPlace.name) + '<br>' +
-          '<em>Tap a result below or click a letter on the map.</em>' +
-          '</div>';
-
-        html += '<div style="margin-top:10px;">';
-
-        currentPlaces.forEach((place, index) => {
-          const label = String.fromCharCode(65 + index);
-          html +=
-            '<button class="place-list-btn" type="button" onclick="selectPlaceByIndex(' + index + ')">' +
-            label + '. ' + place.name +
-            (place.vicinity ? ' — ' + place.vicinity : '') +
-            '</button>';
-        });
-
-        html += '</div>';
-        document.getElementById("selectedPlace").innerHTML = html;
-
-        currentPlaces.forEach((place, index) => {
-          const marker = new google.maps.Marker({
-            map: map,
-            position: place.geometry.location,
-            title: place.name,
-            label: String.fromCharCode(65 + index)
-          });
-
-          markers.push(marker);
-
-          marker.addListener("click", function() {
-            showSelectedPlace(place);
-          });
-        });
-      });
+  function trySearch(index) {
+    if (index >= radii.length) {
+      document.getElementById("selectedPlace").innerHTML =
+        "No places found within 5 km of the midpoint.";
+      return;
     }
 
+    placesService.nearbySearch({
+      location: mid,
+      radius: radii[index],
+      keyword: keyword || undefined
+    }, function(results, status) {
+
+      if (status !== "OK" || !results || !results.length) {
+        // try next radius
+        trySearch(index + 1);
+        return;
+      }
+
+      // SUCCESS
+      currentPlaces = results.slice(0, 5);
+      const topPlace = currentPlaces[0];
+
+      let html =
+        '<div class="top-pick">' +
+        '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
+        (topPlace.vicinity || topPlace.name) + '<br>' +
+        '<em>Search radius: ' + (radii[index] / 1000) + ' km</em><br>' +
+        '<em>Tap a result below or click a letter on the map.</em>' +
+        '</div>';
+
+      html += '<div style="margin-top:10px;">';
+
+      currentPlaces.forEach((place, i) => {
+        const label = String.fromCharCode(65 + i);
+        html +=
+          '<button class="place-list-btn" type="button" onclick="selectPlaceByIndex(' + i + ')">' +
+          label + '. ' + place.name +
+          (place.vicinity ? ' — ' + place.vicinity : '') +
+          '</button>';
+      });
+
+      html += '</div>';
+      document.getElementById("selectedPlace").innerHTML = html;
+
+      currentPlaces.forEach((place, i) => {
+        const marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location,
+          title: place.name,
+          label: String.fromCharCode(65 + i)
+        });
+
+        markers.push(marker);
+
+        marker.addListener("click", function() {
+          showSelectedPlace(place);
+        });
+      });
+    });
+  }
+
+  trySearch(0); // start at 1km
+}
    function updateRouteForUser(userNumber, originPos) {
   if (!selectedDestinationLatLng || !originPos) return;
 
