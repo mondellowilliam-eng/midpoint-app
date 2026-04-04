@@ -440,7 +440,7 @@ function formatDistance(meters) {
       box.style.display = "block";
 
      const person1Text = !latestUser1Pos
-  ? ? "Waiting for location"
+  ? "Waiting for location"
   : user1Arrived
     ? "Arrived"
     : (user1ETA
@@ -448,13 +448,12 @@ function formatDistance(meters) {
         : "Connected");
 
 const person2Text = !latestUser2Pos
-  ? ? "Waiting for location"
+  ? "Waiting for location"
   : user2Arrived
     ? "Arrived"
     : (user2ETA
         ? user2ETA + " away" + (user2Distance ? " (" + formatDistance(user2Distance) + ")" : "")
         : "Connected");
-
       box.innerHTML =
         '<strong>📍 Meetup Status</strong><br>' +
         '<strong>Person 1:</strong> ' + person1Text + '<br>' +
