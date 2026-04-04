@@ -1362,6 +1362,8 @@ user2Arrived = false;
         selectedShareDestination = data.destination || "";
         selectedShareName = data.name || "";
         selectedTravelMode = data.travelMode || "DRIVING";
+user1TravelMode = selectedTravelMode;
+user2TravelMode = selectedTravelMode;
         updateTravelModeButtons();
 
         if (data.address1) document.getElementById("address1").value = data.address1;
