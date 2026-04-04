@@ -377,17 +377,29 @@ checkLastSession();
       document.getElementById("placeKeyword").value = type;
     }
 
-    function setTravelMode(mode) {
-      selectedTravelMode = mode;
-      updateTravelModeButtons();
+   function setTravelMode(mode) {
+  selectedTravelMode = mode;
 
-      document.getElementById("liveInfo").innerHTML =
-       (mode === "WALKING" ? "Walking" : mode === "TRANSIT" ? "Transit" : "Driving")
+  if (selectedRole === "user1") {
+    user1TravelMode = mode;
+  } else if (selectedRole === "user2") {
+    user2TravelMode = mode;
+  } else {
+    user1TravelMode = mode;
+    user2TravelMode = mode;
+  }
 
-      lastRouteUpdate1 = 0;
-      lastRouteUpdate2 = 0;
-      refreshBothRoutes();
-    }
+  updateTravelModeButtons();
+
+  document.getElementById("liveInfo").innerHTML =
+    '<span class="status-ok">Travel mode set to ' +
+    (mode === "WALKING" ? "Walking" : mode === "TRANSIT" ? "Transit" : "Driving") +
+    '.</span>';
+
+  lastRouteUpdate1 = 0;
+  lastRouteUpdate2 = 0;
+  refreshBothRoutes();
+}
 function formatDistance(meters) {
   if (meters === null) return "";
 
