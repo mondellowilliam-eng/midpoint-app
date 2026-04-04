@@ -378,15 +378,12 @@ checkLastSession();
       document.getElementById("placeKeyword").value = type;
     }
 
-   function setTravelMode(mode) {
+  function setTravelMode(mode) {
   selectedTravelMode = mode;
 
   if (selectedRole === "user1") {
     user1TravelMode = mode;
   } else if (selectedRole === "user2") {
-    user2TravelMode = mode;
-  } else {
-    user1TravelMode = mode;
     user2TravelMode = mode;
   }
 
@@ -428,57 +425,55 @@ function formatDistance(meters) {
     }
 
     function updateTripSummary() {
-      const box = document.getElementById("tripSummary");
-      if (!box) return;
+  const box = document.getElementById("tripSummary");
+  if (!box) return;
 
-      if (!selectedShareDestination) {
-        box.style.display = "none";
-        box.innerHTML = "";
-        return;
-      }
+  if (!selectedShareDestination) {
+    box.style.display = "none";
+    box.innerHTML = "";
+    return;
+  }
 
-      box.style.display = "block";
+  box.style.display = "block";
 
-     const person1Text = !latestUser1Pos
-  ? "Waiting for location"
-  : user1Arrived
-    ? "Arrived"
-    : (user1ETA
-        ? user1ETA + " away" + (user1Distance ? " (" + formatDistance(user1Distance) + ")" : "")
-        : "Connected");
+  const person1Text = !latestUser1Pos
+    ? "Waiting for location"
+    : user1Arrived
+      ? "Arrived"
+      : (user1ETA
+          ? user1ETA + " away" + (user1Distance ? " (" + formatDistance(user1Distance) + ")" : "")
+          : "Connected");
 
-const person2Text = !latestUser2Pos
-  ? "Waiting for location"
-  : user2Arrived
-    ? "Arrived"
-    : (user2ETA
-        ? user2ETA + " away" + (user2Distance ? " (" + formatDistance(user2Distance) + ")" : "")
-        : "Connected");
-      box.innerHTML =
-        '<strong>📍 Meetup Status</strong><br>' +
-        '<strong>Person 1:</strong> ' + person1Text + '<br>' +
-        '<strong>Person 2:</strong> ' + person2Text;
-      const closerText = getCloserStatus();
-const arrivalMessage = getArrivalStatusMessage();
-     const approachingMessage = getApproachingMessage();
-const usersDistance = getUsersDistance(); 
+  const person2Text = !latestUser2Pos
+    ? "Waiting for location"
+    : user2Arrived
+      ? "Arrived"
+      : (user2ETA
+          ? user2ETA + " away" + (user2Distance ? " (" + formatDistance(user2Distance) + ")" : "")
+          : "Connected");
 
-if (arrivalMessage) {
-  box.innerHTML += "<br><br><strong>" + arrivalMessage + "</strong>";
+  box.innerHTML =
+    '<strong>📍 Meetup Status</strong><br>' +
+    '<strong>Person 1:</strong> ' + person1Text + '<br>' +
+    '<strong>Person 2:</strong> ' + person2Text;
+
+  const arrivalMessage = getArrivalStatusMessage();
+  const approachingMessage = getApproachingMessage();
+  const closerText = getCloserStatus();
+  const usersDistance = getUsersDistance();
+
+  if (arrivalMessage) {
+    box.innerHTML += "<br><br><strong>" + arrivalMessage + "</strong>";
+  } else if (approachingMessage) {
+    box.innerHTML += "<br><br><strong>" + approachingMessage + "</strong>";
+  } else if (closerText) {
+    box.innerHTML += "<br><br><strong>" + closerText + "</strong>";
+  }
+
+  if (usersDistance) {
+    box.innerHTML += "<br><br>" + usersDistance;
+  }
 }
-
-if (approachingMessage) {
-  box.innerHTML += "<br><br><strong>" + approachingMessage + "</strong>";
-}
-
-if (closerText) {
-  box.innerHTML += "<br><br><strong>" + closerText + "</strong>";
-}
-
-if (usersDistance) {
-  box.innerHTML += "<br><br>" + usersDistance;
-}
-}         
 function getCloserStatus() {
   if (!user1ETA || !user2ETA) return "";
 
