@@ -466,10 +466,18 @@ const approachingMessage = getApproachingMessage();
 if (arrivalMessage) {
   box.innerHTML += "<br><br><strong>" + arrivalMessage + "</strong>";
 }
+
+if (approachingMessage) {
+  box.innerHTML += "<br><br><strong>" + approachingMessage + "</strong>";
+}
+
 if (closerText) {
   box.innerHTML += "<br><br><strong>" + closerText + "</strong>";
 }
-    }
+
+if (usersDistance) {
+  box.innerHTML += "<br><br>" + usersDistance;
+}
 function getCloserStatus() {
   if (!user1ETA || !user2ETA) return "";
 
