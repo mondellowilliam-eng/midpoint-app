@@ -943,7 +943,7 @@ user2Arrived = false;
       });
     }
 
-    function updateRouteForUser(userNumber, originPos) {
+   function updateRouteForUser(userNumber, originPos) {
   if (!selectedDestinationLatLng || !originPos) return;
 
   const metersAway = getDistanceMeters(
@@ -970,7 +970,9 @@ user2Arrived = false;
     {
       origin: { lat: originPos.lat, lng: originPos.lng },
       destination: selectedDestinationLatLng,
-      travelMode: google.maps.TravelMode[selectedTravelMode]
+      travelMode: google.maps.TravelMode[
+        userNumber === 1 ? user1TravelMode : user2TravelMode
+      ]
     },
     function(result, status) {
       if (status !== "OK") return;
