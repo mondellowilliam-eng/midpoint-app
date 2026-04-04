@@ -534,7 +534,25 @@ function getArrivalStatusMessage() {
       document.getElementById("distanceInfo").innerHTML = "";
       updateTripSummary();
     }
+function getApproachingMessage() {
+  if (!user1ETA || !user2ETA) return "";
 
+  const getMinutes = (text) => {
+    const match = text.match(/\d+/);
+    return match ? parseInt(match[0]) : null;
+  };
+
+  const m1 = getMinutes(user1ETA);
+  const m2 = getMinutes(user2ETA);
+
+  if (m1 === null || m2 === null) return "";
+
+  if (m1 <= 5 && m2 <= 5) {
+    return "⏳ Both are about 5 minutes away";
+  }
+
+  return "";
+}
     function getDistanceKm(lat1, lng1, lat2, lng2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
