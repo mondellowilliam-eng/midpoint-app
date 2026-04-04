@@ -678,58 +678,63 @@ user2Arrived = false;
       location.reload();
     }
 
-    function openMyRoute() {
-      if (!selectedDestinationLatLng) {
-        alert("No destination selected.");
-        return;
-      }
+   function openMyRoute() {
+  if (!selectedDestinationLatLng) {
+    alert("No destination selected.");
+    return;
+  }
 
-      function openRouteFromPosition(lat, lng) {
-        const url =
-          "https://www.google.com/maps/dir/?api=1" +
-          "&origin=" + lat + "," + lng +
-          "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
-          "&travelmode=" + selectedTravelMode.toLowerCase();
+  function openRouteFromPosition(lat, lng) {
+    const modeForUser =
+      selectedRole === "user1" ? user1TravelMode :
+      selectedRole === "user2" ? user2TravelMode :
+      selectedTravelMode;
 
-        window.location.href = url;
-      }
+    const url =
+      "https://www.google.com/maps/dir/?api=1" +
+      "&origin=" + lat + "," + lng +
+      "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
+      "&travelmode=" + modeForUser.toLowerCase();
 
-      let userPos = null;
+    window.location.href = url;
+  }
 
-      if (selectedRole === "user1" && latestUser1Pos) {
-        userPos = latestUser1Pos;
-      } else if (selectedRole === "user2" && latestUser2Pos) {
-        userPos = latestUser2Pos;
-      }
+  let userPos = null;
 
-      if (userPos) {
-        openRouteFromPosition(userPos.lat, userPos.lng);
-        return;
-      }
+  if (selectedRole === "user1" && latestUser1Pos) {
+    userPos = latestUser1Pos;
+  } else if (selectedRole === "user2" && latestUser2Pos) {
+    userPos = latestUser2Pos;
+  }
 
-      if (!navigator.geolocation) {
-        alert("Geolocation is not supported on this device.");
-        return;
-      }
+  if (userPos) {
+    openRouteFromPosition(userPos.lat, userPos.lng);
+    return;
+  }
 
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported on this device.");
+    return;
+  }
+
+  document.getElementById("liveInfo").innerHTML =
+    '<span class="status-warn">Getting your current location for directions...</span>';
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      openRouteFromPosition(position.coords.latitude, position.coords.longitude);
+    },
+    function(error) {
       document.getElementById("liveInfo").innerHTML =
-        '<span class="status-warn">Getting your current location for directions...</span>';
-
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          openRouteFromPosition(position.coords.latitude, position.coords.longitude);
-        },
-        function(error) {
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-error">Could not get your current location for directions: ' + error.message + '</span>';
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 5000,
-          timeout: 10000
-        }
-      );
+        '<span class="status-error">Could not get your current location for directions: ' + error.message + '</span>';
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000
     }
+  );
+}
 
     function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
