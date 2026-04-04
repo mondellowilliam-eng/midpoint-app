@@ -574,7 +574,7 @@ function getApproachingMessage() {
 
   return "";
 }
-    function getUsersDistance() {
+   function getUsersDistance() {
   if (!latestUser1Pos || !latestUser2Pos) return "";
 
   const meters = getDistanceMeters(
@@ -585,11 +585,11 @@ function getApproachingMessage() {
   );
 
   if (meters < 1000) {
-    return "📏 You are " + Math.round(meters) + " m apart";
+    return "📏 Straight-line distance: " + Math.round(meters) + " m";
   }
 
-  return "📏 You are " + (meters / 1000).toFixed(1) + " km apart";
-}  
+  return "📏 Straight-line distance: " + (meters / 1000).toFixed(1) + " km";
+}
     function getDistanceKm(lat1, lng1, lat2, lng2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
