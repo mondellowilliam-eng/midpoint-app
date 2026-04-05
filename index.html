@@ -1511,91 +1511,94 @@ user2Arrived = false;
       }
     }
 
-    function loadSession() {
-      const params = new URLSearchParams(window.location.search);
-      const sessionId = params.get("session");
+  function loadSession() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get("session");
 
-      if (!sessionId) return;
+  if (!sessionId) return;
 
-      currentSessionId = sessionId;
-      hideSetupControls();
+  currentSessionId = sessionId;
+  hideSetupControls();
 
-      db.ref("sessions/" + sessionId).once("value", snapshot => {
-        const data = snapshot.val();
-        if (!data) return;
+  db.ref("sessions/" + sessionId).once("value", snapshot => {
+    const data = snapshot.val();
+    if (!data) return;
 
-        const isCancelled = data.cancelled === true || (data.cancelled && data.cancelled.value === true);
-        if (isCancelled) {
-          cleanupLiveUI();
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-warn">This trip was already cancelled.</span>';
-          return;
-        }
-
-        selectedShareDestination = data.destination || "";
-        selectedShareName = data.name || "";
-        selectedTravelMode = data.travelMode || "DRIVING";
-user1TravelMode = selectedTravelMode;
-user2TravelMode = selectedTravelMode;
-        updateTravelModeButtons();
-
-        if (data.address1) document.getElementById("address1").value = data.address1;
-        if (data.address2) document.getElementById("address2").value = data.address2;
-
-        if (data.destination) {
-          showDestinationFromSession(data.destination);
-        }
-
-       document.getElementById("sharedSessionInfo").innerHTML =
-  '<div class="shared-box">' +
-    '🔗 <strong>Shared Session Loaded</strong><br><br>' +
-
-    '<strong>Start 1:</strong> ' + (data.address1 || "Not provided") + '<br>' +
-    '<strong>Start 2:</strong> ' + (data.address2 || "Not provided") + '<br><br>' +
-
-    '<strong>Meetup Place:</strong> ' + (data.name || "") + '<br>' +
-    '<strong>Destination:</strong> ' + (data.destination || "") + '<br><br>' +
-
-    '<strong>Choose Your Travel Mode:</strong>' +
-    '<div class="action-row">' +
-      '<button class="action-link" type="button" onclick="setTravelMode(\'DRIVING\')">🚗 Driving</button>' +
-      '<button class="secondary-btn" type="button" onclick="setTravelMode(\'WALKING\')">🚶 Walking</button>' +
-      '<button class="session-btn" type="button" onclick="setTravelMode(\'TRANSIT\')">🚌 Transit</button>' +
-    '</div>' +
-
-    '<div class="action-row">' +
-      '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here</button>' +
-      '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route</button>' +
-      '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
-      '<button class="danger-btn" type="button" onclick="cancelTrip()">Cancel Trip</button>' +
-    '</div>' +
-  '</div>';
-
-        if (data.name && data.destination) {
-          document.getElementById("selectedPlace").innerHTML =
-            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-            data.destination;
-          updateTripSummary();
-        }
-
-        listenToLiveUsers(sessionId);
-        listenForCancellation(sessionId);
-        updateConnectionStatus();
-      });
+    const isCancelled = data.cancelled === true || (data.cancelled && data.cancelled.value === true);
+    if (isCancelled) {
+      cleanupLiveUI();
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-warn">This trip was already cancelled.</span>';
+      return;
     }
-db.ref("sessions/" + sessionId + "/modes/user1").on("value", snapshot => {
-  if (snapshot.val()) {
-    user1TravelMode = snapshot.val();
-    updateTripSummary();
-  }
-});
 
-db.ref("sessions/" + sessionId + "/modes/user2").on("value", snapshot => {
-  if (snapshot.val()) {
-    user2TravelMode = snapshot.val();
-    updateTripSummary();
-  }
-});
+    selectedShareDestination = data.destination || "";
+    selectedShareName = data.name || "";
+    selectedTravelMode = data.travelMode || "DRIVING";
+    user1TravelMode = (data.modes && data.modes.user1) ? data.modes.user1 : selectedTravelMode;
+    user2TravelMode = (data.modes && data.modes.user2) ? data.modes.user2 : selectedTravelMode;
+
+    updateTravelModeButtons();
+
+    if (data.address1) document.getElementById("address1").value = data.address1;
+    if (data.address2) document.getElementById("address2").value = data.address2;
+
+    if (data.destination) {
+      showDestinationFromSession(data.destination);
+    }
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+        '🔗 <strong>Shared Session Loaded</strong><br><br>' +
+
+        '<strong>Start 1:</strong> ' + (data.address1 || "Not provided") + '<br>' +
+        '<strong>Start 2:</strong> ' + (data.address2 || "Not provided") + '<br><br>' +
+
+        '<strong>Meetup Place:</strong> ' + (data.name || "") + '<br>' +
+        '<strong>Destination:</strong> ' + (data.destination || "") + '<br><br>' +
+
+        '<strong>Choose Your Travel Mode:</strong>' +
+        '<div class="action-row">' +
+          '<button class="action-link" type="button" onclick="setTravelMode(\'DRIVING\')">🚗 Driving</button>' +
+          '<button class="secondary-btn" type="button" onclick="setTravelMode(\'WALKING\')">🚶 Walking</button>' +
+          '<button class="session-btn" type="button" onclick="setTravelMode(\'TRANSIT\')">🚌 Transit</button>' +
+        '</div>' +
+
+        '<div class="action-row">' +
+          '<button class="live-btn" type="button" onclick="joinLiveSession()">I’m Here</button>' +
+          '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route</button>' +
+          '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
+          '<button class="danger-btn" type="button" onclick="cancelTrip()">Cancel Trip</button>' +
+        '</div>' +
+      '</div>';
+
+    if (data.name && data.destination) {
+      document.getElementById("selectedPlace").innerHTML =
+        "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+        data.destination;
+      updateTripSummary();
+    }
+
+    listenToLiveUsers(sessionId);
+    listenForCancellation(sessionId);
+
+    db.ref("sessions/" + sessionId + "/modes/user1").on("value", snapshot => {
+      if (snapshot.val()) {
+        user1TravelMode = snapshot.val();
+        updateTripSummary();
+      }
+    });
+
+    db.ref("sessions/" + sessionId + "/modes/user2").on("value", snapshot => {
+      if (snapshot.val()) {
+        user2TravelMode = snapshot.val();
+        updateTripSummary();
+      }
+    });
+
+    updateConnectionStatus();
+  });
+} 
     function checkLastSession() {
       const lastSession = localStorage.getItem("midpoint_last_session");
 
