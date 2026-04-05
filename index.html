@@ -674,6 +674,10 @@ function getDistanceMeters(lat1, lng1, lat2, lng2) {
         address1: document.getElementById("address1").value.trim(),
         address2: document.getElementById("address2").value.trim(),
         travelMode: selectedTravelMode,
+        modes: {
+  user1: selectedTravelMode,
+  user2: selectedTravelMode
+},
         created: Date.now(),
         cancelled: false
       }).then(() => {
@@ -706,6 +710,10 @@ function getDistanceMeters(lat1, lng1, lat2, lng2) {
         address1: document.getElementById("address1").value.trim(),
         address2: document.getElementById("address2").value.trim(),
         travelMode: selectedTravelMode,
+        modes: {
+  user1: selectedTravelMode,
+  user2: selectedTravelMode
+},
         created: Date.now(),
         cancelled: false
       }).then(async () => {
