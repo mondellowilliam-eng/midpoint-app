@@ -484,7 +484,10 @@ function formatTravelMode(mode) {
       : (user2ETA
           ? user2ETA + " away" + (user2Distance ? " (" + formatDistance(user2Distance) + ")" : "")
           : "Connected");
-
+const arrivalMessage = getArrivalStatusMessage();
+  const approachingMessage = getApproachingMessage();
+  const closerText = getCloserStatus();
+  const usersDistance = getUsersDistance();
 box.innerHTML =
   '<div class="status-card">' +
 
@@ -505,10 +508,7 @@ box.innerHTML =
     (arrivalMessage ? '<div class="status-alert">' + arrivalMessage + '</div>' : '') +
 
   '</div>'; 
-  const arrivalMessage = getArrivalStatusMessage();
-  const approachingMessage = getApproachingMessage();
-  const closerText = getCloserStatus();
-  const usersDistance = getUsersDistance();
+  
 
   if (arrivalMessage) {
     box.innerHTML += "<br><br><strong>" + arrivalMessage + "</strong>";
