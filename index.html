@@ -1573,7 +1573,19 @@ user2TravelMode = selectedTravelMode;
         updateConnectionStatus();
       });
     }
+db.ref("sessions/" + sessionId + "/modes/user1").on("value", snapshot => {
+  if (snapshot.val()) {
+    user1TravelMode = snapshot.val();
+    updateTripSummary();
+  }
+});
 
+db.ref("sessions/" + sessionId + "/modes/user2").on("value", snapshot => {
+  if (snapshot.val()) {
+    user2TravelMode = snapshot.val();
+    updateTripSummary();
+  }
+});
     function checkLastSession() {
       const lastSession = localStorage.getItem("midpoint_last_session");
 
