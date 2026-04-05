@@ -407,13 +407,18 @@ checkLastSession();
       document.getElementById("placeKeyword").value = type;
     }
 
-  function setTravelMode(mode) {
+ function setTravelMode(mode) {
   selectedTravelMode = mode;
 
   if (selectedRole === "user1") {
     user1TravelMode = mode;
+
+    db.ref("sessions/" + currentSessionId + "/modes/user1").set(mode);
+
   } else if (selectedRole === "user2") {
     user2TravelMode = mode;
+
+    db.ref("sessions/" + currentSessionId + "/modes/user2").set(mode);
   }
 
   updateTravelModeButtons();
