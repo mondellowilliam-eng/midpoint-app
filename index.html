@@ -12,7 +12,28 @@
       font-family: Arial, sans-serif;
       background: #e6f0ff;
     }
+@media (max-width: 640px) {
+  .container {
+    padding: 14px;
+  }
 
+  .card {
+    padding: 14px;
+  }
+
+  #map {
+    height: 320px;
+  }
+
+  .action-row > * {
+    flex: 1 1 100%;
+  }
+
+  .filters button {
+    min-width: unset;
+    flex: 1 1 calc(50% - 8px);
+  }
+}
     header {
       background: #007BFF;
       padding: 18px 20px;
