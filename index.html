@@ -1360,7 +1360,7 @@ user2Arrived = false;
       );
     }
 
-    function joinLiveSession() {
+   function joinLiveSession() {
   if (!currentSessionId) {
     alert("No shared session loaded.");
     return;
@@ -1380,8 +1380,10 @@ user2Arrived = false;
       claimRole(function(role) {
         if (role === "user1") {
           user1TravelMode = selectedTravelMode;
+          db.ref("sessions/" + currentSessionId + "/modes/user1").set(selectedTravelMode);
         } else {
           user2TravelMode = selectedTravelMode;
+          db.ref("sessions/" + currentSessionId + "/modes/user2").set(selectedTravelMode);
         }
 
         const pos = {
@@ -1452,7 +1454,7 @@ user2Arrived = false;
       timeout: 10000
     }
   );
-}
+} 
     function updateConnectionStatus() {
   const box = document.getElementById("connectionStatus");
   if (!box) return;
