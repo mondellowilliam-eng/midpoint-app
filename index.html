@@ -761,10 +761,12 @@ function getDistanceMeters(lat1, lng1, lat2, lng2) {
       const sessionId = Math.random().toString(36).substring(2, 8);
 
       db.ref("sessions/" + sessionId).set({
-        destination: selectedShareDestination,
-        name: selectedShareName,
-        address1: document.getElementById("address1").value.trim(),
-        address2: document.getElementById("address2").value.trim(),
+       destination: selectedShareDestination,
+name: selectedShareName,
+destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
+destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
+address1: document.getElementById("address1").value.trim(),
+address2: document.getElementById("address2").value.trim(), 
         travelMode: selectedTravelMode,
         modes: {
   user1: selectedTravelMode,
