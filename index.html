@@ -792,56 +792,56 @@ checkLastSession();
     }
 
     function createSession() {
-      if (!selectedShareDestination) {
-        alert("Pick a place first.");
-        return;
+  if (!selectedShareDestination) {
+    alert("Pick a place first.");
+    return;
+  }
+
+  const sessionId = Math.random().toString(36).substring(2, 8);
+  const link = buildSessionLink(sessionId);
+
+  db.ref("sessions/" + sessionId).set({
+    destination: selectedShareDestination,
+    name: selectedShareName,
+    destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
+    destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
+    address1: document.getElementById("address1").value.trim(),
+    address2: document.getElementById("address2").value.trim(),
+    travelMode: selectedTravelMode,
+    modes: {
+      user1: selectedTravelMode,
+      user2: selectedTravelMode
+    },
+    created: Date.now(),
+    cancelled: false
+  }).then(async () => {
+
+    const message =
+      "📍 MidLink meetup invite\n" +
+      "Tap this link to open the app:\n" +
+      link;
+
+    localStorage.setItem("midlink_last_session", sessionId);
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "MidLink Session",
+          text: message,
+          url: link
+        });
+      } catch (err) {
+        prompt("Copy and send this session link:", link);
       }
-
-      const sessionId = Math.random().toString(36).substring(2, 8);
-      const link = buildSessionLink(sessionId);
-
-      db.ref("sessions/" + sessionId).set({
-        destination: selectedShareDestination,
-        name: selectedShareName,
-        destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
-        destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
-        address1: document.getElementById("address1").value.trim(),
-        address2: document.getElementById("address2").value.trim(),
-        travelMode: selectedTravelMode,
-        modes: {
-          user1: selectedTravelMode,
-          user2: selectedTravelMode
-        },
-        created: Date.now(),
-        cancelled: false
-      }).then(async () => {
-        const message =
-          "📍 MidLink meetup invite\n" +
-          "Tap this link to open the app:\n" +
-          link;
-
-        localStorage.setItem("Midlink_last_session", sessionId);
-
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: "MidLink Session",
-              text: message,
-              url: link
-            });
-          } catch (err) {
-            prompt("Copy and send this session link:", link);
-          }
-        } else {
-          prompt("Copy and send this session link:", link);
-        }
-
-        window.location.replace(link);
-      }).catch((error) => {
-        alert("Firebase error: " + error.message);
-      });
+    } else {
+      prompt("Copy and send this session link:", link);
     }
 
+    window.location.replace(link);
+  }).catch((error) => {
+    alert("Firebase error: " + error.message);
+  });
+}
     function recenterMap() {
       if (!map) return;
 
