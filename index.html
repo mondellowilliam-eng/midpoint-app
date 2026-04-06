@@ -409,10 +409,10 @@
     const db = firebase.database();
 
     const clientId = (() => {
-      const existing = localStorage.getItem("midlinkClientId");
+      const existing = localStorage.getItem("MidlinkClientId");
       if (existing) return existing;
       const created = "client_" + Math.random().toString(36).slice(2, 10);
-      localStorage.setItem("midlinkClientId", created);
+      localStorage.setItem("MidlinkClientId", created);
       return created;
     })();
 
