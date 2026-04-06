@@ -1144,11 +1144,38 @@ checkLastSession();
       const radii = [1000, 3000, 5000];
 
       function trySearch(index) {
-        if (index >= radii.length) {
-          document.getElementById("selectedPlace").innerHTML =
-            "No places found within 5 km of the midpoint.";
-          return;
-        }
+       if (index >= radii.length) {
+  selectedShareName = "Exact Midpoint";
+  selectedShareDestination = mid.lat.toFixed(6) + ", " + mid.lng.toFixed(6);
+  selectedDestinationLatLng = {
+    lat: mid.lat,
+    lng: mid.lng
+  };
+
+  if (destinationMarker) destinationMarker.setMap(null);
+
+  destinationMarker = new google.maps.Marker({
+    position: mid,
+    map: map,
+    title: "Exact Midpoint",
+    icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+  });
+
+  document.getElementById("selectedPlace").innerHTML =
+    "<strong>📍 No places found nearby</strong><br>" +
+    "Using the exact midpoint as the meetup location.<br>" +
+    selectedShareDestination +
+    '<div class="action-row">' +
+      '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
+      '<button class="secondary-btn" type="button" onclick="copySessionLink()">Copy Link</button>' +
+    '</div>';
+
+  lastRouteUpdate1 = 0;
+  lastRouteUpdate2 = 0;
+  refreshBothRoutes();
+  updateTripSummary();
+  return;
+}
 
         placesService.nearbySearch({
           location: mid,
