@@ -754,43 +754,44 @@ checkLastSession();
       return window.location.origin + window.location.pathname + "?session=" + sessionId;
     }
 
-    function copySessionLink() {
-      if (!selectedShareDestination) {
-        alert("Pick a place first.");
-        return;
-      }
+   function copySessionLink() {
+  if (!selectedShareDestination) {
+    alert("Pick a place first.");
+    return;
+  }
 
-      const sessionId = Math.random().toString(36).substring(2, 8);
-      const link = buildSessionLink(sessionId);
+  const sessionId = Math.random().toString(36).substring(2, 8);
+  const link = buildSessionLink(sessionId);
 
-      db.ref("sessions/" + sessionId).set({
-        destination: selectedShareDestination,
-        name: selectedShareName,
-        destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
-        destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
-        address1: document.getElementById("address1").value.trim(),
-        address2: document.getElementById("address2").value.trim(),
-        travelMode: selectedTravelMode,
-        modes: {
-          user1: selectedTravelMode,
-          user2: selectedTravelMode
-        },
-        created: Date.now(),
-        cancelled: false
-      }).then(() => {
-        localStorage.setItem("Midlink_last_session", sessionId);
+  db.ref("sessions/" + sessionId).set({
+    destination: selectedShareDestination,
+    name: selectedShareName,
+    destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
+    destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
+    address1: document.getElementById("address1").value.trim(),
+    address2: document.getElementById("address2").value.trim(),
+    travelMode: selectedTravelMode,
+    modes: {
+      user1: selectedTravelMode,
+      user2: selectedTravelMode
+    },
+    created: Date.now(),
+    cancelled: false
+  }).then(() => {
 
-        navigator.clipboard.writeText(link).then(() => {
-          document.getElementById("liveInfo").innerHTML =
-            '<span class="status-ok">Link copied! Paste it into a text message.</span>';
-        }).catch(() => {
-          prompt("Copy this session link:", link);
-        });
-      }).catch((error) => {
-        alert("Firebase error: " + error.message);
-      });
-    }
+    localStorage.setItem("midlink_last_session", sessionId);
 
+    navigator.clipboard.writeText(link).then(() => {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-ok">Link copied! Paste it into a text message.</span>';
+    }).catch(() => {
+      prompt("Copy this session link:", link);
+    });
+
+  }).catch((error) => {
+    alert("Firebase error: " + error.message);
+  });
+} 
     function createSession() {
   if (!selectedShareDestination) {
     alert("Pick a place first.");
