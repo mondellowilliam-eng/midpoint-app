@@ -1548,7 +1548,7 @@ user2Arrived = false;
       }
     }
 
-  function loadSession() {
+ function loadSession() {
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get("session");
 
@@ -1575,8 +1575,6 @@ user2Arrived = false;
     user1TravelMode = (data.modes && data.modes.user1) ? data.modes.user1 : selectedTravelMode;
     user2TravelMode = (data.modes && data.modes.user2) ? data.modes.user2 : selectedTravelMode;
 
-    updateTravelModeButtons();
-
     if (data.address1) document.getElementById("address1").value = data.address1;
     if (data.address2) document.getElementById("address2").value = data.address2;
 
@@ -1596,21 +1594,21 @@ user2Arrived = false;
 
         '<strong>Choose Your Travel Mode:</strong>' +
         '<div class="action-row">' +
-  '<button id="modeDriving" class="action-link" type="button" onclick="setTravelMode(\'DRIVING\')">🚗 Driving</button>' +
-  '<button id="modeTransit" class="session-btn" type="button" onclick="setTravelMode(\'TRANSIT\')">🚌 Transit</button>' +
-  '<button id="modeWalking" class="secondary-btn" type="button" onclick="setTravelMode(\'WALKING\')">🚶 Walking</button>' +
-'</div>' +
+          '<button id="modeDriving" class="action-link" type="button" onclick="setTravelMode(\'DRIVING\')">🚗 Driving</button>' +
+          '<button id="modeTransit" class="session-btn" type="button" onclick="setTravelMode(\'TRANSIT\')">🚌 Transit</button>' +
+          '<button id="modeWalking" class="secondary-btn" type="button" onclick="setTravelMode(\'WALKING\')">🚶 Walking</button>' +
+        '</div>' +
 
-
-'<button class="live-btn" type="button" onclick="joinLiveSession()">Start Live Sharing</button>'
-
+        '<strong style="display:block; margin-top:12px;">Trip Controls:</strong>' +
         '<div class="action-row">' +
-          '<button class="live-btn" type="button" onclick="joinLiveSession()">Start Live Sharing</button>'
+          '<button class="live-btn" type="button" onclick="joinLiveSession()">Start Live Sharing</button>' +
           '<button class="action-link" type="button" onclick="openMyRoute()">Open My Route</button>' +
           '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
           '<button class="danger-btn" type="button" onclick="cancelTrip()">Cancel Trip</button>' +
         '</div>' +
       '</div>';
+
+    updateTravelModeButtons();
 
     if (data.name && data.destination) {
       document.getElementById("selectedPlace").innerHTML =
@@ -1638,7 +1636,7 @@ user2Arrived = false;
 
     updateConnectionStatus();
   });
-} 
+}
     function checkLastSession() {
       const lastSession = localStorage.getItem("midpoint_last_session");
 
