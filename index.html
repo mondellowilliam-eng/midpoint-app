@@ -790,51 +790,58 @@ address2: document.getElementById("address2").value.trim(),
       });
     }
 
-    function createSession() {
-      if (!selectedShareDestination) {
-        alert("Pick a place first.");
-        return;
+   function createSession() {
+  if (!selectedShareDestination) {
+    alert("Pick a place first.");
+    return;
+  }
+
+  const sessionId = Math.random().toString(36).substring(2, 8);
+
+  db.ref("sessions/" + sessionId).set({
+    destination: selectedShareDestination,
+    name: selectedShareName,
+    destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
+    destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
+    address1: document.getElementById("address1").value.trim(),
+    address2: document.getElementById("address2").value.trim(),
+    travelMode: selectedTravelMode,
+    modes: {
+      user1: selectedTravelMode,
+      user2: selectedTravelMode
+    },
+    created: Date.now(),
+    cancelled: false
+  }).then(async () => {
+
+    const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+
+    const message =
+      "📍 MidLink meetup invite\n" +
+      "Tap this link to open the app:\n" +
+      link;
+
+    localStorage.setItem("midpoint_last_session", sessionId);
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "MidLink Session",
+          text: message
+        });
+      } catch (err) {
+        prompt("Copy and send this session link:", link);
       }
-
-      const sessionId = Math.random().toString(36).substring(2, 8);
-
-      db.ref("sessions/" + sessionId).set({
-        destination: selectedShareDestination,
-        name: selectedShareName,
-        address1: document.getElementById("address1").value.trim(),
-        address2: document.getElementById("address2").value.trim(),
-        travelMode: selectedTravelMode,
-        modes: {
-  user1: selectedTravelMode,
-  user2: selectedTravelMode
-},
-        created: Date.now(),
-        cancelled: false
-      }).then(async () => {
-        const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
-        const message = "📍 Midpoint meetup invite\nTap this link to open the app:\n" + link;
-
-        localStorage.setItem("midpoint_last_session", sessionId);
-
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: "Midpoint Session",
-              text: message
-            });
-          } catch (err) {
-            prompt("Copy and send this session link:", link);
-          }
-        } else {
-          prompt("Copy and send this session link:", link);
-        }
-
-        window.location.href = "?session=" + sessionId;
-      }).catch((error) => {
-        alert("Firebase error: " + error.message);
-      });
+    } else {
+      prompt("Copy and send this session link:", link);
     }
 
+    window.location.replace(window.location.pathname + "?session=" + sessionId);
+
+  }).catch((error) => {
+    alert("Firebase error: " + error.message);
+  });
+}
   function recenterMap() {
   if (!map) return;
 
