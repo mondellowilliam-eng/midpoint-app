@@ -1236,10 +1236,14 @@ user2Arrived = false;
         userNumber === 1 ? user1TravelMode : user2TravelMode
       ]
     },
-    function(result, status) {
-      if (status !== "OK") return;
+   function(result, status) {
+  if (status !== "OK") {
+    document.getElementById("liveInfo").innerHTML =
+      '<span class="status-error">Route error: ' + status + '</span>';
+    return;
+  }
 
-      const durationText = result.routes[0].legs[0].duration.text;
+  const durationText = result.routes[0].legs[0].duration.text; 
 
       if (userNumber === 1) {
         user1ETA = durationText;
