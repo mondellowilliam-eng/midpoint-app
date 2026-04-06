@@ -412,7 +412,7 @@
       const existing = localStorage.getItem("midlinkClientId");
       if (existing) return existing;
       const created = "client_" + Math.random().toString(36).slice(2, 10);
-      localStorage.setItem("idlinkClientId", created);
+     localStorage.setItem("midlinkClientId", created);
       return created;
     })();
 
