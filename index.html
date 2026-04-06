@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
- <title>MidLink</title>
+  <title>MidLink</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="midpoint_icon.png">
 
@@ -12,104 +12,82 @@
       font-family: Arial, sans-serif;
       background: #e6f0ff;
     }
-@media (max-width: 640px) {
-  .container {
-    padding: 14px;
-  }
 
-  .card {
-    padding: 14px;
-  }
+    header {
+      background: #007BFF;
+      padding: 22px 20px 18px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+    }
 
-  #map {
-    height: 320px;
-  }
+    header .logo {
+      width: 90px;
+      display: block;
+      margin: 0 auto 6px;
+    }
 
-  .action-row > * {
-    flex: 1 1 100%;
-  }
+    .app-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
 
-  .filters button {
-    min-width: unset;
-    flex: 1 1 calc(50% - 8px);
-  }
-}
- header {
-  background: #007BFF;
-  padding: 22px 20px 18px;
-  text-align: center;
-  color: white;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
-}
+    header .subtitle {
+      font-size: 14px;
+      opacity: 0.95;
+      margin-top: 4px;
+    }
 
-header .logo {
-  width: 90px;
-  display: block;
-  margin: 0 auto 6px;
-}
+    .container {
+      padding: 18px;
+      max-width: 760px;
+      margin: auto;
+    }
 
-.app-title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
+    .card {
+      background: white;
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      border: 1px solid #dbe7f7;
+    }
 
-header .subtitle {
-  font-size: 14px;
-  opacity: 0.95;
-  margin-top: 4px;
-} 
-   .container {
-  padding: 18px;
-  max-width: 760px;
-  margin: auto;
-}
+    .instructions {
+      font-size: 14px;
+      color: #0b3c5d;
+      background: #dbeeff;
+      border: 1px solid #a8d0ff;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
 
-  .card {
-  background: white;
-  padding: 18px;
-  border-radius: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-  border: 1px solid #dbe7f7;
-}
+    input,
+    button,
+    .place-list-btn {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 10px 0;
+      box-sizing: border-box;
+      font-size: 16px;
+      border-radius: 10px;
+    }
 
-  .instructions {
-  font-size: 14px;
-  color: #0b3c5d;
-  background: #dbeeff;
-  border: 1px solid #a8d0ff;
-  padding: 14px;
-  border-radius: 12px;
-  margin-bottom: 16px;
-  line-height: 1.6;
-}
-#findBtn {
-  font-weight: 700;
-  min-height: 46px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-}
- input,
-button,
-.place-list-btn {
-  width: 100%;
-  padding: 12px 14px;
-  margin: 10px 0;
-  box-sizing: border-box;
-  font-size: 16px;
-  border-radius: 10px;
-}
-input {
-  border: 1px solid #c9d8ee;
-  background: #ffffff;
-}
+    input {
+      border: 1px solid #c9d8ee;
+      background: #ffffff;
+    }
 
-input:focus {
-  outline: none;
-  border-color: #007BFF;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.12);
-}
+    input:focus {
+      outline: none;
+      border-color: #007BFF;
+      box-shadow: 0 0 0 3px rgba(0,123,255,0.12);
+    }
+
     button,
     .place-list-btn {
       border: none;
@@ -124,6 +102,12 @@ input:focus {
       background: #0062cc;
     }
 
+    #findBtn {
+      font-weight: 700;
+      min-height: 46px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
     .filters {
       display: flex;
       flex-wrap: wrap;
@@ -131,71 +115,72 @@ input:focus {
       margin: 10px 0;
     }
 
-   .filters button {
-  flex: 1 1 auto;
-  min-width: 90px;
-  background: #f1f7ff;
-  color: #1976d2;
-  border-radius: 20px;
-  font-size: 14px;
-  padding: 8px 10px;
-  transition: all 0.2s ease;
-}
-  .filters button:hover {
-  background: #d6eaff;
-}  
+    .filters button {
+      flex: 1 1 auto;
+      min-width: 90px;
+      background: #f1f7ff;
+      color: #1976d2;
+      border-radius: 20px;
+      font-size: 14px;
+      padding: 8px 10px;
+      transition: all 0.2s ease;
+    }
+
+    .filters button:hover {
+      background: #d6eaff;
+    }
 
     .mode-active {
-  background: #007BFF !important;
-  color: white !important;
-  box-shadow: 0 2px 6px rgba(0,123,255,0.3);
-}
+      background: #007BFF !important;
+      color: white !important;
+      box-shadow: 0 2px 6px rgba(0,123,255,0.3);
+    }
 
     #map {
-  height: 420px;
-  margin-top: 18px;
-  border-radius: 14px;
-}
+      height: 420px;
+      margin-top: 18px;
+      border-radius: 14px;
+    }
 
-   #selectedPlace {
-  margin-top: 14px;
-  padding: 14px;
-  background: #e8f5e9;
-  border-radius: 10px;
-  line-height: 1.6;
-  min-height: 24px;
-  border: 1px solid #c8e6c9;
-}
+    #selectedPlace {
+      margin-top: 14px;
+      padding: 14px;
+      background: #e8f5e9;
+      border-radius: 10px;
+      line-height: 1.6;
+      min-height: 24px;
+      border: 1px solid #c8e6c9;
+    }
 
-   .action-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
 
-.action-row > * {
-  flex: 1 1 160px;
-}
+    .action-row > * {
+      flex: 1 1 160px;
+    }
 
     .session-btn,
-.live-btn,
-.action-link,
-.secondary-btn,
-.danger-btn {
-  display: inline-block;
-  padding: 12px 14px;
-  border-radius: 10px;
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  color: white;
-  width: auto;
-  min-height: 44px;
-}
+    .live-btn,
+    .action-link,
+    .secondary-btn,
+    .danger-btn {
+      display: inline-block;
+      padding: 12px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      width: auto;
+      min-height: 44px;
+    }
 
     .session-btn { background: #6f42c1; }
     .live-btn { background: #ff7a00; }
@@ -203,14 +188,14 @@ input:focus {
     .secondary-btn { background: #0f766e; }
     .danger-btn { background: #c62828; }
 
-   #distanceInfo,
-#liveInfo,
-#connectionStatus {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #333;
-  line-height: 1.5;
-}
+    #distanceInfo,
+    #liveInfo,
+    #connectionStatus {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
 
     #connectionStatus {
       background: #f5f9ff;
@@ -228,22 +213,24 @@ input:focus {
       margin-left: 8px;
     }
 
-   .top-pick {
-  background: #fff8e1;
-  border: 1px solid #f2d675;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-   .shared-box {
-  background: #eef6ff;
-  border: 1px solid #9cc3ff;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 14px;
-  line-height: 1.6;
-}
+    .top-pick {
+      background: #fff8e1;
+      border: 1px solid #f2d675;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .shared-box {
+      background: #eef6ff;
+      border: 1px solid #9cc3ff;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
     .status-ok {
       color: #1a7f37;
       font-weight: bold;
@@ -259,97 +246,101 @@ input:focus {
       font-weight: bold;
     }
 
-  .place-list-btn {
-  margin-bottom: 10px;
-  text-align: left;
-  background: #ffffff;
-  color: #0b3c5d;
-  border: 1px solid #dbe7f7;
-  border-radius: 10px;
-  padding: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-.place-list-btn:hover {
-  background: #f1f7ff;
-  border-color: #007BFF;
-}    
-  .status-card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 14px;
-  margin-top: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  border: 1px solid #e8eef7;
-} 
+    .place-list-btn {
+      margin-bottom: 10px;
+      text-align: left;
+      background: #ffffff;
+      color: #0b3c5d;
+      border: 1px solid #dbe7f7;
+      border-radius: 10px;
+      padding: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
 
-.status-title {
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #0b3c5d;
-}
+    .place-list-btn:hover {
+      background: #f1f7ff;
+      border-color: #007BFF;
+    }
 
-.status-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
+    .status-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      border: 1px solid #e8eef7;
+    }
 
-.mode-tag {
-  font-size: 12px;
-  color: #555;
-}
+    .status-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #0b3c5d;
+    }
 
-.status-alert {
-  margin-top: 10px;
-  padding: 8px;
-  background: #e8f5e9;
-  border-radius: 8px;
-  font-weight: bold;
-}   
- @media (max-width: 640px) {
-  .container {
-    padding: 14px;
-  }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
 
-  .card {
-    padding: 14px;
-  }
+    .mode-tag {
+      font-size: 12px;
+      color: #555;
+    }
 
-  #map {
-    height: 320px;
-  }
+    .status-alert {
+      margin-top: 10px;
+      padding: 8px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      font-weight: bold;
+    }
 
-  .action-row > * {
-    flex: 1 1 100%;
-  }
+    @media (max-width: 640px) {
+      .container {
+        padding: 14px;
+      }
 
-  .filters button {
-    flex: 1 1 calc(50% - 8px);
-    min-width: unset;
-  }
-}   
+      .card {
+        padding: 14px;
+      }
+
+      #map {
+        height: 320px;
+      }
+
+      .action-row > * {
+        flex: 1 1 100%;
+      }
+
+      .filters button {
+        flex: 1 1 calc(50% - 8px);
+        min-width: unset;
+      }
+    }
   </style>
 </head>
 <body>
 
- <header>
-  <img src="midpoint_icon.png" alt="MidLink Logo" class="logo">
-  <h1 class="app-title">MidLink</h1>
-  <div class="subtitle">Meet halfway. Share live locations and routes instantly.</div>
-</header>
+  <header>
+    <img src="midpoint_icon.png" alt="MidLink Logo" class="logo">
+    <h1 class="app-title">MidLink</h1>
+    <div class="subtitle">Meet halfway. Share live locations and routes instantly.</div>
+  </header>
 
   <div class="container">
     <div class="card">
-   <div class="instructions">
-  <strong>How it works:</strong><br>
-  Enter two starting points → tap <strong>Find Meetup Spot</strong> → choose a meetup place → tap <strong>Share Session</strong> or <strong>Copy Link</strong> → open the shared link on both phones → choose your travel mode → tap <strong>Start Live Sharing</strong> to start live sharing → tap <strong>Open Navigation</strong> to open directions in Google Maps.<br><br>
-  <small>
-    Works with regular addresses, coordinates, and full Google Maps links.<br>
-    Not supported yet: shortened maps.app.goo.gl links.
-  </small>
-</div>
+      <div class="instructions">
+        <strong>How it works:</strong><br>
+        Enter two starting points → tap <strong>Find Meetup Spot</strong> → choose a meetup place → tap <strong>Share Session</strong> or <strong>Copy Link</strong> → open the shared link on both phones → choose your travel mode → tap <strong>Start Live Sharing</strong> → tap <strong>Open Navigation</strong> to open directions in Google Maps.<br><br>
+        <small>
+          Works with regular addresses, coordinates, and full Google Maps links.<br>
+          Not supported yet: shortened maps.app.goo.gl links.
+        </small>
+      </div>
+
       <div id="sharedSessionInfo"></div>
 
       <input id="address1" placeholder="First location" autocomplete="off" class="setup-only">
@@ -360,20 +351,18 @@ input:focus {
 
       <input id="placeKeyword" placeholder="What kind of place? Coffee, pizza, park..." class="setup-only">
 
-     <div class="filters setup-only">
-  <button type="button" onclick="setFilter('coffee')">☕ Coffee</button>
-  <button type="button" onclick="setFilter('food')">🍽️ Food</button>
-  <button type="button" onclick="setFilter('drinks')">🍹 Drinks</button>
-  <button type="button" onclick="setFilter('dessert')">🍰 Dessert</button>
-  <button type="button" onclick="setFilter('park')">🌳 Park</button>
-</div>
+      <div class="filters setup-only">
+        <button type="button" onclick="setFilter('coffee')">☕ Coffee</button>
+        <button type="button" onclick="setFilter('food')">🍽️ Food</button>
+        <button type="button" onclick="setFilter('drinks')">🍹 Drinks</button>
+        <button type="button" onclick="setFilter('dessert')">🍰 Dessert</button>
+        <button type="button" onclick="setFilter('park')">🌳 Park</button>
+      </div>
 
       <div id="weightWrap" class="setup-only">
         <label for="weightSlider">Adjust midpoint <span id="weightValue">50%</span></label>
         <input type="range" id="weightSlider" min="0" max="100" value="50">
       </div>
-
-      
 
       <button id="findBtn" type="button" onclick="findMidpoint()" class="setup-only">Find Meetup Spot</button>
 
@@ -436,18 +425,20 @@ input:focus {
     let latestUser2Pos = null;
     let user1Distance = null;
     let user2Distance = null;
-    
+
     let user1ETA = null;
     let user2ETA = null;
     let user1Arrived = false;
-let user2Arrived = false;
+    let user2Arrived = false;
+
     let currentPlaces = [];
     let lastRouteUpdate1 = 0;
     let lastRouteUpdate2 = 0;
     const ROUTE_UPDATE_MS = 8000;
+
     let selectedTravelMode = "DRIVING";
     let user1TravelMode = "DRIVING";
-let user2TravelMode = "DRIVING";
+    let user2TravelMode = "DRIVING";
     let cancelListenerRef = null;
 
     function initMap() {
@@ -489,192 +480,196 @@ let user2TravelMode = "DRIVING";
         document.getElementById("weightValue").textContent = this.value + "%";
       });
 
-     updateTravelModeButtons();
-loadSession();
-setInterval(checkTrackingHealth, 5000);
-checkLastSession();
+      updateTravelModeButtons();
+      loadSession();
+      setInterval(checkTrackingHealth, 5000);
+      checkLastSession();
     }
 
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
     }
 
- function setTravelMode(mode) {
-  selectedTravelMode = mode;
+    function setTravelMode(mode) {
+      selectedTravelMode = mode;
 
-  if (selectedRole === "user1") {
-    user1TravelMode = mode;
+      if (selectedRole === "user1") {
+        user1TravelMode = mode;
+        db.ref("sessions/" + currentSessionId + "/modes/user1").set(mode);
+      } else if (selectedRole === "user2") {
+        user2TravelMode = mode;
+        db.ref("sessions/" + currentSessionId + "/modes/user2").set(mode);
+      }
 
-    db.ref("sessions/" + currentSessionId + "/modes/user1").set(mode);
+      updateTravelModeButtons();
 
-  } else if (selectedRole === "user2") {
-    user2TravelMode = mode;
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-ok">Travel mode set to ' +
+        (mode === "WALKING" ? "Walking" : mode === "TRANSIT" ? "Transit" : "Driving") +
+        '.</span>';
 
-    db.ref("sessions/" + currentSessionId + "/modes/user2").set(mode);
-  }
+      lastRouteUpdate1 = 0;
+      lastRouteUpdate2 = 0;
+      refreshBothRoutes();
+    }
 
-  updateTravelModeButtons();
+    function formatDistance(meters) {
+      if (meters === null) return "";
 
-  document.getElementById("liveInfo").innerHTML =
-    '<span class="status-ok">Travel mode set to ' +
-    (mode === "WALKING" ? "Walking" : mode === "TRANSIT" ? "Transit" : "Driving") +
-    '.</span>';
+      if (meters < 1000) {
+        return Math.round(meters) + " m";
+      }
 
-  lastRouteUpdate1 = 0;
-  lastRouteUpdate2 = 0;
-  refreshBothRoutes();
-}
-function formatDistance(meters) {
-  if (meters === null) return "";
+      return (meters / 1000).toFixed(1) + " km";
+    }
 
-  if (meters < 1000) {
-    return Math.round(meters) + " m";
-  }
+    function updateTravelModeButtons() {
+      const drivingBtn = document.getElementById("modeDriving");
+      const walkingBtn = document.getElementById("modeWalking");
+      const transitBtn = document.getElementById("modeTransit");
 
-  return (meters / 1000).toFixed(1) + " km";
-}
-   function updateTravelModeButtons() {
-  const drivingBtn = document.getElementById("modeDriving");
-  const walkingBtn = document.getElementById("modeWalking");
-  const transitBtn = document.getElementById("modeTransit");
+      if (!drivingBtn || !walkingBtn || !transitBtn) return;
 
-  if (!drivingBtn || !walkingBtn || !transitBtn) return;
+      drivingBtn.classList.toggle("mode-active", selectedTravelMode === "DRIVING");
+      walkingBtn.classList.toggle("mode-active", selectedTravelMode === "WALKING");
+      transitBtn.classList.toggle("mode-active", selectedTravelMode === "TRANSIT");
+    }
 
-  drivingBtn.classList.toggle("mode-active", selectedTravelMode === "DRIVING");
-  walkingBtn.classList.toggle("mode-active", selectedTravelMode === "WALKING");
-  transitBtn.classList.toggle("mode-active", selectedTravelMode === "TRANSIT");
-} 
     function hideSetupControls() {
       document.querySelectorAll(".setup-only").forEach(el => {
         el.style.display = "none";
       });
     }
-function formatTravelMode(mode) {
-  if (mode === "WALKING") return "Walking";
-  if (mode === "TRANSIT") return "Transit";
-  return "Driving";
-}
-    function updateTripSummary() {
-  const box = document.getElementById("tripSummary");
-  if (!box) return;
 
-  if (!selectedShareDestination) {
-    box.style.display = "none";
-    box.innerHTML = "";
-    return;
-  }
-
-  box.style.display = "block";
-
-  const person1Text = !latestUser1Pos
-    ? "Waiting for location"
-    : user1Arrived
-      ? "Arrived"
-      : (user1ETA
-          ? user1ETA + " away" + (user1Distance ? " (" + formatDistance(user1Distance) + ")" : "")
-          : "Connected");
-
-  const person2Text = !latestUser2Pos
-    ? "Waiting for location"
-    : user2Arrived
-      ? "Arrived"
-      : (user2ETA
-          ? user2ETA + " away" + (user2Distance ? " (" + formatDistance(user2Distance) + ")" : "")
-          : "Connected");
-const arrivalMessage = getArrivalStatusMessage();
-  const approachingMessage = getApproachingMessage();
-  const closerText = getCloserStatus();
-  const usersDistance = getUsersDistance();
-box.innerHTML =
-  '<div class="status-card">' +
-
-    '<div class="status-title">📍 Live Meetup</div>' +
-
-    '<div class="status-row">' +
-      '<div><strong>Person 1</strong><br>' +
-      person1Text + '<br>' +
-      '<span class="mode-tag">' + formatTravelMode(user1TravelMode) + '</span></div>' +
-    '</div>' +
-
-    '<div class="status-row">' +
-      '<div><strong>Person 2</strong><br>' +
-      person2Text + '<br>' +
-      '<span class="mode-tag">' + formatTravelMode(user2TravelMode) + '</span></div>' +
-    '</div>' +
-
-    (arrivalMessage ? '<div class="status-alert">' + arrivalMessage + '</div>' : '') +
-
-  '</div>'; 
-  
-
-  if (arrivalMessage) {
-    box.innerHTML += "<br><br><strong>" + arrivalMessage + "</strong>";
-  } else if (approachingMessage) {
-    box.innerHTML += "<br><br><strong>" + approachingMessage + "</strong>";
-  } else if (closerText) {
-    box.innerHTML += "<br><br><strong>" + closerText + "</strong>";
-  }
-
-  if (usersDistance) {
-    box.innerHTML += "<br><br>" + usersDistance;
-  }
-}
-function getCloserStatus() {
-  if (!user1ETA || !user2ETA) return "";
-
-  function etaToMinutes(text) {
-    text = text.toLowerCase();
-
-    let total = 0;
-
-    const hourMatch = text.match(/(\d+)\s*hour/);
-    const minMatch = text.match(/(\d+)\s*min/);
-
-    if (hourMatch) total += parseInt(hourMatch[1], 10) * 60;
-    if (minMatch) total += parseInt(minMatch[1], 10);
-
-    // handle cases like "1 hour" with no mins, or "9 mins"
-    if (!hourMatch && !minMatch) {
-      const onlyNumber = text.match(/\d+/);
-      if (onlyNumber) total = parseInt(onlyNumber[0], 10);
+    function formatTravelMode(mode) {
+      if (mode === "WALKING") return "Walking";
+      if (mode === "TRANSIT") return "Transit";
+      return "Driving";
     }
 
-    return total || null;
-  }
+    function updateTripSummary() {
+      const box = document.getElementById("tripSummary");
+      if (!box) return;
 
-  const m1 = etaToMinutes(user1ETA);
-  const m2 = etaToMinutes(user2ETA);
+      if (!selectedShareDestination) {
+        box.style.display = "none";
+        box.innerHTML = "";
+        return;
+      }
 
-  if (m1 === null || m2 === null) return "";
+      box.style.display = "block";
 
-  if (Math.abs(m1 - m2) <= 1) {
-    return "🟡 Both are about the same distance";
-  }
+      const person1Text = !latestUser1Pos
+        ? "Waiting for location"
+        : user1Arrived
+          ? "Arrived"
+          : (user1ETA
+              ? user1ETA + " away" + (user1Distance ? " (" + formatDistance(user1Distance) + ")" : "")
+              : "Connected");
 
-  return m1 < m2
-    ? "🟢 Person 1 is closer"
-    : "🟠 Person 2 is closer";
-}
+      const person2Text = !latestUser2Pos
+        ? "Waiting for location"
+        : user2Arrived
+          ? "Arrived"
+          : (user2ETA
+              ? user2ETA + " away" + (user2Distance ? " (" + formatDistance(user2Distance) + ")" : "")
+              : "Connected");
+
+      const arrivalMessage = getArrivalStatusMessage();
+      const approachingMessage = getApproachingMessage();
+      const closerText = getCloserStatus();
+      const usersDistance = getUsersDistance();
+
+      box.innerHTML =
+        '<div class="status-card">' +
+          '<div class="status-title">📍 Live Meetup</div>' +
+
+          '<div class="status-row">' +
+            '<div><strong>Person 1</strong><br>' +
+            person1Text + '<br>' +
+            '<span class="mode-tag">' + formatTravelMode(user1TravelMode) + '</span></div>' +
+          '</div>' +
+
+          '<div class="status-row">' +
+            '<div><strong>Person 2</strong><br>' +
+            person2Text + '<br>' +
+            '<span class="mode-tag">' + formatTravelMode(user2TravelMode) + '</span></div>' +
+          '</div>' +
+
+          (arrivalMessage ? '<div class="status-alert">' + arrivalMessage + '</div>' : '') +
+        '</div>';
+
+      if (arrivalMessage) {
+        box.innerHTML += "<br><br><strong>" + arrivalMessage + "</strong>";
+      } else if (approachingMessage) {
+        box.innerHTML += "<br><br><strong>" + approachingMessage + "</strong>";
+      } else if (closerText) {
+        box.innerHTML += "<br><br><strong>" + closerText + "</strong>";
+      }
+
+      if (usersDistance) {
+        box.innerHTML += "<br><br>" + usersDistance;
+      }
+    }
+
+    function getCloserStatus() {
+      if (!user1ETA || !user2ETA) return "";
+
+      function etaToMinutes(text) {
+        text = text.toLowerCase();
+
+        let total = 0;
+        const hourMatch = text.match(/(\d+)\s*hour/);
+        const minMatch = text.match(/(\d+)\s*min/);
+
+        if (hourMatch) total += parseInt(hourMatch[1], 10) * 60;
+        if (minMatch) total += parseInt(minMatch[1], 10);
+
+        if (!hourMatch && !minMatch) {
+          const onlyNumber = text.match(/\d+/);
+          if (onlyNumber) total = parseInt(onlyNumber[0], 10);
+        }
+
+        return total || null;
+      }
+
+      const m1 = etaToMinutes(user1ETA);
+      const m2 = etaToMinutes(user2ETA);
+
+      if (m1 === null || m2 === null) return "";
+
+      if (Math.abs(m1 - m2) <= 1) {
+        return "🟡 Both are about the same distance";
+      }
+
+      return m1 < m2
+        ? "🟢 Person 1 is closer"
+        : "🟠 Person 2 is closer";
+    }
+
     function clearRouteLines() {
       if (directionsRenderer1) directionsRenderer1.set("directions", null);
       if (directionsRenderer2) directionsRenderer2.set("directions", null);
+
       latestUser1Pos = null;
       latestUser2Pos = null;
       user1ETA = null;
       user2ETA = null;
-     user1Distance = null;
-user2Distance = null; 
+      user1Distance = null;
+      user2Distance = null;
       lastRouteUpdate1 = 0;
       lastRouteUpdate2 = 0;
-     user1Arrived = false;
-user2Arrived = false; 
- }      
-function getArrivalStatusMessage() {
-  if (user1Arrived && user2Arrived) {
-    return "🎉 Both have arrived!";
-  }
-  return "";
-}
+      user1Arrived = false;
+      user2Arrived = false;
+    }
+
+    function getArrivalStatusMessage() {
+      if (user1Arrived && user2Arrived) {
+        return "🎉 Both have arrived!";
+      }
+      return "";
+    }
+
     function clearMarkers() {
       markers.forEach(m => m.setMap(null));
       markers = [];
@@ -700,41 +695,44 @@ function getArrivalStatusMessage() {
       document.getElementById("distanceInfo").innerHTML = "";
       updateTripSummary();
     }
-function getApproachingMessage() {
-  if (!user1ETA || !user2ETA) return "";
 
-  const getMinutes = (text) => {
-    const match = text.match(/\d+/);
-    return match ? parseInt(match[0]) : null;
-  };
+    function getApproachingMessage() {
+      if (!user1ETA || !user2ETA) return "";
 
-  const m1 = getMinutes(user1ETA);
-  const m2 = getMinutes(user2ETA);
+      const getMinutes = (text) => {
+        const match = text.match(/\d+/);
+        return match ? parseInt(match[0], 10) : null;
+      };
 
-  if (m1 === null || m2 === null) return "";
+      const m1 = getMinutes(user1ETA);
+      const m2 = getMinutes(user2ETA);
 
-  if (m1 <= 5 && m2 <= 5) {
-    return "⏳ Both are about 5 minutes away";
-  }
+      if (m1 === null || m2 === null) return "";
 
-  return "";
-}
-   function getUsersDistance() {
-  if (!latestUser1Pos || !latestUser2Pos) return "";
+      if (m1 <= 5 && m2 <= 5) {
+        return "⏳ Both are about 5 minutes away";
+      }
 
-  const meters = getDistanceMeters(
-    latestUser1Pos.lat,
-    latestUser1Pos.lng,
-    latestUser2Pos.lat,
-    latestUser2Pos.lng
-  );
+      return "";
+    }
 
-  if (meters < 1000) {
-    return "📏 Straight-line distance: " + Math.round(meters) + " m";
-  }
+    function getUsersDistance() {
+      if (!latestUser1Pos || !latestUser2Pos) return "";
 
-  return "📏 Straight-line distance: " + (meters / 1000).toFixed(1) + " km";
-}
+      const meters = getDistanceMeters(
+        latestUser1Pos.lat,
+        latestUser1Pos.lng,
+        latestUser2Pos.lat,
+        latestUser2Pos.lng
+      );
+
+      if (meters < 1000) {
+        return "📏 Straight-line distance: " + Math.round(meters) + " m";
+      }
+
+      return "📏 Straight-line distance: " + (meters / 1000).toFixed(1) + " km";
+    }
+
     function getDistanceKm(lat1, lng1, lat2, lng2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -749,137 +747,137 @@ function getApproachingMessage() {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
-function getDistanceMeters(lat1, lng1, lat2, lng2) {
-  return getDistanceKm(lat1, lng1, lat2, lng2) * 1000;
-}
-   function copySessionLink() {
-  if (!selectedShareDestination) {
-    alert("Pick a place first.");
-    return;
-  }
 
-  const sessionId = Math.random().toString(36).substring(2, 8);
+    function getDistanceMeters(lat1, lng1, lat2, lng2) {
+      return getDistanceKm(lat1, lng1, lat2, lng2) * 1000;
+    }
 
-  db.ref("sessions/" + sessionId).set({
-    destination: selectedShareDestination,
-    name: selectedShareName,
-    destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
-    destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
-    address1: document.getElementById("address1").value.trim(),
-    address2: document.getElementById("address2").value.trim(),
-    travelMode: selectedTravelMode,
-    modes: {
-      user1: selectedTravelMode,
-      user2: selectedTravelMode
-    },
-    created: Date.now(),
-    cancelled: false
-  }).then(() => {
-
-    const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
-
-    localStorage.setItem("midpoint_last_session", sessionId);
-
-    navigator.clipboard.writeText(link).then(() => {
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-ok">Link copied! Paste it into a text message.</span>';
-    }).catch(() => {
-      prompt("Copy this session link:", link);
-    });
-
-  }).catch((error) => {
-    alert("Firebase error: " + error.message);
-  });
-}
-   function createSession() {
-  if (!selectedShareDestination) {
-    alert("Pick a place first.");
-    return;
-  }
-
-  const sessionId = Math.random().toString(36).substring(2, 8);
-
-  db.ref("sessions/" + sessionId).set({
-    destination: selectedShareDestination,
-    name: selectedShareName,
-    destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
-    destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
-    address1: document.getElementById("address1").value.trim(),
-    address2: document.getElementById("address2").value.trim(),
-    travelMode: selectedTravelMode,
-    modes: {
-      user1: selectedTravelMode,
-      user2: selectedTravelMode
-    },
-    created: Date.now(),
-    cancelled: false
-  }).then(async () => {
-
-    const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
-
-    const message =
-      "📍 MidLink meetup invite\n" +
-      "Tap this link to open the app:\n" +
-      link;
-
-    localStorage.setItem("midpoint_last_session", sessionId);
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "MidLink Session",
-          text: message
-        });
-      } catch (err) {
-        prompt("Copy and send this session link:", link);
+    function copySessionLink() {
+      if (!selectedShareDestination) {
+        alert("Pick a place first.");
+        return;
       }
-    } else {
-      prompt("Copy and send this session link:", link);
+
+      const sessionId = Math.random().toString(36).substring(2, 8);
+
+      db.ref("sessions/" + sessionId).set({
+        destination: selectedShareDestination,
+        name: selectedShareName,
+        destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
+        destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
+        address1: document.getElementById("address1").value.trim(),
+        address2: document.getElementById("address2").value.trim(),
+        travelMode: selectedTravelMode,
+        modes: {
+          user1: selectedTravelMode,
+          user2: selectedTravelMode
+        },
+        created: Date.now(),
+        cancelled: false
+      }).then(() => {
+        const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
+
+        localStorage.setItem("midpoint_last_session", sessionId);
+
+        navigator.clipboard.writeText(link).then(() => {
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-ok">Link copied! Paste it into a text message.</span>';
+        }).catch(() => {
+          prompt("Copy this session link:", link);
+        });
+      }).catch((error) => {
+        alert("Firebase error: " + error.message);
+      });
     }
 
-    window.location.replace(window.location.pathname + "?session=" + sessionId);
+    function createSession() {
+      if (!selectedShareDestination) {
+        alert("Pick a place first.");
+        return;
+      }
 
-  }).catch((error) => {
-    alert("Firebase error: " + error.message);
-  });
-}
-  function recenterMap() {
-  if (!map) return;
+      const sessionId = Math.random().toString(36).substring(2, 8);
 
-  const bounds = new google.maps.LatLngBounds();
-  let count = 0;
+      db.ref("sessions/" + sessionId).set({
+        destination: selectedShareDestination,
+        name: selectedShareName,
+        destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
+        destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
+        address1: document.getElementById("address1").value.trim(),
+        address2: document.getElementById("address2").value.trim(),
+        travelMode: selectedTravelMode,
+        modes: {
+          user1: selectedTravelMode,
+          user2: selectedTravelMode
+        },
+        created: Date.now(),
+        cancelled: false
+      }).then(async () => {
+        const link = "https://mondellowilliam-eng.github.io/midpoint-app/?session=" + sessionId;
 
-  if (liveUser1Marker) {
-    bounds.extend(liveUser1Marker.getPosition());
-    count++;
-  }
+        const message =
+          "📍 MidLink meetup invite\n" +
+          "Tap this link to open the app:\n" +
+          link;
 
-  if (liveUser2Marker) {
-    bounds.extend(liveUser2Marker.getPosition());
-    count++;
-  }
+        localStorage.setItem("midpoint_last_session", sessionId);
 
-  if (destinationMarker) {
-    bounds.extend(destinationMarker.getPosition());
-    count++;
-  }
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "MidLink Session",
+              text: message
+            });
+          } catch (err) {
+            prompt("Copy and send this session link:", link);
+          }
+        } else {
+          prompt("Copy and send this session link:", link);
+        }
 
-  if (count === 0) return;
-
-  if (count === 1) {
-    map.setCenter(bounds.getCenter());
-    map.setZoom(15);
-    return;
-  }
-
-  map.fitBounds(bounds);
-
-  google.maps.event.addListenerOnce(map, "bounds_changed", function() {
-    if (map.getZoom() > 15) {
-      map.setZoom(15);
+        window.location.replace(window.location.origin + window.location.pathname + "?session=" + sessionId);
+      }).catch((error) => {
+        alert("Firebase error: " + error.message);
+      });
     }
-  });
-} 
+
+    function recenterMap() {
+      if (!map) return;
+
+      const bounds = new google.maps.LatLngBounds();
+      let count = 0;
+
+      if (liveUser1Marker) {
+        bounds.extend(liveUser1Marker.getPosition());
+        count++;
+      }
+
+      if (liveUser2Marker) {
+        bounds.extend(liveUser2Marker.getPosition());
+        count++;
+      }
+
+      if (destinationMarker) {
+        bounds.extend(destinationMarker.getPosition());
+        count++;
+      }
+
+      if (count === 0) return;
+
+      if (count === 1) {
+        map.setCenter(bounds.getCenter());
+        map.setZoom(15);
+        return;
+      }
+
+      map.fitBounds(bounds);
+
+      google.maps.event.addListenerOnce(map, "bounds_changed", function() {
+        if (map.getZoom() > 15) {
+          map.setZoom(15);
+        }
+      });
+    }
 
     function resetSession() {
       if (!currentSessionId) {
@@ -906,8 +904,9 @@ function getDistanceMeters(lat1, lng1, lat2, lng2) {
       selectedRole = "";
       latestUser1Pos = null;
       latestUser2Pos = null;
-user1Arrived = false;
-user2Arrived = false;
+      user1Arrived = false;
+      user2Arrived = false;
+
       if (liveUser1Marker) {
         liveUser1Marker.setMap(null);
         liveUser1Marker = null;
@@ -930,63 +929,63 @@ user2Arrived = false;
       location.reload();
     }
 
-   function openMyRoute() {
-  if (!selectedDestinationLatLng) {
-    alert("No destination selected.");
-    return;
-  }
+    function openMyRoute() {
+      if (!selectedDestinationLatLng) {
+        alert("No destination selected.");
+        return;
+      }
 
-  function openRouteFromPosition(lat, lng) {
-    const modeForUser =
-      selectedRole === "user1" ? user1TravelMode :
-      selectedRole === "user2" ? user2TravelMode :
-      selectedTravelMode;
+      function openRouteFromPosition(lat, lng) {
+        const modeForUser =
+          selectedRole === "user1" ? user1TravelMode :
+          selectedRole === "user2" ? user2TravelMode :
+          selectedTravelMode;
 
-    const url =
-      "https://www.google.com/maps/dir/?api=1" +
-      "&origin=" + lat + "," + lng +
-      "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
-      "&travelmode=" + modeForUser.toLowerCase();
+        const url =
+          "https://www.google.com/maps/dir/?api=1" +
+          "&origin=" + lat + "," + lng +
+          "&destination=" + selectedDestinationLatLng.lat + "," + selectedDestinationLatLng.lng +
+          "&travelmode=" + modeForUser.toLowerCase();
 
-    window.location.href = url;
-  }
+        window.location.href = url;
+      }
 
-  let userPos = null;
+      let userPos = null;
 
-  if (selectedRole === "user1" && latestUser1Pos) {
-    userPos = latestUser1Pos;
-  } else if (selectedRole === "user2" && latestUser2Pos) {
-    userPos = latestUser2Pos;
-  }
+      if (selectedRole === "user1" && latestUser1Pos) {
+        userPos = latestUser1Pos;
+      } else if (selectedRole === "user2" && latestUser2Pos) {
+        userPos = latestUser2Pos;
+      }
 
-  if (userPos) {
-    openRouteFromPosition(userPos.lat, userPos.lng);
-    return;
-  }
+      if (userPos) {
+        openRouteFromPosition(userPos.lat, userPos.lng);
+        return;
+      }
 
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported on this device.");
-    return;
-  }
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported on this device.");
+        return;
+      }
 
-  document.getElementById("liveInfo").innerHTML =
-    '<span class="status-warn">Getting your current location for directions...</span>';
-
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      openRouteFromPosition(position.coords.latitude, position.coords.longitude);
-    },
-    function(error) {
       document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">Could not get your current location for directions: ' + error.message + '</span>';
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 10000
+        '<span class="status-warn">Getting your current location for directions...</span>';
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          openRouteFromPosition(position.coords.latitude, position.coords.longitude);
+        },
+        function(error) {
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">Could not get your current location for directions: ' + error.message + '</span>';
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 10000
+        }
+      );
     }
-  );
-}
 
     function showSelectedPlace(place) {
       const destination = place.vicinity || place.name;
@@ -997,6 +996,7 @@ user2Arrived = false;
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng()
       };
+
       lastRouteUpdate1 = 0;
       lastRouteUpdate2 = 0;
 
@@ -1037,8 +1037,9 @@ user2Arrived = false;
       latestUser2Pos = null;
       user1ETA = null;
       user2ETA = null;
-user1Arrived = false;
-user2Arrived = false;
+      user1Arrived = false;
+      user2Arrived = false;
+
       if (liveUser1Marker) {
         liveUser1Marker.setMap(null);
         liveUser1Marker = null;
@@ -1077,198 +1078,187 @@ user2Arrived = false;
     }
 
     function cancelTrip() {
-  if (!currentSessionId) return;
+      if (!currentSessionId) return;
+      if (!confirm("Cancel this trip for everyone?")) return;
 
-  if (!confirm("Cancel this trip for everyone?")) return;
+      db.ref("sessions/" + currentSessionId + "/cancelled").set({
+        value: true,
+        cancelledAt: Date.now()
+      }).then(() => {
+        db.ref("sessions/" + currentSessionId + "/live").remove();
+        db.ref("sessions/" + currentSessionId + "/claims").remove();
 
-  db.ref("sessions/" + currentSessionId + "/cancelled").set({
-    value: true,
-    cancelledAt: Date.now()
-  }).then(() => {
+        currentSessionId = "";
+        selectedRole = "";
+        latestUser1Pos = null;
+        latestUser2Pos = null;
+        user1ETA = null;
+        user2ETA = null;
+        user1Arrived = false;
+        user2Arrived = false;
 
-    // remove live tracking + claims
-    db.ref("sessions/" + currentSessionId + "/live").remove();
-    db.ref("sessions/" + currentSessionId + "/claims").remove();
+        if (liveUser1Marker) {
+          liveUser1Marker.setMap(null);
+          liveUser1Marker = null;
+        }
 
-    // reset local state
-    currentSessionId = "";
-    selectedRole = "";
-    latestUser1Pos = null;
-    latestUser2Pos = null;
+        if (liveUser2Marker) {
+          liveUser2Marker.setMap(null);
+          liveUser2Marker = null;
+        }
 
-    user1ETA = null;
-    user2ETA = null;
+        if (destinationMarker) {
+          destinationMarker.setMap(null);
+          destinationMarker = null;
+        }
 
-    user1Arrived = false;
-    user2Arrived = false;
+        clearRouteLines();
 
-    // clear markers
-    if (liveUser1Marker) {
-      liveUser1Marker.setMap(null);
-      liveUser1Marker = null;
+        document.getElementById("sharedSessionInfo").innerHTML = "";
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-warn">Trip cancelled.</span>';
+        document.getElementById("connectionStatus").innerHTML = "";
+        document.getElementById("selectedPlace").innerHTML = "";
+        document.getElementById("distanceInfo").innerHTML = "";
+
+        const tripBox = document.getElementById("tripSummary");
+        tripBox.innerHTML = "";
+        tripBox.style.display = "none";
+
+        localStorage.removeItem("midpoint_last_session");
+
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, "", cleanUrl);
+
+        location.reload();
+      });
     }
 
-    if (liveUser2Marker) {
-      liveUser2Marker.setMap(null);
-      liveUser2Marker = null;
-    }
-
-    if (destinationMarker) {
-      destinationMarker.setMap(null);
-      destinationMarker = null;
-    }
-
-    clearRouteLines();
-
-    // clear UI
-    document.getElementById("sharedSessionInfo").innerHTML = "";
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-warn">Trip cancelled.</span>';
-    document.getElementById("connectionStatus").innerHTML = "";
-    document.getElementById("selectedPlace").innerHTML = "";
-    document.getElementById("distanceInfo").innerHTML = "";
-
-    const tripBox = document.getElementById("tripSummary");
-    tripBox.innerHTML = "";
-    tripBox.style.display = "none";
-
-    // clear saved session
-    localStorage.removeItem("midpoint_last_session");
-
-    // clean URL
-    const cleanUrl = window.location.origin + window.location.pathname;
-    window.history.replaceState({}, "", cleanUrl);
-
-    // reload app
-    location.reload();
-  });
-}
     function selectPlaceByIndex(index) {
       if (!currentPlaces[index]) return;
       showSelectedPlace(currentPlaces[index]);
     }
 
-   function searchNearby(mid, keyword) {
-  const radii = [1000, 3000, 5000]; // 1km → 3km → 5km
+    function searchNearby(mid, keyword) {
+      const radii = [1000, 3000, 5000];
 
-  function trySearch(index) {
-    if (index >= radii.length) {
-      document.getElementById("selectedPlace").innerHTML =
-        "No places found within 5 km of the midpoint.";
-      return;
-    }
+      function trySearch(index) {
+        if (index >= radii.length) {
+          document.getElementById("selectedPlace").innerHTML =
+            "No places found within 5 km of the midpoint.";
+          return;
+        }
 
-    placesService.nearbySearch({
-      location: mid,
-      radius: radii[index],
-      keyword: keyword || undefined
-    }, function(results, status) {
+        placesService.nearbySearch({
+          location: mid,
+          radius: radii[index],
+          keyword: keyword || undefined
+        }, function(results, status) {
+          if (status !== "OK" || !results || !results.length) {
+            trySearch(index + 1);
+            return;
+          }
 
-      if (status !== "OK" || !results || !results.length) {
-        // try next radius
-        trySearch(index + 1);
-        return;
+          currentPlaces = results.slice(0, 5);
+          const topPlace = currentPlaces[0];
+
+          let html =
+            '<div class="top-pick">' +
+            '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
+            (topPlace.vicinity || topPlace.name) + '<br>' +
+            '<em>Search radius: ' + (radii[index] / 1000) + ' km</em><br>' +
+            '<em>Tap a result below or click a letter on the map.</em>' +
+            '</div>';
+
+          html += '<div style="margin-top:10px;">';
+
+          currentPlaces.forEach((place, i) => {
+            const label = String.fromCharCode(65 + i);
+            html +=
+              '<button class="place-list-btn" type="button" onclick="selectPlaceByIndex(' + i + ')">' +
+              label + '. ' + place.name +
+              (place.vicinity ? ' — ' + place.vicinity : '') +
+              '</button>';
+          });
+
+          html += '</div>';
+          document.getElementById("selectedPlace").innerHTML = html;
+
+          currentPlaces.forEach((place, i) => {
+            const marker = new google.maps.Marker({
+              map: map,
+              position: place.geometry.location,
+              title: place.name,
+              label: String.fromCharCode(65 + i)
+            });
+
+            markers.push(marker);
+
+            marker.addListener("click", function() {
+              showSelectedPlace(place);
+            });
+          });
+        });
       }
 
-      // SUCCESS
-      currentPlaces = results.slice(0, 5);
-      const topPlace = currentPlaces[0];
+      trySearch(0);
+    }
 
-      let html =
-        '<div class="top-pick">' +
-        '⭐ <strong>Top Pick: ' + topPlace.name + '</strong><br>' +
-        (topPlace.vicinity || topPlace.name) + '<br>' +
-        '<em>Search radius: ' + (radii[index] / 1000) + ' km</em><br>' +
-        '<em>Tap a result below or click a letter on the map.</em>' +
-        '</div>';
+    function updateRouteForUser(userNumber, originPos) {
+      if (!selectedDestinationLatLng || !originPos) return;
 
-      html += '<div style="margin-top:10px;">';
-
-      currentPlaces.forEach((place, i) => {
-        const label = String.fromCharCode(65 + i);
-        html +=
-          '<button class="place-list-btn" type="button" onclick="selectPlaceByIndex(' + i + ')">' +
-          label + '. ' + place.name +
-          (place.vicinity ? ' — ' + place.vicinity : '') +
-          '</button>';
-      });
-
-      html += '</div>';
-      document.getElementById("selectedPlace").innerHTML = html;
-
-      currentPlaces.forEach((place, i) => {
-        const marker = new google.maps.Marker({
-          map: map,
-          position: place.geometry.location,
-          title: place.name,
-          label: String.fromCharCode(65 + i)
-        });
-
-        markers.push(marker);
-
-        marker.addListener("click", function() {
-          showSelectedPlace(place);
-        });
-      });
-    });
-  }
-
-  trySearch(0); // start at 1km
-}
-   function updateRouteForUser(userNumber, originPos) {
-  if (!selectedDestinationLatLng || !originPos) return;
-
-  const metersAway = getDistanceMeters(
-    originPos.lat,
-    originPos.lng,
-    selectedDestinationLatLng.lat,
-    selectedDestinationLatLng.lng
-  );
-
-  if (userNumber === 1) {
-    user1Distance = metersAway;
-    user1Arrived = metersAway <= 100;
-  } else {
-    user2Distance = metersAway;
-    user2Arrived = metersAway <= 100;
-  }
-
-  const now = Date.now();
-
-  if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
-  if (userNumber === 2 && now - lastRouteUpdate2 < ROUTE_UPDATE_MS) return;
-
-  directionsService.route(
-    {
-      origin: { lat: originPos.lat, lng: originPos.lng },
-      destination: selectedDestinationLatLng,
-      travelMode: google.maps.TravelMode[
-        userNumber === 1 ? user1TravelMode : user2TravelMode
-      ]
-    },
-   function(result, status) {
-  if (status !== "OK") {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-error">Route error: ' + status + '</span>';
-    return;
-  }
-
-  const durationText = result.routes[0].legs[0].duration.text; 
+      const metersAway = getDistanceMeters(
+        originPos.lat,
+        originPos.lng,
+        selectedDestinationLatLng.lat,
+        selectedDestinationLatLng.lng
+      );
 
       if (userNumber === 1) {
-        user1ETA = durationText;
-        lastRouteUpdate1 = now;
-        directionsRenderer1.setDirections(result);
+        user1Distance = metersAway;
+        user1Arrived = metersAway <= 100;
       } else {
-        user2ETA = durationText;
-        lastRouteUpdate2 = now;
-        directionsRenderer2.setDirections(result);
+        user2Distance = metersAway;
+        user2Arrived = metersAway <= 100;
       }
 
-      updateTripSummary();
+      const now = Date.now();
+
+      if (userNumber === 1 && now - lastRouteUpdate1 < ROUTE_UPDATE_MS) return;
+      if (userNumber === 2 && now - lastRouteUpdate2 < ROUTE_UPDATE_MS) return;
+
+      directionsService.route(
+        {
+          origin: { lat: originPos.lat, lng: originPos.lng },
+          destination: selectedDestinationLatLng,
+          travelMode: google.maps.TravelMode[
+            userNumber === 1 ? user1TravelMode : user2TravelMode
+          ]
+        },
+        function(result, status) {
+          if (status !== "OK") {
+            document.getElementById("liveInfo").innerHTML =
+              '<span class="status-error">Route error: ' + status + '</span>';
+            return;
+          }
+
+          const durationText = result.routes[0].legs[0].duration.text;
+
+          if (userNumber === 1) {
+            user1ETA = durationText;
+            lastRouteUpdate1 = now;
+            directionsRenderer1.setDirections(result);
+          } else {
+            user2ETA = durationText;
+            lastRouteUpdate2 = now;
+            directionsRenderer2.setDirections(result);
+          }
+
+          updateTripSummary();
+        }
+      );
     }
-  );
-}
+
     function updateLiveMapBounds(forceZoom) {
       const bounds = new google.maps.LatLngBounds();
       let hasPoint = false;
@@ -1309,6 +1299,7 @@ user2Arrived = false;
           lat: location.lat(),
           lng: location.lng()
         };
+
         lastRouteUpdate1 = 0;
         lastRouteUpdate2 = 0;
 
@@ -1364,7 +1355,7 @@ user2Arrived = false;
         if (!data) {
           latestUser2Pos = null;
           user2ETA = null;
-         user2Distance = null; 
+          user2Distance = null;
           if (liveUser2Marker) {
             liveUser2Marker.setMap(null);
             liveUser2Marker = null;
@@ -1468,139 +1459,140 @@ user2Arrived = false;
       );
     }
 
-   function joinLiveSession() {
-  if (!currentSessionId) {
-    alert("No shared session loaded.");
-    return;
-  }
+    function joinLiveSession() {
+      if (!currentSessionId) {
+        alert("No shared session loaded.");
+        return;
+      }
 
-  if (!navigator.geolocation) {
-    document.getElementById("liveInfo").innerHTML =
-      '<span class="status-error">Geolocation is not supported on this device.</span>';
-    return;
-  }
-
-  document.getElementById("liveInfo").innerHTML =
-    '<span class="status-warn">Requesting location access... If your browser asks, tap Allow.</span>';
-
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      claimRole(function(role) {
-        if (role === "user1") {
-          user1TravelMode = selectedTravelMode;
-          db.ref("sessions/" + currentSessionId + "/modes/user1").set(selectedTravelMode);
-        } else {
-          user2TravelMode = selectedTravelMode;
-          db.ref("sessions/" + currentSessionId + "/modes/user2").set(selectedTravelMode);
-        }
-
-        const pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          updated: Date.now()
-        };
-
-        db.ref("sessions/" + currentSessionId + "/live/" + role).set(pos).then(() => {
-          if (role === "user1") {
-            latestUser1Pos = pos;
-
-            if (!liveUser1Marker) {
-              liveUser1Marker = new google.maps.Marker({
-                position: pos,
-                map: map,
-                label: "1",
-                title: "Person 1"
-              });
-            } else {
-              liveUser1Marker.setPosition(pos);
-            }
-          } else {
-            latestUser2Pos = pos;
-
-            if (!liveUser2Marker) {
-              liveUser2Marker = new google.maps.Marker({
-                position: pos,
-                map: map,
-                label: "2",
-                title: "Person 2"
-              });
-            } else {
-              liveUser2Marker.setPosition(pos);
-            }
-          }
-
-          document.getElementById("liveInfo").innerHTML =
-            'You are connected as <span class="status-ok">' +
-            (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
-            '</span>. Live tracking is on.';
-
-          updateConnectionStatus();
-          updateTripSummary();
-          refreshBothRoutes();
-          recenterMap();
-          startWatchForRole(role);
-        });
-      });
-    },
-    function(error) {
-      let message = "Could not get your location.";
-
-      if (error.code === 1) {
-        message = "Location was blocked. Tap the lock icon in your browser address bar and allow location, then try again.";
-      } else if (error.code === 2) {
-        message = "Your location could not be determined. Make sure location services are turned on and try again.";
-      } else if (error.code === 3) {
-        message = "Location request timed out. Try again in an area with better signal.";
+      if (!navigator.geolocation) {
+        document.getElementById("liveInfo").innerHTML =
+          '<span class="status-error">Geolocation is not supported on this device.</span>';
+        return;
       }
 
       document.getElementById("liveInfo").innerHTML =
-        '<span class="status-error">' + message + '</span>';
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 10000
+        '<span class="status-warn">Requesting location access... If your browser asks, tap Allow.</span>';
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          claimRole(function(role) {
+            if (role === "user1") {
+              user1TravelMode = selectedTravelMode;
+              db.ref("sessions/" + currentSessionId + "/modes/user1").set(selectedTravelMode);
+            } else {
+              user2TravelMode = selectedTravelMode;
+              db.ref("sessions/" + currentSessionId + "/modes/user2").set(selectedTravelMode);
+            }
+
+            const pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              updated: Date.now()
+            };
+
+            db.ref("sessions/" + currentSessionId + "/live/" + role).set(pos).then(() => {
+              if (role === "user1") {
+                latestUser1Pos = pos;
+
+                if (!liveUser1Marker) {
+                  liveUser1Marker = new google.maps.Marker({
+                    position: pos,
+                    map: map,
+                    label: "1",
+                    title: "Person 1"
+                  });
+                } else {
+                  liveUser1Marker.setPosition(pos);
+                }
+              } else {
+                latestUser2Pos = pos;
+
+                if (!liveUser2Marker) {
+                  liveUser2Marker = new google.maps.Marker({
+                    position: pos,
+                    map: map,
+                    label: "2",
+                    title: "Person 2"
+                  });
+                } else {
+                  liveUser2Marker.setPosition(pos);
+                }
+              }
+
+              document.getElementById("liveInfo").innerHTML =
+                'You are connected as <span class="status-ok">' +
+                (role === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
+                '</span>. Live tracking is on.';
+
+              updateConnectionStatus();
+              updateTripSummary();
+              refreshBothRoutes();
+              recenterMap();
+              startWatchForRole(role);
+            });
+          });
+        },
+        function(error) {
+          let message = "Could not get your location.";
+
+          if (error.code === 1) {
+            message = "Location was blocked. Tap the lock icon in your browser address bar and allow location, then try again.";
+          } else if (error.code === 2) {
+            message = "Your location could not be determined. Make sure location services are turned on and try again.";
+          } else if (error.code === 3) {
+            message = "Location request timed out. Try again in an area with better signal.";
+          }
+
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-error">' + message + '</span>';
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 5000,
+          timeout: 10000
+        }
+      );
     }
-  );
-} 
+
     function updateConnectionStatus() {
-  const box = document.getElementById("connectionStatus");
-  if (!box) return;
+      const box = document.getElementById("connectionStatus");
+      if (!box) return;
 
-  // Hide until a shared session is actually loaded
-  if (!currentSessionId) {
-    box.innerHTML = "";
-    box.style.display = "none";
-    return;
-  }
+      if (!currentSessionId) {
+        box.innerHTML = "";
+        box.style.display = "none";
+        return;
+      }
 
-  box.style.display = "block";
+      box.style.display = "block";
 
-  const parts = [];
+      const parts = [];
 
-  if (selectedRole) {
-    parts.push(
-      'You are <span class="status-ok">' +
-      (selectedRole === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
-      '</span>.'
-    );
-  }
+      if (selectedRole) {
+        parts.push(
+          'You are <span class="status-ok">' +
+          (selectedRole === "user1" ? "Person 1 (Blue)" : "Person 2 (Orange)") +
+          '</span>.'
+        );
+      }
 
-  if (latestUser1Pos) {
-    parts.push('<span class="status-ok">Person 1 connected</span>');
-  } else {
-    parts.push('<span class="status-warn">Waiting for Person 1</span>');
-  }
+      if (latestUser1Pos) {
+        parts.push('<span class="status-ok">Person 1 connected</span>');
+      } else {
+        parts.push('<span class="status-warn">Waiting for Person 1</span>');
+      }
 
-  if (latestUser2Pos) {
-    parts.push('<span class="status-ok">Person 2 connected</span>');
-  } else {
-    parts.push('<span class="status-warn">Waiting for Person 2</span>');
-  }
+      if (latestUser2Pos) {
+        parts.push('<span class="status-ok">Person 2 connected</span>');
+      } else {
+        parts.push('<span class="status-warn">Waiting for Person 2</span>');
+      }
 
-  box.innerHTML = parts.join("<br>");
-  updateTripSummary();
-}
+      box.innerHTML = parts.join("<br>");
+      updateTripSummary();
+    }
+
     function checkTrackingHealth() {
       const now = Date.now();
       let warnings = [];
@@ -1619,109 +1611,110 @@ user2Arrived = false;
       }
     }
 
-function loadSession() {
-  const params = new URLSearchParams(window.location.search);
-  const sessionId = params.get("session");
+    function loadSession() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session");
 
-  if (!sessionId) return;
+      if (!sessionId) return;
 
-  currentSessionId = sessionId;
-  hideSetupControls();
+      currentSessionId = sessionId;
+      hideSetupControls();
 
-  db.ref("sessions/" + sessionId).once("value", snapshot => {
-    const data = snapshot.val();
-    if (!data) return;
+      db.ref("sessions/" + sessionId).once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
 
-    const isCancelled = data.cancelled === true || (data.cancelled && data.cancelled.value === true);
-    if (isCancelled) {
-      cleanupLiveUI();
-      document.getElementById("liveInfo").innerHTML =
-        '<span class="status-warn">This trip was already cancelled.</span>';
-      return;
-    }
+        const isCancelled = data.cancelled === true || (data.cancelled && data.cancelled.value === true);
+        if (isCancelled) {
+          cleanupLiveUI();
+          document.getElementById("liveInfo").innerHTML =
+            '<span class="status-warn">This trip was already cancelled.</span>';
+          return;
+        }
 
-    selectedShareDestination = data.destination || "";
-    selectedShareName = data.name || "";
-    selectedTravelMode = data.travelMode || "DRIVING";
-    user1TravelMode = (data.modes && data.modes.user1) ? data.modes.user1 : selectedTravelMode;
-    user2TravelMode = (data.modes && data.modes.user2) ? data.modes.user2 : selectedTravelMode;
+        selectedShareDestination = data.destination || "";
+        selectedShareName = data.name || "";
+        selectedTravelMode = data.travelMode || "DRIVING";
+        user1TravelMode = (data.modes && data.modes.user1) ? data.modes.user1 : selectedTravelMode;
+        user2TravelMode = (data.modes && data.modes.user2) ? data.modes.user2 : selectedTravelMode;
 
-    if (data.address1) document.getElementById("address1").value = data.address1;
-    if (data.address2) document.getElementById("address2").value = data.address2;
+        if (data.address1) document.getElementById("address1").value = data.address1;
+        if (data.address2) document.getElementById("address2").value = data.address2;
 
-    if (data.destinationLat !== null && data.destinationLng !== null) {
-      selectedDestinationLatLng = {
-        lat: data.destinationLat,
-        lng: data.destinationLng
-      };
+        if (data.destinationLat !== null && data.destinationLng !== null) {
+          selectedDestinationLatLng = {
+            lat: data.destinationLat,
+            lng: data.destinationLng
+          };
 
-      if (destinationMarker) destinationMarker.setMap(null);
+          if (destinationMarker) destinationMarker.setMap(null);
 
-      destinationMarker = new google.maps.Marker({
-        position: selectedDestinationLatLng,
-        map: map,
-        title: data.destination || data.name || "Destination",
-        icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+          destinationMarker = new google.maps.Marker({
+            position: selectedDestinationLatLng,
+            map: map,
+            title: data.destination || data.name || "Destination",
+            icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+          });
+
+          lastRouteUpdate1 = 0;
+          lastRouteUpdate2 = 0;
+          refreshBothRoutes();
+        } else if (data.destination) {
+          showDestinationFromSession(data.destination);
+        }
+
+        document.getElementById("sharedSessionInfo").innerHTML =
+          '<div class="shared-box">' +
+            '🔗 <strong>Shared Session Loaded</strong><br><br>' +
+            '<strong>Start 1:</strong> ' + (data.address1 || "Not provided") + '<br>' +
+            '<strong>Start 2:</strong> ' + (data.address2 || "Not provided") + '<br><br>' +
+            '<strong>Meetup Place:</strong> ' + (data.name || "") + '<br>' +
+            '<strong>Destination:</strong> ' + (data.destination || "") + '<br><br>' +
+            '<strong>Choose Your Travel Mode:</strong>' +
+            '<div class="action-row">' +
+              '<button id="modeDriving" class="action-link" type="button" onclick="setTravelMode(\'DRIVING\')">🚗 Driving</button>' +
+              '<button id="modeTransit" class="session-btn" type="button" onclick="setTravelMode(\'TRANSIT\')">🚌 Transit</button>' +
+              '<button id="modeWalking" class="secondary-btn" type="button" onclick="setTravelMode(\'WALKING\')">🚶 Walking</button>' +
+            '</div>' +
+            '<strong style="display:block; margin-top:12px;">Trip Controls:</strong>' +
+            '<div class="action-row">' +
+              '<button class="live-btn" type="button" onclick="joinLiveSession()">Start Live Sharing</button>' +
+              '<button class="action-link" type="button" onclick="openMyRoute()">Open Navigation</button>' +
+              '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
+              '<button class="danger-btn" type="button" onclick="cancelTrip()">Cancel Trip</button>' +
+            '</div>' +
+          '</div>';
+
+        updateTravelModeButtons();
+
+        if (data.name && data.destination) {
+          document.getElementById("selectedPlace").innerHTML =
+            "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
+            data.destination;
+          updateTripSummary();
+        }
+
+        listenToLiveUsers(sessionId);
+        listenForCancellation(sessionId);
+
+        db.ref("sessions/" + sessionId + "/modes/user1").on("value", snapshot => {
+          if (snapshot.val()) {
+            user1TravelMode = snapshot.val();
+            updateTripSummary();
+          }
+        });
+
+        db.ref("sessions/" + sessionId + "/modes/user2").on("value", snapshot => {
+          if (snapshot.val()) {
+            user2TravelMode = snapshot.val();
+            updateTripSummary();
+          }
+        });
+
+        updateConnectionStatus();
       });
-
-      lastRouteUpdate1 = 0;
-      lastRouteUpdate2 = 0;
-      refreshBothRoutes();
-    } else if (data.destination) {
-      showDestinationFromSession(data.destination);
     }
 
-    document.getElementById("sharedSessionInfo").innerHTML =
-      '<div class="shared-box">' +
-        '🔗 <strong>Shared Session Loaded</strong><br><br>' +
-        '<strong>Start 1:</strong> ' + (data.address1 || "Not provided") + '<br>' +
-        '<strong>Start 2:</strong> ' + (data.address2 || "Not provided") + '<br><br>' +
-        '<strong>Meetup Place:</strong> ' + (data.name || "") + '<br>' +
-        '<strong>Destination:</strong> ' + (data.destination || "") + '<br><br>' +
-        '<strong>Choose Your Travel Mode:</strong>' +
-        '<div class="action-row">' +
-          '<button id="modeDriving" class="action-link" type="button" onclick="setTravelMode(\'DRIVING\')">🚗 Driving</button>' +
-          '<button id="modeTransit" class="session-btn" type="button" onclick="setTravelMode(\'TRANSIT\')">🚌 Transit</button>' +
-          '<button id="modeWalking" class="secondary-btn" type="button" onclick="setTravelMode(\'WALKING\')">🚶 Walking</button>' +
-        '</div>' +
-        '<strong style="display:block; margin-top:12px;">Trip Controls:</strong>' +
-        '<div class="action-row">' +
-          '<button class="live-btn" type="button" onclick="joinLiveSession()">Start Live Sharing</button>' +
-          '<button class="action-link" type="button" onclick="openMyRoute()">Open Navigation</button>' +
-          '<button class="secondary-btn" type="button" onclick="recenterMap()">Recenter Map</button>' +
-          '<button class="danger-btn" type="button" onclick="cancelTrip()">Cancel Trip</button>' +
-        '</div>' +
-      '</div>';
-
-    updateTravelModeButtons();
-
-    if (data.name && data.destination) {
-      document.getElementById("selectedPlace").innerHTML =
-        "<strong>✅ Shared Meetup: " + data.name + "</strong><br>" +
-        data.destination;
-      updateTripSummary();
-    }
-
-    listenToLiveUsers(sessionId);
-    listenForCancellation(sessionId);
-
-    db.ref("sessions/" + sessionId + "/modes/user1").on("value", snapshot => {
-      if (snapshot.val()) {
-        user1TravelMode = snapshot.val();
-        updateTripSummary();
-      }
-    });
-
-    db.ref("sessions/" + sessionId + "/modes/user2").on("value", snapshot => {
-      if (snapshot.val()) {
-        user2TravelMode = snapshot.val();
-        updateTripSummary();
-      }
-    });
-
-    updateConnectionStatus();
-  });
-}
     function checkLastSession() {
       const lastSession = localStorage.getItem("midpoint_last_session");
 
@@ -1741,7 +1734,7 @@ function loadSession() {
     }
 
     function resumeSession(sessionId) {
-      window.location.href = window.location.origin + window.location.pathname + "?session=" + sessionId;
+      window.location.replace(window.location.origin + window.location.pathname + "?session=" + sessionId);
     }
 
     function clearLastSession() {
