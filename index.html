@@ -1641,9 +1641,27 @@ function loadSession() {
     if (data.address1) document.getElementById("address1").value = data.address1;
     if (data.address2) document.getElementById("address2").value = data.address2;
 
-    if (data.destination) {
-      showDestinationFromSession(data.destination);
-    }
+    if (data.destinationLat !== null && data.destinationLng !== null) {
+  selectedDestinationLatLng = {
+    lat: data.destinationLat,
+    lng: data.destinationLng
+  };
+
+  if (destinationMarker) destinationMarker.setMap(null);
+
+  destinationMarker = new google.maps.Marker({
+    position: selectedDestinationLatLng,
+    map: map,
+    title: data.destination || data.name || "Destination",
+    icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+  });
+
+  lastRouteUpdate1 = 0;
+  lastRouteUpdate2 = 0;
+  refreshBothRoutes();
+} else if (data.destination) {
+  showDestinationFromSession(data.destination);
+}
 
     document.getElementById("sharedSessionInfo").innerHTML =
       '<div class="shared-box">' +
