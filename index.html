@@ -293,7 +293,28 @@ input:focus {
   border-radius: 8px;
   font-weight: bold;
 }   
-    
+ @media (max-width: 640px) {
+  .container {
+    padding: 14px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  #map {
+    height: 320px;
+  }
+
+  .action-row > * {
+    flex: 1 1 100%;
+  }
+
+  .filters button {
+    flex: 1 1 calc(50% - 8px);
+    min-width: unset;
+  }
+}   
   </style>
 </head>
 <body>
