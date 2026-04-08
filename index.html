@@ -591,6 +591,8 @@ if (hint) hint.style.display = "none";
       document.querySelectorAll(".setup-only").forEach(el => {
         el.style.display = "";
       });
+      const hint = document.getElementById("startHint");
+if (hint) hint.style.display = "block";
     }
 
     function formatTravelMode(mode) {
