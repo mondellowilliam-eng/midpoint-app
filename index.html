@@ -583,6 +583,8 @@
       document.querySelectorAll(".setup-only").forEach(el => {
         el.style.display = "none";
       });
+     const hint = document.getElementById("startHint");
+if (hint) hint.style.display = "none"; 
     }
 
     function showSetupControls() {
