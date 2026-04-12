@@ -948,6 +948,9 @@ function updateMapBounds() {
   });
 } 
     function createSession() {
+  db.ref("analytics/sessionCreated").push({
+  time: Date.now()
+});    
   if (!selectedShareDestination) {
     alert("Pick a place first.");
     return;
