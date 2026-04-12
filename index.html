@@ -1986,12 +1986,13 @@ function recenterMap() {
           "User 1 to midpoint: " + d1 + " km<br>" +
           "User 2 to midpoint: " + d2 + " km";
 
-        const bounds = new google.maps.LatLngBounds();
-        bounds.extend(c1);
-        bounds.extend(c2);
-        bounds.extend(mid);
-        map.fitBounds(bounds);
-
+        if (!userMovedMap) {
+  const bounds = new google.maps.LatLngBounds();
+  bounds.extend(c1);
+  bounds.extend(c2);
+  bounds.extend(mid);
+  map.fitBounds(bounds);
+}
         searchNearby(mid, keyword);
       }).catch(err => {
         alert(err);
