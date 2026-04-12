@@ -550,6 +550,12 @@ autocomplete1.addListener("place_changed", function () {
     focusAndFlash("address2");
   }, 150);
 });
+document.getElementById("placeKeyword").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    focusAndFlash("findBtn");
+  }
+});      
 
 autocomplete2.addListener("place_changed", function () {
   setTimeout(() => {
