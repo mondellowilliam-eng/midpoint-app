@@ -1663,7 +1663,16 @@ function updateMapBounds() {
         }
       );
     }
+function resumeLastSession() {
+  const lastSession = localStorage.getItem("midlink_last_session");
 
+  if (!lastSession) {
+    alert("No session to resume yet.");
+    return;
+  }
+
+  resumeSession(lastSession);
+}
     function updateConnectionStatus() {
       const box = document.getElementById("connectionStatus");
       if (!box) return;
