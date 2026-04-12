@@ -707,6 +707,43 @@ if (hint) hint.style.display = "block";
       if (Math.abs(m1 - m2) <= 1) return "🟡 Both are about the same distance";
       return m1 < m2 ? "🟢 Person 1 is closer" : "🟠 Person 2 is closer";
     }
+    function focusAndFlash(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  el.focus();
+  el.classList.remove("guide-flash");
+  void el.offsetWidth;
+  el.classList.add("guide-flash");
+
+  el.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
+
+function guideToNextStep() {
+  const a1 = document.getElementById("address1").value.trim();
+  const a2 = document.getElementById("address2").value.trim();
+  const keyword = document.getElementById("placeKeyword").value.trim();
+
+  if (!a1) {
+    focusAndFlash("address1");
+    return;
+  }
+
+  if (!a2) {
+    focusAndFlash("address2");
+    return;
+  }
+
+  if (!keyword) {
+    focusAndFlash("placeKeyword");
+    return;
+  }
+
+  focusAndFlash("findBtn");
+}
 
     function clearRouteLines() {
       if (directionsRenderer1) directionsRenderer1.set("directions", null);
