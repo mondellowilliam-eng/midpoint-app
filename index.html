@@ -774,7 +774,37 @@ function recenterMap() {
       if (meters < 1000) return "📏 Straight-line distance: " + Math.round(meters) + " m";
       return "📏 Straight-line distance: " + (meters / 1000).toFixed(1) + " km";
     }
+    
+let userMovedMap = false;
 
+function setupMapListeners() {
+  map.addListener('dragstart', () => {
+    userMovedMap = true;
+  });
+
+  map.addListener('zoom_changed', () => {
+    userMovedMap = true;
+  });
+}
+
+function updateMapBounds() {
+  if (user1Location && user2Location && !userMovedMap) {
+    const bounds = new google.maps.LatLngBounds();
+    bounds.extend(user1Location);
+    bounds.extend(user2Location);
+    map.fitBounds(bounds);
+  }
+}
+
+function recenterMap() {
+  if (user1Location && user2Location) {
+    userMovedMap = false;
+    const bounds = new google.maps.LatLngBounds();
+    bounds.extend(user1Location);
+    bounds.extend(user2Location);
+    map.fitBounds(bounds);
+  }
+}
     function getDistanceKm(lat1, lng1, lat2, lng2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
