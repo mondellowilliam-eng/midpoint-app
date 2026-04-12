@@ -573,6 +573,10 @@ setupMapListeners();
       db.ref("analytics/appOpened").push({
   time: Date.now()
 });
+   db.ref("test").set({
+  hello: "world",
+  time: Date.now()
+});   
 setInterval(checkTrackingHealth, 5000);
     }
 
