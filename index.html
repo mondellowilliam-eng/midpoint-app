@@ -783,10 +783,27 @@ function setupMapListeners() {
 }
 
 function updateMapBounds() {
-  if (user1Location && user2Location && !userMovedMap) {
-    const bounds = new google.maps.LatLngBounds();
-    bounds.extend(user1Location);
-    bounds.extend(user2Location);
+  if (userMovedMap || !map) return;
+
+  const bounds = new google.maps.LatLngBounds();
+  let count = 0;
+
+  if (liveUser1Marker) {
+    bounds.extend(liveUser1Marker.getPosition());
+    count++;
+  }
+
+  if (liveUser2Marker) {
+    bounds.extend(liveUser2Marker.getPosition());
+    count++;
+  }
+
+  if (destinationMarker) {
+    bounds.extend(destinationMarker.getPosition());
+    count++;
+  }
+
+  if (count >= 2) {
     map.fitBounds(bounds);
   }
 }
