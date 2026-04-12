@@ -1650,6 +1650,9 @@ function updateMapBounds() {
     }
 
     function joinLiveSession() {
+      db.ref("analytics/liveJoined").push({
+  time: Date.now()
+});
       if (!currentSessionId) {
         alert("No shared session loaded.");
         return;
