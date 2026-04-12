@@ -1372,30 +1372,31 @@ function updateMapBounds() {
       );
     }
 
-    function updateLiveMapBounds(forceZoom) {
-      const bounds = new google.maps.LatLngBounds();
-      let hasPoint = false;
+   function updateLiveMapBounds(forceZoom) {
+  if (userMovedMap && !forceZoom) return;
 
-      if (liveUser1Marker) {
-        bounds.extend(liveUser1Marker.getPosition());
-        hasPoint = true;
-      }
+  const bounds = new google.maps.LatLngBounds();
+  let hasPoint = false;
 
-      if (liveUser2Marker) {
-        bounds.extend(liveUser2Marker.getPosition());
-        hasPoint = true;
-      }
+  if (liveUser1Marker) {
+    bounds.extend(liveUser1Marker.getPosition());
+    hasPoint = true;
+  }
 
-      if (destinationMarker) {
-        bounds.extend(destinationMarker.getPosition());
-        hasPoint = true;
-      }
+  if (liveUser2Marker) {
+    bounds.extend(liveUser2Marker.getPosition());
+    hasPoint = true;
+  }
 
-      if (hasPoint && (forceZoom || liveUser1Marker || liveUser2Marker)) {
-        map.fitBounds(bounds);
-      }
-    }
+  if (destinationMarker) {
+    bounds.extend(destinationMarker.getPosition());
+    hasPoint = true;
+  }
 
+  if (hasPoint && (forceZoom || liveUser1Marker || liveUser2Marker)) {
+    map.fitBounds(bounds);
+  }
+}
     function refreshBothRoutes() {
       if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
       if (latestUser2Pos) updateRouteForUser(2, latestUser2Pos);
