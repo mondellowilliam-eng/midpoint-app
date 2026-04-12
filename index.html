@@ -1737,17 +1737,29 @@ function updateMapBounds() {
       '</div>' +
     '</div>';
 }
-   function startNewSession() {
+  function startNewSession() {
   localStorage.removeItem("midlink_last_session");
   currentSessionId = "";
   selectedRole = "";
+  selectedShareName = "";
+  selectedShareDestination = "";
+  selectedDestinationLatLng = null;
+
   document.getElementById("sharedSessionInfo").innerHTML = "";
   document.getElementById("selectedPlace").innerHTML = "";
   document.getElementById("liveInfo").innerHTML = "";
   document.getElementById("connectionStatus").innerHTML = "";
   document.getElementById("distanceInfo").innerHTML = "";
-  document.getElementById("tripSummary").style.display = "none";
+
+  const tripBox = document.getElementById("tripSummary");
+  if (tripBox) {
+    tripBox.innerHTML = "";
+    tripBox.style.display = "none";
+  }
+
   showSetupControls();
+
+  document.getElementById("address1").focus();
 }
     
 
