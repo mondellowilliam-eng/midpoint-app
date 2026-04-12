@@ -537,8 +537,25 @@
       });
       directionsRenderer2.setMap(map);
 
-      new google.maps.places.Autocomplete(document.getElementById("address1"));
-      new google.maps.places.Autocomplete(document.getElementById("address2"));
+      const autocomplete1 = new google.maps.places.Autocomplete(
+  document.getElementById("address1")
+);
+
+const autocomplete2 = new google.maps.places.Autocomplete(
+  document.getElementById("address2")
+);
+
+autocomplete1.addListener("place_changed", function () {
+  setTimeout(() => {
+    focusAndFlash("address2");
+  }, 150);
+});
+
+autocomplete2.addListener("place_changed", function () {
+  setTimeout(() => {
+    focusAndFlash("placeKeyword");
+  }, 150);
+});
 
       document.getElementById("weightSlider").addEventListener("input", function () {
         document.getElementById("weightValue").textContent = this.value + "%";
