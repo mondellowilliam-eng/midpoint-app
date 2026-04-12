@@ -905,41 +905,42 @@ function updateMapBounds() {
   });
 }
     function recenterMap() {
-      if (!map) return;
+  if (!map) return;
 
-      const bounds = new google.maps.LatLngBounds();
-      let count = 0;
+  const bounds = new google.maps.LatLngBounds();
+  let count = 0;
 
-      if (liveUser1Marker) {
-        bounds.extend(liveUser1Marker.getPosition());
-        count++;
-      }
+  if (liveUser1Marker) {
+    bounds.extend(liveUser1Marker.getPosition());
+    count++;
+  }
 
-      if (liveUser2Marker) {
-        bounds.extend(liveUser2Marker.getPosition());
-        count++;
-      }
+  if (liveUser2Marker) {
+    bounds.extend(liveUser2Marker.getPosition());
+    count++;
+  }
 
-      if (destinationMarker) {
-        bounds.extend(destinationMarker.getPosition());
-        count++;
-      }
+  if (destinationMarker) {
+    bounds.extend(destinationMarker.getPosition());
+    count++;
+  }
 
-      if (count === 0) return;
+  if (count === 0) return;
 
-      if (count === 1) {
-        map.setCenter(bounds.getCenter());
-        map.setZoom(15);
-        return;
-      }
+  userMovedMap = false;
 
-     updateMapBounds();
-      
-      google.maps.event.addListenerOnce(map, "bounds_changed", function() {
-        if (map.getZoom() > 15) map.setZoom(15);
-      });
-    }
+  if (count === 1) {
+    map.setCenter(bounds.getCenter());
+    map.setZoom(15);
+    return;
+  }
 
+  map.fitBounds(bounds);
+
+  google.maps.event.addListenerOnce(map, "bounds_changed", function() {
+    if (map.getZoom() > 15) map.setZoom(15);
+  });
+}
     function resetSession() {
       if (!currentSessionId) {
         clearMarkers();
