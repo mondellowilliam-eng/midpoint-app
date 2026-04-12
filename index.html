@@ -570,6 +570,9 @@ autocomplete2.addListener("place_changed", function () {
      updateTravelModeButtons();
 loadSession();
 setupMapListeners();
+      db.ref("analytics/appOpened").push({
+  time: Date.now()
+});
 setInterval(checkTrackingHealth, 5000);
     }
 
