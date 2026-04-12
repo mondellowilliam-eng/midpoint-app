@@ -1726,6 +1726,15 @@ function recenterMap() {
       '</div>' +
     '</div>';
 }
+    function startNewSession() {
+  localStorage.removeItem("midlink_last_session");
+  currentSessionId = "";
+  selectedRole = "";
+  document.getElementById("sharedSessionInfo").innerHTML = "";
+  showSetupControls();
+  checkLastSession();
+}
+    
 
     function loadSession() {
       const params = new URLSearchParams(window.location.search);
