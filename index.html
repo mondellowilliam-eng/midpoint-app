@@ -1398,10 +1398,10 @@ function updateMapBounds() {
   }
 }
     function refreshBothRoutes() {
-      if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
-      if (latestUser2Pos) updateRouteForUser(2, latestUser2Pos);
-      updateLiveMapBounds(false);
-    }
+  if (latestUser1Pos) updateRouteForUser(1, latestUser1Pos);
+  if (latestUser2Pos) updateRouteForUser(2, latestUser2Pos);
+  updateLiveMapBounds(false);
+}
 
     function showDestinationFromSession(destinationText) {
       geocoder.geocode({ address: destinationText }, function(results, status) {
