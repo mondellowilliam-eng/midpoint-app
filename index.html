@@ -1710,25 +1710,22 @@ function recenterMap() {
     }
 
     function checkLastSession() {
-      const lastSession = localStorage.getItem("midlink_last_session");
-      const container = document.getElementById("sharedSessionInfo");
+  const lastSession = localStorage.getItem("midlink_last_session");
+  const container = document.getElementById("sharedSessionInfo");
 
-      if (!container) return;
+  if (!container) return;
 
-      if (!lastSession || currentSessionId) {
-        container.innerHTML = "";
-        return;
-      }
-
-      container.innerHTML =
-        '<div class="shared-box">' +
-          '🔁 <strong>Resume your last session?</strong><br>' +
-          '<div class="action-row">' +
-            '<button class="live-btn" type="button" onclick="resumeSession(\'' + lastSession + '\')">Resume</button>' +
-            '<button class="secondary-btn" type="button" onclick="clearLastSession()">Start New</button>' +
-          '</div>' +
-        '</div>';
-    }
+  container.innerHTML =
+    '<div class="shared-box">' +
+      '<strong>Start Options</strong><br>' +
+      '<div class="action-row">' +
+        '<button class="secondary-btn" type="button" onclick="startNewSession()">New</button>' +
+        (lastSession
+          ? '<button class="live-btn" type="button" onclick="resumeSession(\'' + lastSession + '\')">Resume</button>'
+          : '') +
+      '</div>' +
+    '</div>';
+}
 
     function loadSession() {
       const params = new URLSearchParams(window.location.search);
