@@ -940,8 +940,8 @@ function recenterMap() {
         return;
       }
 
-      map.fitBounds(bounds);
-
+     updateMapBounds();
+      
       google.maps.event.addListenerOnce(map, "bounds_changed", function() {
         if (map.getZoom() > 15) map.setZoom(15);
       });
