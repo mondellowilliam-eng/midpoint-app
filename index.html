@@ -1737,13 +1737,17 @@ function updateMapBounds() {
       '</div>' +
     '</div>';
 }
-    function startNewSession() {
+   function startNewSession() {
   localStorage.removeItem("midlink_last_session");
   currentSessionId = "";
   selectedRole = "";
   document.getElementById("sharedSessionInfo").innerHTML = "";
+  document.getElementById("selectedPlace").innerHTML = "";
+  document.getElementById("liveInfo").innerHTML = "";
+  document.getElementById("connectionStatus").innerHTML = "";
+  document.getElementById("distanceInfo").innerHTML = "";
+  document.getElementById("tripSummary").style.display = "none";
   showSetupControls();
-  checkLastSession();
 }
     
 
