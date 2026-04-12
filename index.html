@@ -753,7 +753,14 @@ if (hint) hint.style.display = "block";
       if (m1 <= 5 && m2 <= 5) return "⏳ Both are about 5 minutes away";
       return "";
     }
-
+function recenterMap() {
+  if (user1Location && user2Location) {
+    const bounds = new google.maps.LatLngBounds();
+    bounds.extend(user1Location);
+    bounds.extend(user2Location);
+    map.fitBounds(bounds);
+  }
+}
     function getUsersDistance() {
       if (!latestUser1Pos || !latestUser2Pos) return "";
 
