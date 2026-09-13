@@ -2099,9 +2099,20 @@ if (data.waitingForPerson2 === true && !data.address2) {
     document.getElementById("address1").value = data.address1;
   }
 
-  listenForCancellation(sessionId);
-  updateConnectionStatus();
-  return;
+ listenForCancellation(sessionId);
+updateConnectionStatus();
+
+db.ref("sessions/" + sessionId + "/destination").on("value", snapshot => {
+  const destination = snapshot.val();
+
+  if (!destination) return;
+
+  window.location.reload();
+});
+
+return;
+
+} else {
   
 } else if (data.address1 && data.address2 && !data.destination) {
   showSetupControls();
