@@ -2111,8 +2111,6 @@ db.ref("sessions/" + sessionId + "/destination").on("value", snapshot => {
 });
 
 return;
-
-} else {
   
 } else if (data.address1 && data.address2 && !data.destination) {
   showSetupControls();
