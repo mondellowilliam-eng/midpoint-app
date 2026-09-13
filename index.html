@@ -603,7 +603,51 @@ setupMapListeners();
   
 setInterval(checkTrackingHealth, 5000);
     }
+async function invitePerson2() {
+  const address1 = document.getElementById("address1").value.trim();
 
+  if (!address1) {
+    alert("Please enter your starting address first.");
+    focusAndFlash("address1");
+    return;
+  }
+
+  const sessionId = Math.random().toString(36).substring(2, 8);
+  const link = buildSessionLink(sessionId);
+
+  try {
+    await db.ref("sessions/" + sessionId).set({
+      address1: address1,
+      address2: "",
+      created: Date.now(),
+      cancelled: false,
+      waitingForPerson2: true
+    });
+
+    currentSessionId = sessionId;
+    localStorage.setItem("midlink_last_session", sessionId);
+
+    const message =
+      "📍 MidLink invite\n" +
+      "Enter your starting location so we can find a place to meet.";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "MidLink Invite",
+          text: message,
+          url: link
+        });
+      } catch (err) {
+        prompt("Copy and send this link to Person 2:", link);
+      }
+    } else {
+      prompt("Copy and send this link to Person 2:", link);
+    }
+  } catch (error) {
+    alert("Could not create invite: " + error.message);
+  }
+}
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
     }
