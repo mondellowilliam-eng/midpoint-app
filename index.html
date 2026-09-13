@@ -537,27 +537,42 @@
       });
       directionsRenderer2.setMap(map);
 
-      const autocomplete1 = new google.maps.places.Autocomplete(
-  document.getElementById("address1")
+     const autocompleteOptions = {
+  fields: ["formatted_address", "geometry", "name"],
+  componentRestrictions: { country: "ca" }
+};
+
+const autocomplete1 = new google.maps.places.Autocomplete(
+  document.getElementById("address1"),
+  autocompleteOptions
 );
 
 const autocomplete2 = new google.maps.places.Autocomplete(
-  document.getElementById("address2")
+  document.getElementById("address2"),
+  autocompleteOptions
 );
 
 autocomplete1.addListener("place_changed", function () {
+  const place = autocomplete1.getPlace();
+
+  if (!place.geometry) {
+    console.log("No autocomplete result selected for Person 1.");
+    return;
+  }
+
   setTimeout(() => {
     focusAndFlash("address2");
   }, 150);
 });
-document.getElementById("placeKeyword").addEventListener("keydown", function (e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    focusAndFlash("findBtn");
-  }
-});      
 
 autocomplete2.addListener("place_changed", function () {
+  const place = autocomplete2.getPlace();
+
+  if (!place.geometry) {
+    console.log("No autocomplete result selected for Person 2.");
+    return;
+  }
+
   setTimeout(() => {
     focusAndFlash("placeKeyword");
   }, 150);
