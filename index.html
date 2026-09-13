@@ -1945,8 +1945,30 @@ function resumeLastSession() {
           return;
         }
 
-        currentSessionId = sessionId;
-        hideSetupControls();
+       currentSessionId = sessionId;
+
+if (data.waitingForPerson2 === true && !data.address2) {
+  hideSetupControls();
+
+  document.getElementById("person1Section").style.display = "none";
+  document.getElementById("person2Section").style.display = "block";
+
+  const person2LocationButton =
+    document.querySelector("#person2Section .setup-only");
+
+  if (person2LocationButton) {
+    person2LocationButton.style.display = "block";
+  }
+
+  document.getElementById("sharedSessionInfo").innerHTML =
+    '<div class="shared-box">' +
+    '<strong>👋 You were invited to MidLink</strong><br>' +
+    'Enter your starting location below.' +
+    '</div>';
+
+} else {
+  hideSetupControls();
+} 
 
         const isCancelled = data.cancelled === true || (data.cancelled && data.cancelled.value === true);
         if (isCancelled) {
