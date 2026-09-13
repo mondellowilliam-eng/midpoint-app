@@ -1966,6 +1966,13 @@ if (data.waitingForPerson2 === true && !data.address2) {
     'Enter your starting location below.' +
     '</div>';
 
+  if (data.address1) {
+    document.getElementById("address1").value = data.address1;
+  }
+
+  listenForCancellation(sessionId);
+  updateConnectionStatus();
+  return;
 } else {
   hideSetupControls();
 } 
