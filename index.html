@@ -651,6 +651,58 @@ async function invitePerson2() {
     alert("Could not create invite: " + error.message);
   }
 }
+  async function submitPerson2Location() {
+  const address2 = document.getElementById("address2").value.trim();
+
+  if (!address2) {
+    alert("Please enter your starting location.");
+    focusAndFlash("address2");
+    return;
+  }
+
+  if (!currentSessionId) {
+    alert("This MidLink invite could not be found.");
+    return;
+  }
+
+  try {
+    await db.ref("sessions/" + currentSessionId).update({
+      address2: address2,
+      waitingForPerson2: false
+    });
+
+    showSetupControls();
+
+    document.getElementById("person1Section").style.display = "none";
+    document.getElementById("person2Section").style.display = "block";
+
+    const continueButton =
+      document.querySelector("#person2Section .session-btn");
+
+    if (continueButton) {
+      continueButton.style.display = "none";
+    }
+
+    const hint = document.getElementById("startHint");
+
+    if (hint) {
+      hint.textContent =
+        "Both starting locations are ready. Choose what kind of place you want to meet at.";
+      hint.style.display = "block";
+    }
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+      '<strong>✅ Both locations added</strong><br>' +
+      'Now choose what kind of place you want to meet at.' +
+      '</div>';
+
+    focusAndFlash("placeKeyword");
+
+  } catch (error) {
+    alert("Could not save your location: " + error.message);
+  }
+}  
     function setFilter(type) {
       document.getElementById("placeKeyword").value = type;
     }
