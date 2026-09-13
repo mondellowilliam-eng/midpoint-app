@@ -2028,9 +2028,44 @@ if (data.waitingForPerson2 === true && !data.address2) {
   listenForCancellation(sessionId);
   updateConnectionStatus();
   return;
+  
+} else if (data.address1 && data.address2 && !data.destination) {
+  showSetupControls();
+
+  document.getElementById("person1Section").style.display = "none";
+  document.getElementById("person2Section").style.display = "block";
+
+  document.getElementById("address1").value = data.address1;
+  document.getElementById("address2").value = data.address2;
+
+  const continueButton =
+    document.querySelector("#person2Section .session-btn");
+
+  if (continueButton) {
+    continueButton.style.display = "none";
+  }
+
+  const hint = document.getElementById("startHint");
+
+  if (hint) {
+    hint.textContent =
+      "Both starting locations are ready. Choose what kind of place you want to meet at.";
+    hint.style.display = "block";
+  }
+
+  document.getElementById("sharedSessionInfo").innerHTML =
+    '<div class="shared-box">' +
+    '<strong>✅ Both locations added</strong><br>' +
+    'Choose what kind of place you want to meet at.' +
+    '</div>';
+
+  listenForCancellation(sessionId);
+  updateConnectionStatus();
+  return;
+
 } else {
   hideSetupControls();
-} 
+}
 
         const isCancelled = data.cancelled === true || (data.cancelled && data.cancelled.value === true);
         if (isCancelled) {
