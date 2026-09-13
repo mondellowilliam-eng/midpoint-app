@@ -630,6 +630,22 @@ async function invitePerson2() {
     currentSessionId = sessionId;
     localStorage.setItem("midlink_last_session", sessionId);
 
+    hideSetupControls();
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+      '<strong>⏳ Waiting for Person 2</strong><br>' +
+      'The invitation was created. MidLink will continue automatically when Person 2 enters their location.' +
+      '</div>';
+
+    db.ref("sessions/" + sessionId + "/address2").on("value", snapshot => {
+      const address2 = snapshot.val();
+
+      if (!address2) return;
+
+      window.location.replace(link);
+    });
+
     const message =
       "📍 MidLink invite\n" +
       "Enter your starting location so we can find a place to meet.";
@@ -647,6 +663,7 @@ async function invitePerson2() {
     } else {
       prompt("Copy and send this link to Person 2:", link);
     }
+
   } catch (error) {
     alert("Could not create invite: " + error.message);
   }
