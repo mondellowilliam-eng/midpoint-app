@@ -402,11 +402,23 @@
 <div id="startHint" class="start-hint">
   Enter two locations to get started.
 </div>
-      <input id="address1" placeholder="Enter starting address for Person 1">
-      <button type="button" onclick="useMyLocation('address1')" class="setup-only">📍 Use My Location (Person 1)</button>
+      <div id="person1Section">
+  <input id="address1" placeholder="Enter your starting address">
+  <button type="button" onclick="useMyLocation('address1')" class="setup-only">
+    📍 Use My Location
+  </button>
 
-      <input id="address2" placeholder="Enter starting address for Person 2">
-      <button type="button" onclick="useMyLocation('address2')" class="setup-only">📍 Use My Location (Person 2)</button>
+  <button type="button" class="session-btn setup-only" onclick="invitePerson2()">
+    🔗 Invite Person 2
+  </button>
+</div>
+
+<div id="person2Section" style="display:none;">
+  <input id="address2" placeholder="Person 2: Enter your starting address">
+  <button type="button" onclick="useMyLocation('address2')" class="setup-only">
+    📍 Use My Location
+  </button>
+</div>
 
       <input id="placeKeyword" placeholder="What kind of place? Coffee, pizza, park..." class="setup-only">
 
