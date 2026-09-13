@@ -1317,44 +1317,54 @@ function updateMapBounds() {
       );
     }
 
-    function showSelectedPlace(place) {
-      const destination = place.vicinity || place.name;
+   function showSelectedPlace(place) {
+  const destination = place.vicinity || place.name;
 
-      selectedShareName = place.name;
-      selectedShareDestination = destination;
-      selectedDestinationLatLng = {
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng()
-      };
+  selectedShareName = place.name;
+  selectedShareDestination = destination;
+  selectedDestinationLatLng = {
+    lat: place.geometry.location.lat(),
+    lng: place.geometry.location.lng()
+  };
 
-      lastRouteUpdate1 = 0;
-      lastRouteUpdate2 = 0;
+  lastRouteUpdate1 = 0;
+  lastRouteUpdate2 = 0;
 
-      if (destinationMarker) destinationMarker.setMap(null);
-      destinationMarker = new google.maps.Marker({
-        position: place.geometry.location,
-        map: map,
-        title: place.name,
-        icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
-      });
+  if (destinationMarker) destinationMarker.setMap(null);
 
-      document.getElementById("selectedPlace").innerHTML =
-        "<strong>✅ " + place.name + "</strong><br>" +
-        destination +
-        '<div class="action-row">' +
-          '<button class="session-btn" type="button" onclick="createSession()">Share Session</button>' +
-          '<button class="secondary-btn" type="button" onclick="copySessionLink()">Copy Link</button>' +
-        '</div>';
+  destinationMarker = new google.maps.Marker({
+    position: place.geometry.location,
+    map: map,
+    title: place.name,
+    icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+  });
 
-      refreshBothRoutes();
-      updateTripSummary();
+  document.getElementById("selectedPlace").innerHTML =
+    "<strong>✅ " + place.name + "</strong><br>" +
+    destination +
+    "<br><br><strong>Meetup location selected.</strong>";
 
-      document.getElementById("selectedPlace").scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-    }
+  if (currentSessionId) {
+    db.ref("sessions/" + currentSessionId).update({
+      destination: selectedShareDestination,
+      name: selectedShareName,
+      destinationLat: selectedDestinationLatLng.lat,
+      destinationLng: selectedDestinationLatLng.lng,
+      cancelled: false,
+      waitingForPerson2: false
+    }).catch((error) => {
+      alert("Could not save meetup location: " + error.message);
+    });
+  }
 
+  refreshBothRoutes();
+  updateTripSummary();
+
+  document.getElementById("selectedPlace").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+} 
     function cleanupLiveUI() {
       if (liveWatchId !== null) {
         navigator.geolocation.clearWatch(liveWatchId);
