@@ -2135,8 +2135,20 @@ if (data.waitingForPerson2 === true && !data.address2) {
 
   listenForCancellation(sessionId);
   updateConnectionStatus();
-  return;
 
+  // Watch for either person to choose the meetup location.
+  db.ref("sessions/" + sessionId + "/destination").on("value", snapshot => {
+    const destination = snapshot.val();
+
+    if (!destination) return;
+
+    // Reload the same shared session.
+    // The destination is now stored, so loadSession()
+    // will automatically open the shared meetup screen.
+    window.location.reload();
+  });
+
+  return;
 } else {
   hideSetupControls();
 }
