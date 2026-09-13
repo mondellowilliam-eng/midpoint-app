@@ -1042,14 +1042,20 @@ function updateMapBounds() {
     return;
   }
 
-  const sessionId = Math.random().toString(36).substring(2, 8);
+  const sessionId =
+    currentSessionId || Math.random().toString(36).substring(2, 8);
+
   const link = buildSessionLink(sessionId);
 
-  db.ref("sessions/" + sessionId).set({
+  const sessionData = {
     destination: selectedShareDestination,
     name: selectedShareName,
-    destinationLat: selectedDestinationLatLng ? selectedDestinationLatLng.lat : null,
-    destinationLng: selectedDestinationLatLng ? selectedDestinationLatLng.lng : null,
+    destinationLat: selectedDestinationLatLng
+      ? selectedDestinationLatLng.lat
+      : null,
+    destinationLng: selectedDestinationLatLng
+      ? selectedDestinationLatLng.lng
+      : null,
     address1: document.getElementById("address1").value.trim(),
     address2: document.getElementById("address2").value.trim(),
     travelMode: selectedTravelMode,
@@ -1057,10 +1063,17 @@ function updateMapBounds() {
       user1: selectedTravelMode,
       user2: selectedTravelMode
     },
-    created: Date.now(),
-    cancelled: false
-  }).then(() => {
+    cancelled: false,
+    waitingForPerson2: false
+  };
 
+  if (!currentSessionId) {
+    sessionData.created = Date.now();
+  }
+
+  db.ref("sessions/" + sessionId).update(sessionData).then(() => {
+
+    currentSessionId = sessionId;
     localStorage.setItem("midlink_last_session", sessionId);
 
     navigator.clipboard.writeText(link).then(() => {
@@ -1073,7 +1086,7 @@ function updateMapBounds() {
   }).catch((error) => {
     alert("Firebase error: " + error.message);
   });
-} 
+}
    function createSession() {
   db.ref("analytics/sessionCreated").push({
     time: Date.now()
