@@ -805,6 +805,51 @@ function watchGroupParticipants(sessionId) {
       '</div>';
   });
 } 
+function listenForGroupDestination(sessionId) {
+  db.ref("sessions/" + sessionId).on("value", snapshot => {
+    const data = snapshot.val();
+
+    if (!data || !data.destination || !data.destinationLat || !data.destinationLng) {
+      return;
+    }
+
+    selectedShareName = data.name || "Group Meetup";
+    selectedShareDestination = data.destination;
+
+    selectedDestinationLatLng = {
+      lat: data.destinationLat,
+      lng: data.destinationLng
+    };
+
+    if (destinationMarker) {
+      destinationMarker.setMap(null);
+    }
+
+    destinationMarker = new google.maps.Marker({
+      position: selectedDestinationLatLng,
+      map: map,
+      title: selectedShareName,
+      icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+    });
+
+    document.getElementById("selectedPlace").innerHTML =
+      "<strong>✅ " + selectedShareName + "</strong><br>" +
+      selectedShareDestination +
+      "<br><br><strong>Group meetup location selected.</strong>";
+
+    map.setCenter(selectedDestinationLatLng);
+    map.setZoom(15);
+
+    document.getElementById("startHint").style.display = "block";
+    document.getElementById("startHint").textContent =
+      "Your Group Meetup location has been selected.";
+
+    document.getElementById("selectedPlace").scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  });
+}    
 async function startGroupSearch() {
   groupSearchMode = true;
   if (!currentSessionId) {
