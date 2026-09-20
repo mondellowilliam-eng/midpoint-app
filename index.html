@@ -2392,11 +2392,16 @@ function resumeLastSession() {
 }
   function startNewSession() {
   localStorage.removeItem("midlink_last_session");
+
   currentSessionId = "";
   selectedRole = "";
   selectedShareName = "";
   selectedShareDestination = "";
   selectedDestinationLatLng = null;
+  groupSearchMode = false;
+
+  // Remove an old session from the address bar.
+  window.history.replaceState({}, document.title, window.location.pathname);
 
   document.getElementById("sharedSessionInfo").innerHTML = "";
   document.getElementById("selectedPlace").innerHTML = "";
@@ -2410,9 +2415,26 @@ function resumeLastSession() {
     tripBox.style.display = "none";
   }
 
+  // Restore the normal MidLink opening screen.
   showSetupControls();
 
- focusAndFlash("address1");
+  document.getElementById("meetupTypeSection").style.display = "block";
+  document.getElementById("person1Section").style.display = "block";
+  document.getElementById("person2Section").style.display = "none";
+
+  document.getElementById("groupMeetupSection").style.display = "none";
+  document.getElementById("groupJoinSection").style.display = "none";
+  document.getElementById("groupReadySection").style.display = "none";
+
+  document.getElementById("weightWrap").style.display = "block";
+
+  document.getElementById("findBtn").textContent = "Find Midpoint Places";
+
+  document.getElementById("startHint").style.display = "block";
+  document.getElementById("startHint").textContent =
+    "Person 1: Enter your starting location, then invite Person 2.";
+
+  focusAndFlash("address1");
 }
     
 
