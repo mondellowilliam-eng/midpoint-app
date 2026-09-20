@@ -2330,23 +2330,38 @@ function resumeLastSession() {
       updateTripSummary();
     }
 
-    function checkTrackingHealth() {
-      const now = Date.now();
-      let warnings = [];
+  function checkTrackingHealth() {
+  const now = Date.now();
+  let warnings = [];
 
-      if (latestUser1Pos && latestUser1Pos.updated && now - latestUser1Pos.updated > 20000) {
-        warnings.push("Person 1 tracking paused");
-      }
+  // Only check tracking after this device has actually started live sharing
+  if (liveWatchId === null) {
+    return;
+  }
 
-      if (latestUser2Pos && latestUser2Pos.updated && now - latestUser2Pos.updated > 20000) {
-        warnings.push("Person 2 tracking paused");
-      }
+  if (
+    latestUser1Pos &&
+    latestUser1Pos.updated &&
+    now - latestUser1Pos.updated > 20000
+  ) {
+    warnings.push("Person 1 tracking paused");
+  }
 
-      if (warnings.length) {
-        document.getElementById("liveInfo").innerHTML =
-          '<span class="status-warn">' + warnings.join(" • ") + '</span>';
-      }
-    }
+  if (
+    latestUser2Pos &&
+    latestUser2Pos.updated &&
+    now - latestUser2Pos.updated > 20000
+  ) {
+    warnings.push("Person 2 tracking paused");
+  }
+
+  if (warnings.length) {
+    document.getElementById("liveInfo").innerHTML =
+      '<span class="status-warn">' +
+      warnings.join(" • ") +
+      "</span>";
+  }
+} 
 
    function checkLastSession() {
   const container = document.getElementById("sharedSessionInfo");
