@@ -684,7 +684,7 @@ async function createGroupMeetup() {
 
     currentSessionId = sessionId;
     localStorage.setItem("midlink_last_session", sessionId);
-
+watchGroupParticipants(sessionId);
     document.getElementById("sharedSessionInfo").innerHTML =
       '<div class="shared-box">' +
       '<strong>👥 Group created</strong><br>' +
