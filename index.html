@@ -769,8 +769,9 @@ listenForGroupDestination(sessionId);
       personSlot
     );
     watchGroupParticipants(currentSessionId);
+listenForGroupDestination(currentSessionId);
 
-    document.getElementById("groupJoinSection").style.display = "none";
+document.getElementById("groupJoinSection").style.display = "none";
 
     document.getElementById("sharedSessionInfo").innerHTML =
       '<div class="shared-box">' +
