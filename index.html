@@ -805,6 +805,7 @@ function watchGroupParticipants(sessionId) {
   });
 } 
 async function startGroupSearch() {
+  groupSearchMode = true;
   if (!currentSessionId) {
     alert("Group Meetup session could not be found.");
     return;
