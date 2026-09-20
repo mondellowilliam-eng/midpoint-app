@@ -669,7 +669,18 @@ setInterval(checkTrackingHealth, 5000);
   document.getElementById("startHint").textContent =
     "Group Meetup: Enter your starting location to create the group.";
 
-  document.getElementById("groupAddress").focus();
+  const groupInput = document.getElementById("groupAddress");
+
+  if (!groupInput.dataset.autocompleteReady) {
+    new google.maps.places.Autocomplete(groupInput, {
+      fields: ["formatted_address", "geometry", "name"],
+      componentRestrictions: { country: "ca" }
+    });
+
+    groupInput.dataset.autocompleteReady = "true";
+  }
+
+  groupInput.focus();
 }
 async function createGroupMeetup() {
   const address = document.getElementById("groupAddress").value.trim();
