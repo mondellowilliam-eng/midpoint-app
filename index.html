@@ -1055,8 +1055,14 @@ async function invitePerson2() {
   }
 }  
     function setFilter(type) {
-      document.getElementById("placeKeyword").value = type;
-    }
+  document.getElementById("placeKeyword").value = type;
+
+  if (currentSessionId && groupSearchMode) {
+    db.ref("sessions/" + currentSessionId).update({
+      placeKeyword: type
+    });
+  }
+}
 
     function setTravelMode(mode) {
       selectedTravelMode = mode;
