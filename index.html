@@ -427,7 +427,22 @@
   Continue
 </button>
 </div>
+<div id="groupMeetupSection" style="display:none;">
+  <div class="shared-box">
+    <strong>👥 Group Meetup</strong><br>
+    Create a group and invite up to 3 more people.
+  </div>
 
+  <input id="groupAddress" placeholder="Person 1: Enter your starting address">
+
+  <button type="button" onclick="useMyLocation('groupAddress')">
+    📍 Use My Location
+  </button>
+
+  <button type="button" class="session-btn" onclick="createGroupMeetup()">
+    🔗 Create Group & Invite
+  </button>
+</div>
       <input id="placeKeyword" placeholder="What kind of place? Coffee, pizza, park..." class="setup-only">
 
       <div class="filters setup-only">
