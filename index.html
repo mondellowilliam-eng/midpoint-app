@@ -802,6 +802,94 @@ function watchGroupParticipants(sessionId) {
       message +
       '</div>';
   });
+} 
+async function startGroupSearch() {
+  if (!currentSessionId) {
+    alert("Group Meetup session could not be found.");
+    return;
+  }
+
+  try {
+    const snapshot = await db
+      .ref("sessions/" + currentSessionId + "/participants")
+      .once("value");
+
+    const participants = snapshot.val() || {};
+    const addresses = Object.values(participants)
+      .map(person => person.address)
+      .filter(address => address);
+
+    if (addresses.length < 2) {
+      alert("At least 2 people must join before finding a meetup.");
+      return;
+    }
+
+    const locations = [];
+
+    for (const address of addresses) {
+      const location = await new Promise((resolve, reject) => {
+        geocoder.geocode({ address: address }, (results, status) => {
+          if (status === "OK" && results[0]) {
+            resolve(results[0].geometry.location);
+          } else {
+            reject(new Error("Could not find: " + address));
+          }
+        });
+      });
+
+      locations.push(location);
+    }
+
+    let totalLat = 0;
+    let totalLng = 0;
+
+    locations.forEach(location => {
+      totalLat += location.lat();
+      totalLng += location.lng();
+    });
+
+    const centerLat = totalLat / locations.length;
+    const centerLng = totalLng / locations.length;
+
+    midpoint = new google.maps.LatLng(centerLat, centerLng);
+
+    map.setCenter(midpoint);
+    map.setZoom(13);
+
+    await db.ref("sessions/" + currentSessionId).update({
+      groupOpen: false,
+      groupCenter: {
+        lat: centerLat,
+        lng: centerLng
+      }
+    });
+
+    document.getElementById("groupReadySection").style.display = "none";
+
+    showSetupControls();
+
+    document.getElementById("meetupTypeSection").style.display = "none";
+    document.getElementById("person1Section").style.display = "none";
+    document.getElementById("person2Section").style.display = "none";
+    document.getElementById("groupMeetupSection").style.display = "none";
+    document.getElementById("groupJoinSection").style.display = "none";
+
+    document.getElementById("startHint").style.display = "block";
+    document.getElementById("startHint").textContent =
+      "Group midpoint found. Choose what you'd like to meet near.";
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+      '<strong>📍 Group midpoint found</strong><br>' +
+      locations.length +
+      ' people are included in the meetup.' +
+      '</div>';
+
+    focusAndFlash("placeKeyword");
+
+  } catch (error) {
+    alert("Could not calculate the Group Meetup: " + error.message);
+  }
 }    
 async function invitePerson2() {
   const address1 = document.getElementById("address1").value.trim();
