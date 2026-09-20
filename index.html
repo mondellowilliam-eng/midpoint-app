@@ -630,10 +630,15 @@ setInterval(checkTrackingHealth, 5000);
     function startGroupMeetup() {
   document.getElementById("meetupTypeSection").style.display = "none";
 
+  document.getElementById("person1Section").style.display = "none";
+  document.getElementById("person2Section").style.display = "none";
+
+  document.getElementById("groupMeetupSection").style.display = "block";
+
   document.getElementById("startHint").textContent =
     "Group Meetup: Enter your starting location to create the group.";
 
-  document.getElementById("person1Section").style.display = "block";
+  document.getElementById("groupAddress").focus();
 }
 async function invitePerson2() {
   const address1 = document.getElementById("address1").value.trim();
