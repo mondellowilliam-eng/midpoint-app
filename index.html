@@ -771,7 +771,31 @@ async function createGroupMeetup() {
   } catch (error) {
     alert("Could not join the group: " + error.message);
   }
-}   
+} 
+function watchGroupParticipants(sessionId) {
+  db.ref("sessions/" + sessionId + "/participants").on("value", snapshot => {
+    const participants = snapshot.val() || {};
+    const count = Object.keys(participants).length;
+
+    let message = count + " people have joined.";
+
+    if (count === 1) {
+      message = "1 person has joined.";
+    }
+
+    if (count >= 4) {
+      message += "<br><strong>Group is full.</strong>";
+    } else {
+      message += "<br>Waiting for " + (4 - count) + " more.";
+    }
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+      '<strong>👥 Group Meetup</strong><br>' +
+      message +
+      '</div>';
+  });
+}    
 async function invitePerson2() {
   const address1 = document.getElementById("address1").value.trim();
 
