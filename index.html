@@ -609,6 +609,15 @@ const autocomplete2 = new google.maps.places.Autocomplete(
   document.getElementById("address2"),
   autocompleteOptions
 );
+  const autocompleteGroup = new google.maps.places.Autocomplete(
+  document.getElementById("groupAddress"),
+  autocompleteOptions
+);
+
+const autocompleteGroupJoin = new google.maps.places.Autocomplete(
+  document.getElementById("groupJoinAddress"),
+  autocompleteOptions
+);    
 
 autocomplete1.addListener("place_changed", function () {
   const place = autocomplete1.getPlace();
