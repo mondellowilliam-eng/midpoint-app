@@ -806,6 +806,13 @@ function watchGroupParticipants(sessionId) {
   });
 } 
 function listenForGroupDestination(sessionId) {
+  db.ref("sessions/" + sessionId + "/placeKeyword").on("value", snapshot => {
+  const keyword = snapshot.val();
+
+  if (!keyword) return;
+
+  document.getElementById("placeKeyword").value = keyword;
+});
   db.ref("sessions/" + sessionId).on("value", snapshot => {
     const data = snapshot.val();
 
