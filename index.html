@@ -692,6 +692,7 @@ async function createGroupMeetup() {
 localStorage.setItem("midlink_last_session", sessionId);
 localStorage.setItem("midlink_group_role_" + sessionId, "person1");
 watchGroupParticipants(sessionId); 
+listenForGroupDestination(sessionId);    
  document.getElementById("groupReadySection").style.display = "block";   
     document.getElementById("sharedSessionInfo").innerHTML =
       '<div class="shared-box">' +
