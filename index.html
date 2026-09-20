@@ -2397,6 +2397,7 @@ if (data.groupMode === true && data.groupOpen === true) {
    document.getElementById("groupReadySection").style.display = "block";
 
 watchGroupParticipants(sessionId);
+listenForGroupDestination(sessionId);    
 listenForCancellation(sessionId);
 updateConnectionStatus();
 return; 
