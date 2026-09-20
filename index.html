@@ -682,9 +682,10 @@ async function createGroupMeetup() {
       }
     });
 
-    currentSessionId = sessionId;
-    localStorage.setItem("midlink_last_session", sessionId);
-watchGroupParticipants(sessionId);
+ currentSessionId = sessionId;
+localStorage.setItem("midlink_last_session", sessionId);
+localStorage.setItem("midlink_group_role_" + sessionId, "person1");
+watchGroupParticipants(sessionId);   
     document.getElementById("sharedSessionInfo").innerHTML =
       '<div class="shared-box">' +
       '<strong>👥 Group created</strong><br>' +
