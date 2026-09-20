@@ -640,6 +640,64 @@ setInterval(checkTrackingHealth, 5000);
 
   document.getElementById("groupAddress").focus();
 }
+async function createGroupMeetup() {
+  const address = document.getElementById("groupAddress").value.trim();
+
+  if (!address) {
+    alert("Please enter your starting location first.");
+    focusAndFlash("groupAddress");
+    return;
+  }
+
+  const sessionId = Math.random().toString(36).substring(2, 8);
+  const link = buildSessionLink(sessionId);
+
+  try {
+    await db.ref("sessions/" + sessionId).set({
+      groupMode: true,
+      created: Date.now(),
+      cancelled: false,
+      groupOpen: true,
+      participants: {
+        person1: {
+          address: address,
+          joined: Date.now()
+        }
+      }
+    });
+
+    currentSessionId = sessionId;
+    localStorage.setItem("midlink_last_session", sessionId);
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+      '<strong>👥 Group created</strong><br>' +
+      '1 person has joined.<br>' +
+      'Send the same invitation link to up to 3 more people.' +
+      '</div>';
+
+    const message =
+      "👥 MidLink Group Meetup\n" +
+      "Join my group so we can find a place to meet.";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "MidLink Group Meetup",
+          text: message,
+          url: link
+        });
+      } catch (err) {
+        prompt("Copy and send this group link:", link);
+      }
+    } else {
+      prompt("Copy and send this group link:", link);
+    }
+
+  } catch (error) {
+    alert("Could not create group: " + error.message);
+  }
+}    
 async function invitePerson2() {
   const address1 = document.getElementById("address1").value.trim();
 
