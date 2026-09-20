@@ -2271,15 +2271,65 @@ currentSessionId = sessionId;
 
 // GROUP MEETUP INVITATION
 if (data.groupMode === true && data.groupOpen === true) {
+
+  const groupRole =
+    localStorage.getItem("midlink_group_role_" + sessionId);
+
   hideSetupControls();
 
   document.getElementById("meetupTypeSection").style.display = "none";
   document.getElementById("person1Section").style.display = "none";
   document.getElementById("person2Section").style.display = "none";
   document.getElementById("groupMeetupSection").style.display = "none";
-  document.getElementById("groupJoinSection").style.display = "block";
+  document.getElementById("groupJoinSection").style.display = "none";
 
   document.getElementById("startHint").style.display = "block";
+
+  // PERSON 1 - GROUP CREATOR
+  if (groupRole === "person1") {
+
+    document.getElementById("startHint").textContent =
+      "Your Group Meetup is open. Waiting for people to join.";
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+      '<strong>👥 Your Group Meetup</strong><br>' +
+      'Waiting for the other people to join.' +
+      '</div>';
+
+    watchGroupParticipants(sessionId);
+
+    listenForCancellation(sessionId);
+    updateConnectionStatus();
+    return;
+  }
+
+  // PERSON 2, 3 OR 4 - ALREADY JOINED
+  if (
+    groupRole === "person2" ||
+    groupRole === "person3" ||
+    groupRole === "person4"
+  ) {
+
+    document.getElementById("startHint").textContent =
+      "You have joined this Group Meetup.";
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+      '<strong>✅ You joined the Group Meetup</strong><br>' +
+      'Waiting for the group to be ready.' +
+      '</div>';
+
+    watchGroupParticipants(sessionId);
+
+    listenForCancellation(sessionId);
+    updateConnectionStatus();
+    return;
+  }
+
+  // NEW PERSON OPENING THE INVITATION
+  document.getElementById("groupJoinSection").style.display = "block";
+
   document.getElementById("startHint").textContent =
     "You've been invited to a Group Meetup. Enter your starting location.";
 
