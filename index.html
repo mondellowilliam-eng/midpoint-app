@@ -713,7 +713,65 @@ async function createGroupMeetup() {
   } catch (error) {
     alert("Could not create group: " + error.message);
   }
-}    
+}
+ async function joinGroupMeetup() {
+  const address =
+    document.getElementById("groupJoinAddress").value.trim();
+
+  if (!address) {
+    alert("Please enter your starting location.");
+    focusAndFlash("groupJoinAddress");
+    return;
+  }
+
+  if (!currentSessionId) {
+    alert("This Group Meetup could not be found.");
+    return;
+  }
+
+  try {
+    const snapshot =
+      await db.ref("sessions/" + currentSessionId + "/participants").once("value");
+
+    const participants = snapshot.val() || {};
+
+    let personSlot = "";
+
+    if (!participants.person2) {
+      personSlot = "person2";
+    } else if (!participants.person3) {
+      personSlot = "person3";
+    } else if (!participants.person4) {
+      personSlot = "person4";
+    } else {
+      alert("This Group Meetup already has 4 people.");
+      return;
+    }
+
+    await db.ref(
+      "sessions/" + currentSessionId + "/participants/" + personSlot
+    ).set({
+      address: address,
+      joined: Date.now()
+    });
+
+    localStorage.setItem(
+      "midlink_group_role_" + currentSessionId,
+      personSlot
+    );
+
+    document.getElementById("groupJoinSection").style.display = "none";
+
+    document.getElementById("sharedSessionInfo").innerHTML =
+      '<div class="shared-box">' +
+      '<strong>✅ You joined the Group Meetup</strong><br>' +
+      'Your starting location has been added.' +
+      '</div>';
+
+  } catch (error) {
+    alert("Could not join the group: " + error.message);
+  }
+}   
 async function invitePerson2() {
   const address1 = document.getElementById("address1").value.trim();
 
