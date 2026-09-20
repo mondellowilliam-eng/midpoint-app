@@ -859,7 +859,7 @@ async function startGroupSearch() {
     map.setZoom(13);
 
     await db.ref("sessions/" + currentSessionId).update({
-      groupOpen: false,
+      groupOpen: true,
       groupCenter: {
         lat: centerLat,
         lng: centerLng
