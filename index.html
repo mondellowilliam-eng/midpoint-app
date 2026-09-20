@@ -2442,11 +2442,11 @@ if (data.groupMode === true && data.groupOpen === true) {
    document.getElementById("groupReadySection").style.display = "block";
 
 watchGroupParticipants(sessionId);
-listenForGroupDestination(sessionId);    
+listenForGroupDestination(sessionId);
+
 listenForCancellation(sessionId);
 updateConnectionStatus();
-return; 
-  }
+return;
 
   // PERSON 2, 3 OR 4 - ALREADY JOINED
   if (
