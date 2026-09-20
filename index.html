@@ -2711,6 +2711,27 @@ return;
     }
 
     function findMidpoint() {
+     if (groupSearchMode && midpoint) {
+  const keyword = document.getElementById("placeKeyword").value.trim();
+
+  if (!keyword) {
+    alert("Choose or enter what kind of place you want.");
+    focusAndFlash("placeKeyword");
+    return;
+  }
+
+  clearMarkers();
+
+  searchNearby(
+    {
+      lat: midpoint.lat(),
+      lng: midpoint.lng()
+    },
+    keyword
+  );
+
+  return;
+} 
       const a1 = document.getElementById("address1").value.trim();
       const a2 = document.getElementById("address2").value.trim();
       const keyword = document.getElementById("placeKeyword").value.trim();
