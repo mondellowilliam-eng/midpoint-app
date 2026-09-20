@@ -2183,7 +2183,36 @@ function resumeLastSession() {
         }
 
        currentSessionId = sessionId;
+currentSessionId = sessionId;
 
+// GROUP MEETUP INVITATION
+if (data.groupMode === true && data.groupOpen === true) {
+  hideSetupControls();
+
+  document.getElementById("meetupTypeSection").style.display = "none";
+  document.getElementById("person1Section").style.display = "none";
+  document.getElementById("person2Section").style.display = "none";
+  document.getElementById("groupMeetupSection").style.display = "none";
+  document.getElementById("groupJoinSection").style.display = "block";
+
+  document.getElementById("startHint").style.display = "block";
+  document.getElementById("startHint").textContent =
+    "You've been invited to a Group Meetup. Enter your starting location.";
+
+  document.getElementById("sharedSessionInfo").innerHTML =
+    '<div class="shared-box">' +
+    '<strong>👥 Group Meetup Invitation</strong><br>' +
+    'Enter your starting location below to join the group.' +
+    '</div>';
+
+  listenForCancellation(sessionId);
+  updateConnectionStatus();
+
+  focusAndFlash("groupJoinAddress");
+  return;
+}
+
+if (data.waitingForPerson2 === true && !data.address2) {
 if (data.waitingForPerson2 === true && !data.address2) {
   hideSetupControls();
 
