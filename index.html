@@ -443,6 +443,22 @@
     🔗 Create Group & Invite
   </button>
 </div>
+ <div id="groupJoinSection" style="display:none;">
+  <div class="shared-box">
+    <strong>👥 Join Group Meetup</strong><br>
+    Enter your starting location to join the group.
+  </div>
+
+  <input id="groupJoinAddress" placeholder="Enter your starting address">
+
+  <button type="button" onclick="useMyLocation('groupJoinAddress')">
+    📍 Use My Location
+  </button>
+
+  <button type="button" class="session-btn" onclick="joinGroupMeetup()">
+    👥 Join Group
+  </button>
+</div>     
       <input id="placeKeyword" placeholder="What kind of place? Coffee, pizza, park..." class="setup-only">
 
       <div class="filters setup-only">
