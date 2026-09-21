@@ -978,6 +978,42 @@ document.getElementById("weightWrap").style.display = "none";
   } catch (error) {
     alert("Could not calculate the Group Meetup: " + error.message);
   }
+}
+function listenForGroupCenter(sessionId) {
+  db.ref("sessions/" + sessionId + "/groupCenter").on("value", snapshot => {
+    const center = snapshot.val();
+
+    if (!center || center.lat == null || center.lng == null) {
+      return;
+    }
+
+    groupSearchMode = true;
+
+    midpoint = new google.maps.LatLng(
+      center.lat,
+      center.lng
+    );
+
+    map.setCenter(midpoint);
+    map.setZoom(13);
+
+    showSetupControls();
+
+    document.getElementById("weightWrap").style.display = "none";
+    document.getElementById("findBtn").textContent =
+      "Find Group Meetup Places";
+
+    document.getElementById("meetupTypeSection").style.display = "none";
+    document.getElementById("person1Section").style.display = "none";
+    document.getElementById("person2Section").style.display = "none";
+    document.getElementById("groupMeetupSection").style.display = "none";
+    document.getElementById("groupJoinSection").style.display = "none";
+    document.getElementById("groupReadySection").style.display = "none";
+
+    document.getElementById("startHint").style.display = "block";
+    document.getElementById("startHint").textContent =
+      "Group midpoint found. Choose what you'd like to meet near.";
+  });
 }    
 async function invitePerson2() {
   const address1 = document.getElementById("address1").value.trim();
