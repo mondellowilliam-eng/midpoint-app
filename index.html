@@ -835,6 +835,7 @@ function watchGroupParticipants(sessionId) {
       '</div>';
   });
 }
+ function listenForGroupDestination(sessionId) {   
   db.ref("sessions/" + sessionId + "/placeKeyword").on("value", snapshot => {
   const keyword = snapshot.val();
 
