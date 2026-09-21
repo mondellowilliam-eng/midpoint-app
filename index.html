@@ -788,16 +788,18 @@ listenForGroupDestination(sessionId);
       "midlink_group_role_" + currentSessionId,
       personSlot
     );
-    watchGroupParticipants(currentSessionId);
+   watchGroupParticipants(currentSessionId);
 listenForGroupDestination(currentSessionId);
 
 document.getElementById("groupJoinSection").style.display = "none";
 
-    document.getElementById("sharedSessionInfo").innerHTML =
-      '<div class="shared-box">' +
-      '<strong>✅ You joined the Group Meetup</strong><br>' +
-      'Your starting location has been added.' +
-      '</div>';
+document.getElementById("sharedSessionInfo").innerHTML =
+  '<div class="shared-box">' +
+  '<strong>✅ You joined the Group Meetup</strong><br>' +
+  'Your starting location has been added.' +
+  '</div>';
+
+await startGroupSearch();
 
   } catch (error) {
     alert("Could not join the group: " + error.message);
