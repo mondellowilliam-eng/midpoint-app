@@ -1306,6 +1306,59 @@ async function invitePerson2() {
     }
   );
 }
+    function listenToGroupLiveParticipants(sessionId) {
+
+  db.ref("sessions/" + sessionId + "/participants").on("value", snapshot => {
+
+    const participants = snapshot.val() || {};
+
+    const personColors = {
+      person1: "#007BFF",
+      person2: "#ff7a00",
+      person3: "#6f42c1",
+      person4: "#198754"
+    };
+
+    Object.keys(participants).forEach(personKey => {
+
+      const person = participants[personKey];
+
+      if (!person.live ||
+          person.live.lat == null ||
+          person.live.lng == null) {
+        return;
+      }
+
+      const position = {
+        lat: person.live.lat,
+        lng: person.live.lng
+      };
+
+      groupLivePositions[personKey] = position;
+
+      if (!groupLiveMarkers[personKey]) {
+
+        groupLiveMarkers[personKey] =
+          new google.maps.Marker({
+            position: position,
+            map: map,
+            title: personKey.replace("person", "Person "),
+            label: {
+              text: personKey.replace("person", ""),
+              color: "#ffffff",
+              fontWeight: "bold"
+            }
+          });
+
+      } else {
+
+        groupLiveMarkers[personKey].setPosition(position);
+      }
+
+    });
+
+  });
+}
 
     function formatDistance(meters) {
       if (meters === null) return "";
