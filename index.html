@@ -1208,6 +1208,68 @@ async function invitePerson2() {
     refreshBothRoutes();
   }
 }
+    function startGroupLiveSharing() {
+  if (!currentSessionId) {
+    alert("Group Meetup session could not be found.");
+    return;
+  }
+
+  const groupRole =
+    localStorage.getItem("midlink_group_role_" + currentSessionId);
+
+  if (!groupRole) {
+    alert("Your Group Meetup role could not be found.");
+    return;
+  }
+
+  if (!navigator.geolocation) {
+    alert("Location sharing is not supported on this device.");
+    return;
+  }
+
+  if (liveWatchId !== null) {
+    navigator.geolocation.clearWatch(liveWatchId);
+    liveWatchId = null;
+  }
+
+  document.getElementById("liveInfo").innerHTML =
+    '<span class="status-ok">Starting live location sharing...</span>';
+
+  liveWatchId = navigator.geolocation.watchPosition(
+    position => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      db.ref(
+        "sessions/" +
+        currentSessionId +
+        "/participants/" +
+        groupRole +
+        "/live"
+      ).set({
+        lat: lat,
+        lng: lng,
+        updated: Date.now()
+      });
+
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-ok">📍 Live location sharing is on.</span>';
+    },
+
+    error => {
+      document.getElementById("liveInfo").innerHTML =
+        '<span class="status-error">Could not start live location sharing.</span>';
+
+      console.log("Group live location error:", error);
+    },
+
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 15000
+    }
+  );
+}
 
     function formatDistance(meters) {
       if (meters === null) return "";
