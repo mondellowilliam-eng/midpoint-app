@@ -869,20 +869,40 @@ function watchGroupParticipants(sessionId) {
       '</div>';
   });
 }
- function listenForGroupDestination(sessionId) {   
+ function listenForGroupDestination(sessionId) {
+
   db.ref("sessions/" + sessionId + "/placeKeyword").on("value", snapshot => {
-  const keyword = snapshot.val();
+    const keyword = snapshot.val();
 
-  if (!keyword) return;
+    if (!keyword) return;
 
-  document.getElementById("placeKeyword").value = keyword;
-});
-  db.ref("sessions/" + sessionId).on("value", snapshot => {
-    const data = snapshot.val();
+    document.getElementById("placeKeyword").value = keyword;
+  });
 
-    if (!data || !data.destination || !data.destinationLat || !data.destinationLng) {
+  db.ref("sessions/" + sessionId + "/destination").on("value", async snapshot => {
+    const destination = snapshot.val();
+
+    if (!destination) return;
+
+    const dataSnapshot =
+      await db.ref("sessions/" + sessionId).once("value");
+
+    const data = dataSnapshot.val();
+
+    if (
+      !data ||
+      !data.destination ||
+      data.destinationLat == null ||
+      data.destinationLng == null
+    ) {
       return;
     }
+
+    const destinationChanged =
+      selectedShareDestination !== data.destination ||
+      !selectedDestinationLatLng ||
+      selectedDestinationLatLng.lat !== data.destinationLat ||
+      selectedDestinationLatLng.lng !== data.destinationLng;
 
     selectedShareName = data.name || "Group Meetup";
     selectedShareDestination = data.destination;
@@ -908,20 +928,23 @@ function watchGroupParticipants(sessionId) {
       selectedShareDestination +
       "<br><br><strong>Group meetup location selected.</strong>";
 
-    map.setCenter(selectedDestinationLatLng);
-    map.setZoom(15);
+    showGroupTravelControls();
 
     document.getElementById("startHint").style.display = "block";
     document.getElementById("startHint").textContent =
       "Your Group Meetup location has been selected.";
-showGroupTravelControls();
-    
-    document.getElementById("selectedPlace").scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
+
+    if (destinationChanged) {
+      map.setCenter(selectedDestinationLatLng);
+      map.setZoom(15);
+
+      document.getElementById("selectedPlace").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
   });
-}    
+}
 async function startGroupSearch() {
   groupSearchMode = true;
   if (!currentSessionId) {
