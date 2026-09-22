@@ -906,7 +906,8 @@ function watchGroupParticipants(sessionId) {
     document.getElementById("startHint").style.display = "block";
     document.getElementById("startHint").textContent =
       "Your Group Meetup location has been selected.";
-
+showGroupTravelControls();
+    
     document.getElementById("selectedPlace").scrollIntoView({
       behavior: "smooth",
       block: "center"
