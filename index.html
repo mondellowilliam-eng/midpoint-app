@@ -835,6 +835,13 @@ function watchGroupParticipants(sessionId) {
     const participants = snapshot.val() || {};
     const count = Object.keys(participants).length;
 
+    // Once a meetup location has been selected,
+    // participant updates such as travel mode or live GPS
+    // should NOT rebuild the Group Meetup box.
+    if (selectedShareDestination) {
+      return;
+    }
+
     let message = "";
 
     if (count === 1) {
