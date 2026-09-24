@@ -1371,6 +1371,66 @@ async function invitePerson2() {
 
   });
 }
+    function drawGroupRoute(personKey, origin, destination, travelMode, color) {
+
+  if (!directionsService || !map) return;
+  if (!origin || !destination) return;
+
+  if (!groupDirectionsRenderers[personKey]) {
+    groupDirectionsRenderers[personKey] =
+      new google.maps.DirectionsRenderer({
+        suppressMarkers: true,
+        preserveViewport: true,
+        polylineOptions: {
+          strokeColor: color,
+          strokeOpacity: 0.9,
+          strokeWeight: 5
+        }
+      });
+
+    groupDirectionsRenderers[personKey].setMap(map);
+  }
+
+  const mode =
+    google.maps.TravelMode[travelMode] ||
+    google.maps.TravelMode.DRIVING;
+
+  directionsService.route(
+    {
+      origin: origin,
+      destination: destination,
+      travelMode: mode
+    },
+    (result, status) => {
+
+      if (status === "OK") {
+        groupDirectionsRenderers[personKey].setDirections(result);
+
+        const leg =
+          result.routes &&
+          result.routes[0] &&
+          result.routes[0].legs &&
+          result.routes[0].legs[0];
+
+        if (leg) {
+          groupRouteInfo[personKey] = {
+            distance: leg.distance ? leg.distance.text : "",
+            duration: leg.duration ? leg.duration.text : "",
+            travelMode: travelMode
+          };
+        }
+
+      } else {
+        console.log(
+          "Could not draw route for " +
+          personKey +
+          ": " +
+          status
+        );
+      }
+    }
+  );
+}
 
     function formatDistance(meters) {
       if (meters === null) return "";
