@@ -1360,6 +1360,15 @@ async function invitePerson2() {
     });
 
   });
+   if (selectedDestinationLatLng) {
+  drawGroupRoute(
+    personKey,
+    position,
+    selectedDestinationLatLng,
+    person.travelMode || "DRIVING",
+    personColors[personKey]
+  );
+}   
 }
 
     function formatDistance(meters) {
