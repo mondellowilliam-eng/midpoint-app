@@ -2761,6 +2761,8 @@ if (data.groupMode === true && data.groupOpen === true) {
 
 watchGroupParticipants(sessionId);
 listenForGroupDestination(sessionId);
+listenForGroupCenter(sessionId);
+listenToGroupLiveParticipants(sessionId);    
 
 listenForCancellation(sessionId);
 updateConnectionStatus();
