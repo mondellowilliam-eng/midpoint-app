@@ -1376,6 +1376,14 @@ async function invitePerson2() {
 
   if (!directionsService || !map) return;
   if (!origin || !destination) return;
+  const now = Date.now();
+const lastUpdate = groupLastRouteUpdates[personKey] || 0;
+
+if (now - lastUpdate < ROUTE_UPDATE_MS) {
+  return;
+}
+
+groupLastRouteUpdates[personKey] = now;    
 
   if (!groupDirectionsRenderers[personKey]) {
     groupDirectionsRenderers[personKey] =
