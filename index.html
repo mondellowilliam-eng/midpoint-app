@@ -1352,23 +1352,24 @@ async function invitePerson2() {
             }
           });
 
-      } else {
+            } else {
 
         groupLiveMarkers[personKey].setPosition(position);
+      }
+
+      if (selectedDestinationLatLng) {
+        drawGroupRoute(
+          personKey,
+          position,
+          selectedDestinationLatLng,
+          person.travelMode || "DRIVING",
+          personColors[personKey]
+        );
       }
 
     });
 
   });
-   if (selectedDestinationLatLng) {
-  drawGroupRoute(
-    personKey,
-    position,
-    selectedDestinationLatLng,
-    person.travelMode || "DRIVING",
-    personColors[personKey]
-  );
-}   
 }
 
     function formatDistance(meters) {
