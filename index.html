@@ -2801,11 +2801,30 @@ function resumeLastSession() {
       db.ref("sessions/" + sessionId).once("value").then(snapshot => {
         const data = snapshot.val();
 
-        if (!data) {
-          currentSessionId = "";
-          showSetupControls();
-          checkLastSession();
-          return;
+       if (!data) {
+  currentSessionId = "";
+
+  hideSetupControls();
+
+  document.getElementById("meetupTypeSection").style.display = "none";
+  document.getElementById("person1Section").style.display = "none";
+  document.getElementById("person2Section").style.display = "none";
+  document.getElementById("groupMeetupSection").style.display = "none";
+  document.getElementById("groupJoinSection").style.display = "none";
+  document.getElementById("groupReadySection").style.display = "none";
+
+  document.getElementById("startHint").style.display = "block";
+  document.getElementById("startHint").textContent =
+    "This MidLink invitation could not be loaded. Please ask the sender for a new invitation.";
+
+  document.getElementById("sharedSessionInfo").innerHTML =
+    '<div class="shared-box">' +
+    '<strong>⚠️ Invitation not found</strong><br>' +
+    'The invitation link was received, but its session could not be found.' +
+    '</div>';
+
+  return;
+}
         }
 
        
