@@ -1124,23 +1124,20 @@ async function invitePerson2() {
       "📍 MidLink invite\n" +
       "Enter your starting location so we can find a place to meet.";
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "MidLink Invite",
-          text: message,
-          url: link
-        });
-      } catch (err) {
-        prompt("Copy and send this link to Person 2:", link);
-      }
-    } else {
-      prompt("Copy and send this link to Person 2:", link);
-    }
-
+   if (window.Android && typeof window.Android.share === "function") {
+  window.Android.share(message + "\n" + link);
+} else if (navigator.share) {
+  try {
+    await navigator.share({
+      title: "MidLink",
+      text: message,
+      url: link
+    });
   } catch (error) {
-    alert("Could not create invite: " + error.message);
+    console.log("Share canceled");
   }
+} else {
+  prompt("Copy and send this link to Person Two:", link);
 }
   async function submitPerson2Location() {
   const address2 = document.getElementById("address2").value.trim();
