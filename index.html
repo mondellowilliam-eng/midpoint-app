@@ -757,19 +757,21 @@ listenToGroupLiveParticipants(sessionId);
       "👥 MidLink Group Meetup\n" +
       "Join my group so we can find a place to meet.";
 
-    if (navigator.share) {
-      try {
+    if (window.Android && typeof window.Android.share === "function") {
+    window.Android.share(message + "\n" + link);
+} else if (navigator.share) {
+    try {
         await navigator.share({
-          title: "MidLink Group Meetup",
-          text: message,
-          url: link
+            title: "MidLink Group Meetup",
+            text: message,
+            url: link
         });
-      } catch (err) {
-        prompt("Copy and send this group link:", link);
-      }
-    } else {
-      prompt("Copy and send this group link:", link);
+    } catch (err) {
+        console.log("Share cancelled");
     }
+} else {
+    prompt("Copy and send this group link:", link);
+}
 
   } catch (error) {
     alert("Could not create group: " + error.message);
