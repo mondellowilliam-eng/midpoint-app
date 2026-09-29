@@ -2985,6 +2985,13 @@ return;
 
   listenForCancellation(sessionId);
   updateConnectionStatus();
+  db.ref("sessions/" + sessionId + "/placeKeyword").on("value", snapshot => {
+  const keyword = snapshot.val();
+
+  if (!keyword) return;
+
+  document.getElementById("placeKeyword").value = keyword;
+});
 
   // Watch for either person to choose the meetup location.
   db.ref("sessions/" + sessionId + "/destination").on("value", snapshot => {
